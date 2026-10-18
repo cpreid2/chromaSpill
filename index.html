@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chromaSpill</title>
+<style>
+  :root {
+    --bg-image: url("Suminagashi Ink Studio Interface.png");
+    --ink-text: #282019;
+    --muted-text: #5e5042;
+    --ceramic: #e9e2d4;
+    --accent: #a63420;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #140e09;
+    color: var(--ink-text);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", Georgia, serif;
+    overflow: hidden;
+    user-select: none;
+    display: grid;
+    place-items: center;
+  }
+
+  /* =========================================================
+     16:9 Aspect-Ratio Locked Stage Mapped to the Mockup Image
+     ========================================================= */
+  .studio-stage {
+    position: relative;
+    width: min(100vw, calc(100vh * (16 / 9)));
+    height: min(100vh, calc(100vw * (9 / 16)));
+    background-image: var(--bg-image);
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+    container-type: inline-size;
+    overflow: hidden;
+  }
+
+  /* =========================================================
+     Aged Parchment Card Overlays (Left Control Board)
+     ========================================================= */
+  .parchment-card {
+    position: absolute;
+    background-color: #d6cbb8;
+    background-image:
+      radial-gradient(circle at 20% 25%, rgba(246, 240, 228, 0.7), transparent 55%),
+      radial-gradient(circle at 80% 75%, rgba(175, 158, 134, 0.45), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(60, 45, 30, 0.025) 0px, rgba(60, 45, 30, 0.025) 1px, transparent 1px, transparent 3px);
+    border-radius: 0.45cqw;
+    border: 1px solid rgba(55, 42, 28, 0.55);
+    box-shadow:
+      inset 0 0 1.4cqw rgba(68, 50, 32, 0.42),
+      inset 0 1px 0 rgba(255, 250, 240, 0.5),
+      0 0.25cqw 0.6cqw rgba(0, 0, 0, 0.45);
+    padding: 1.1cqw 1.35cqw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 10;
+  }
+
+  .top-slot {
+    left: 6.25%;
+    top: 7.75%;
+    width: 20.8%;
+    height: 27.6%;
+  }
+
+  .bath-slot {
+    left: 5.85%;
+    top: 58.6%;
+    width: 21.05%;
+    height: 31.5%;
+  }
+
+  .top-view {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .top-view.active {
+    display: flex;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(75, 58, 40, 0.35);
+    padding-bottom: 0.35cqw;
+    margin-bottom: 0.3cqw;
+    flex-shrink: 0;
+  }
+
+  .header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6cqw;
+  }
+
+  .section-header h2 {
+    margin: 0;
+    font-size: 0.95cqw;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-text);
+    font-weight: 700;
+  }
+
+  .mini-hanko {
+    display: inline-grid;
+    place-items: center;
+    width: 1.35cqw;
+    height: 1.35cqw;
+    border: 1.5px solid #9e2a1b;
+    border-radius: 2px;
+    color: #9e2a1b;
+    font-size: 0.8cqw;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.85;
+  }
+
+  .cycle-toggle {
+    font-size: 0.72cqw;
+    color: var(--muted-text);
+    display: flex;
+    align-items: center;
+    gap: 0.3cqw;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-weight: 600;
+  }
+
+  .cycle-toggle input {
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin: 0;
+    width: 0.85cqw;
+    height: 0.85cqw;
+  }
+
+  /* Ceramic Ink Dishes */
+  .colors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55cqw;
+    max-height: 3.1cqw;
+    overflow-y: auto;
+    padding: 0.15cqw;
+  }
+
+  .swatch-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .swatch {
+    width: 2.1cqw;
+    height: 2.1cqw;
+    border-radius: 50%;
+    border: 0.22cqw solid var(--ceramic);
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    box-shadow:
+      0 0.2cqw 0.45cqw rgba(25, 18, 12, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(60, 45, 30, 0.35);
+  }
+
+  .swatch:hover {
+    transform: translateY(-1px) scale(1.06);
+  }
+
+  .swatch[aria-pressed="true"] {
+    box-shadow:
+      0 0.25cqw 0.6cqw rgba(166, 52, 32, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 2px var(--accent);
+    transform: scale(1.08);
+  }
+
+  .swatch-del {
+    position: absolute;
+    top: -0.25cqw;
+    right: -0.25cqw;
+    width: 0.95cqw;
+    height: 0.95cqw;
+    background: #f5efe6;
+    color: #5c4b3c;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 50%;
+    font-size: 0.65cqw;
+    line-height: 0.85cqw;
+    text-align: center;
+    cursor: pointer;
+    display: none;
+    font-family: sans-serif;
+  }
+
+  .swatch-wrap:hover .swatch-del {
+    display: block;
+  }
+
+  .add-ink-row {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25cqw;
+  }
+
+  .btn-add-color {
+    position: relative;
+    flex: 1;
+    height: 1.65cqw;
+    border-radius: 0.25cqw;
+    border: 1px solid rgba(75, 58, 40, 0.4);
+    background: rgba(238, 230, 214, 0.75);
+    color: var(--ink-text);
+    font-family: inherit;
+    font-size: 0.72cqw;
+    font-weight: 700;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transition: background 0.15s;
+  }
+
+  .btn-add-color:hover {
+    background: rgba(248, 242, 230, 0.95);
+  }
+
+  .btn-add-color input[type="color"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+  }
+
+  /* =========================================================
+     Skeuomorphic Recessed Groove & Brass Knob Sliders
+     ========================================================= */
+  .compact-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55cqw;
+    padding-top: 0.4cqw;
+    border-top: 1px solid rgba(75, 58, 40, 0.2);
+  }
+
+  .stick-sliders-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex: 1;
+    padding: 0.4cqw 0;
+  }
+
+  .bath-controls-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    padding-top: 0.2cqw;
+  }
+
+  label.craft-slider {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35cqw;
+  }
+
+  .craft-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.84cqw;
+    color: var(--ink-text);
+    font-weight: 600;
+  }
+
+  .craft-slider-header strong {
+    font-size: 0.82cqw;
+    color: var(--ink-text);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .craft-slider input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 0.55cqw;
+    background: linear-gradient(180deg, #4d4032 0%, #7d6d5b 60%, #968673 100%);
+    border-radius: 999px;
+    border: 1px solid rgba(40, 30, 20, 0.65);
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.75),
+      0 1px 0 rgba(255, 250, 240, 0.45);
+    cursor: pointer;
+    outline: none;
+    margin: 0.15cqw 0;
+  }
+
+  .craft-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.45cqw;
+    height: 1.45cqw;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f0cf85 0%, #bd8d42 48%, #7d5720 85%, #593c12 100%);
+    border: 1px solid rgba(50, 32, 12, 0.85);
+    box-shadow:
+      0 0.22cqw 0.4cqw rgba(0, 0, 0, 0.65),
+      inset 0 1px 2px rgba(255, 242, 204, 0.75);
+    cursor: grab;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+
+  .craft-slider input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    filter: brightness(1.08);
+  }
+
+  .craft-slider input[type="range"]::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(0.96);
+  }
+
+  .craft-slider input[type="range"]::-moz-range-thumb {
+    width: 1.45cqw;
+    height: 1.45cqw;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f0cf85 0%, #bd8d42 48%, #7d5720 85%, #593c12 100%);
+    border: 1px solid rgba(50, 32, 12, 0.85);
+    box-shadow:
+      0 0.22cqw 0.4cqw rgba(0, 0, 0, 0.65),
+      inset 0 1px 2px rgba(255, 242, 204, 0.75);
+    cursor: grab;
+  }
+
+  .water-color-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.84cqw;
+    font-weight: 600;
+    color: var(--ink-text);
+  }
+
+  .water-swatch-btn {
+    width: 1.85cqw;
+    height: 1.85cqw;
+    border-radius: 50%;
+    border: 0.18cqw solid #cbbda8;
+    box-shadow:
+      0 0.15cqw 0.35cqw rgba(0, 0, 0, 0.5),
+      inset 0 1px 3px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(45, 32, 20, 0.65);
+    overflow: hidden;
+    cursor: pointer;
+    background: #1c1e21;
+    padding: 0;
+  }
+
+  .water-swatch-btn input {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+  }
+
+  /* =========================================================
+     Middle Tool Rack Hotspots
+     ========================================================= */
+  .tool-hotspot {
+    position: absolute;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    transition: filter 0.2s ease, transform 0.2s ease;
+  }
+
+  .tool-hotspot[data-tool="0"] {
+    left: 8.8%;
+    top: 37%;
+    width: 7.6%;
+    height: 19.6%;
+  }
+
+  .tool-hotspot[data-tool="1"] {
+    left: 17.2%;
+    top: 37%;
+    width: 7.2%;
+    height: 19.6%;
+  }
+
+  .tool-hotspot:hover .plaque-label {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+
+  .plaque-label {
+    width: 82%;
+    height: 20%;
+    border-radius: 0.25cqw;
+    display: grid;
+    place-items: center;
+    font-size: 0.68cqw;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #d7cec0, #b8ad9c);
+    color: #2b221a;
+    border: 1px solid rgba(40, 30, 20, 0.65);
+    box-shadow:
+      0 0.2cqw 0.45cqw rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: all 0.2s ease;
+  }
+
+  .tool-hotspot.active .plaque-label {
+    background: linear-gradient(180deg, #5e2418, #3d160e);
+    color: #f3e9d8;
+    border-color: #a84630;
+    box-shadow:
+      0 0.25cqw 0.55cqw rgba(0, 0, 0, 0.75),
+      0 0 0.6cqw rgba(184, 66, 42, 0.45),
+      inset 0 1px 0 rgba(255, 190, 160, 0.35);
+  }
+
+  /* =========================================================
+     Projective Homography Water Bath (Alpha-Feathered Meniscus)
+     ========================================================= */
+  .bath {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 800px;
+    height: 800px;
+    transform-origin: 0 0;
+    will-change: transform;
+    overflow: hidden;
+    background: transparent;
+    cursor: none;
+    touch-action: none;
+    z-index: 5;
+  }
+
+  .bath canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: transparent;
+  }
+
+  #ring { pointer-events: none; }
+
+  /* =========================================================
+     Floating Skeuomorphic Tool Cursor (brush.png & stick.png)
+     ========================================================= */
+  .tool-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 9.5cqw;
+    height: 9.5cqw;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 25;
+    opacity: 0;
+    transform-origin: 7.5% 91%;
+    transform: translate(-7.5%, -91%);
+    filter: drop-shadow(0.35cqw 0.55cqw 0.45cqw rgba(0, 0, 0, 0.55));
+    transition: opacity 0.12s ease, transform 0.08s ease;
+    will-change: left, top, transform;
+  }
+
+  .tool-cursor.visible {
+    opacity: 1;
+  }
+
+  .tool-cursor.pressing {
+    transform: translate(-7.5%, -91%) scale(0.95) rotate(-3deg);
+    filter: drop-shadow(0.18cqw 0.28cqw 0.25cqw rgba(0, 0, 0, 0.65));
+  }
+
+  /* =========================================================
+     Interactive Corner Calibration Pins (Toggle with 'P' key)
+     ========================================================= */
+  .corner-pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff2c2, #d49b35 60%, #6e4411 100%);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+    cursor: move;
+    z-index: 50;
+    display: none;
+  }
+
+  .corner-pin.visible {
+    display: block;
+  }
+
+  .corner-pin::after {
+    content: attr(data-label);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 14, 9, 0.88);
+    color: #f5ead8;
+    font-family: monospace;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     Right Side Interactive Hotspots (Washi Stack & Fresh Water)
+     ========================================================= */
+  .washi-hotspot-wrap {
+    position: absolute;
+    left: 80.6%;
+    top: 5.5%;
+    width: 13.6%;
+    height: 30.8%;
+    z-index: 20;
+  }
+
+  .washi-hotspot {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transform: rotate(-5.5deg);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .washi-hotspot:hover {
+    transform: rotate(-4deg) scale(1.02);
+    border-color: rgba(235, 215, 185, 0.55);
+    box-shadow: 0 0.6cqw 1.5cqw rgba(0, 0, 0, 0.45);
+  }
+
+  .washi-export-menu {
+    position: absolute;
+    top: 102%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    gap: 0.4cqw;
+    background: #dfd5c3;
+    padding: 0.55cqw;
+    border-radius: 0.3cqw;
+    border: 1px solid rgba(60, 45, 30, 0.6);
+    box-shadow: 0 0.8cqw 1.8cqw rgba(0, 0, 0, 0.65);
+    width: 9.5cqw;
+    z-index: 30;
+  }
+
+  .washi-export-menu.open {
+    display: flex;
+  }
+
+  .washi-btn {
+    background: #efe7d8;
+    border: 1px solid rgba(90, 70, 50, 0.4);
+    color: var(--ink-text);
+    padding: 0.45cqw 0.5cqw;
+    font-family: inherit;
+    font-size: 0.75cqw;
+    font-weight: 700;
+    border-radius: 0.2cqw;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .washi-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .water-cup-hotspot {
+    position: absolute;
+    left: 83.4%;
+    top: 72.3%;
+    width: 9.6%;
+    height: 18.8%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 20;
+    border-radius: 0.5cqw;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .water-cup-hotspot::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    top: 2%;
+    width: 84%;
+    height: 70%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .water-cup-hotspot:hover::before {
+    border-color: rgba(200, 230, 245, 0.65);
+    box-shadow: 0 0 1.2cqw rgba(160, 210, 230, 0.45);
+  }
+
+  .water-cup-hotspot:active {
+    transform: scale(0.96);
+  }
+</style>
+</head>
+<body>
+
+<div class="studio-stage" id="studio-stage">
+
+  <!-- 1. TOP CARD OVERLAY: Sumi Inks (Tool 0) OR Bamboo Stick (Tool 1) -->
+  <div class="parchment-card top-slot">
+    <!-- View 0: Sumi Ink Palette + Brush Sliders -->
+    <div class="top-view" id="panel-0">
+      <div>
+        <div class="section-header">
+          <div class="header-title-group">
+            <h2>Sumi Inks</h2>
+          </div>
+          <label class="cycle-toggle" title="Automatically alternate ink dishes on each drop">
+            <input type="checkbox" id="sumi-mode" checked> Auto-cycle
+          </label>
+          <span class="mini-hanko">墨</span>
+        </div>
+
+        <div class="colors" id="swatches"></div>
+
+        <div class="add-ink-row">
+          <label class="btn-add-color" id="add-to-palette" title="Click to choose and add a new ink color">
+            + Add Color
+            <input id="picker" type="color" value="#1d4e89" aria-label="Add custom ink color">
+          </label>
+        </div>
+      </div>
+
+      <div class="compact-sliders">
+        <label class="craft-slider">
+          <div class="craft-slider-header">
+            <span>Drop Size</span>
+            <strong id="size-read">1.0x</strong>
+          </div>
+          <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+        </label>
+        <label class="craft-slider">
+          <div class="craft-slider-header">
+            <span>Pour Rate</span>
+            <strong id="flow-read">1.0x</strong>
+          </div>
+          <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
+        </label>
+      </div>
+    </div>
+
+    <!-- View 1: Bamboo Stick Parameters -->
+    <div class="top-view active" id="panel-1">
+      <div class="section-header">
+        <h2>Bamboo Stick</h2>
+        <span class="mini-hanko">墨</span>
+      </div>
+
+      <div class="stick-sliders-wrap">
+        <label class="craft-slider">
+          <div class="craft-slider-header">
+            <span>Tip Thickness</span>
+            <strong id="stick-size-read">1.0x</strong>
+          </div>
+          <input id="stick-size" type="range" min="0.2" max="4.0" step="0.1" value="1.0">
+        </label>
+        <label class="craft-slider">
+          <div class="craft-slider-header">
+            <span>Stir Force</span>
+            <strong id="stick-drag-read">1.0x</strong>
+          </div>
+          <input id="stick-drag" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MIDDLE TOOL RACK HOTSPOTS -->
+  <button class="tool-hotspot" data-tool="0" type="button" title="Suminagashi Twin Brushes (Dropper)">
+    <span class="plaque-label">Brushes</span>
+  </button>
+
+  <button class="tool-hotspot active" data-tool="1" type="button" title="Bamboo Stylus Stick">
+    <span class="plaque-label">Stick</span>
+  </button>
+
+  <!-- 3. BOTTOM CARD OVERLAY: Water Bath Controls -->
+  <div class="parchment-card bath-slot">
+    <div class="section-header">
+      <div class="header-title-group">
+        <h2>Water Bath</h2>
+        <span class="mini-hanko">墨</span>
+      </div>
+    </div>
+
+    <div class="bath-controls-list">
+      <div class="water-color-row">
+        <span>Water Color</span>
+        <label class="water-swatch-btn" id="water-swatch-label" title="Change bath water color">
+          <input id="bath-color" type="color" value="#b8b0a2" aria-label="Water Color">
+        </label>
+      </div>
+
+      <label class="craft-slider">
+        <div class="craft-slider-header">
+          <span>Ink Spread</span>
+          <strong id="diffusion-read">68%</strong>
+        </div>
+        <input id="diffusion" type="range" min="0.05" max="1" step="0.01" value="0.68">
+      </label>
+
+      <label class="craft-slider">
+        <div class="craft-slider-header">
+          <span>Viscosity</span>
+          <strong id="glide-read">34%</strong>
+        </div>
+        <input id="glide" type="range" min="0.0" max="1.0" step="0.01" value="0.34">
+      </label>
+
+      <label class="craft-slider">
+        <div class="craft-slider-header">
+          <span>Swirl Drama</span>
+          <strong id="vorticity-read">100%</strong>
+        </div>
+        <input id="vorticity" type="range" min="0.0" max="1.0" step="0.01" value="1.00">
+      </label>
+    </div>
+  </div>
+
+  <!-- 4. CENTER WATER BATH (Post-Transformed & Meniscus-Feathered) -->
+  <div class="bath" id="bath">
+    <canvas id="view" aria-label="Suminagashi water bath. Hold to pour ink."></canvas>
+    <canvas id="ring" aria-hidden="true"></canvas>
+  </div>
+
+  <!-- Skeuomorphic Tool Cursor Hovering Over the Bath Circle -->
+  <img id="tool-cursor" class="tool-cursor" src="stick.png" alt="" aria-hidden="true">
+
+  <!-- Optional Corner Calibration Pins (Press 'P' to show/drag) -->
+  <div class="corner-pin" data-corner="0" data-label="TL"></div>
+  <div class="corner-pin" data-corner="1" data-label="TR"></div>
+  <div class="corner-pin" data-corner="2" data-label="BR"></div>
+  <div class="corner-pin" data-corner="3" data-label="BL"></div>
+
+  <!-- 5. RIGHT SIDE HOTSPOTS: Washi Print Stack & Fresh Water Cup -->
+  <div class="washi-hotspot-wrap">
+    <button class="washi-hotspot" id="washi-trigger" type="button" title="Click to pull a print onto Washi paper" aria-label="Pull Washi Print"></button>
+    <div class="washi-export-menu" id="washi-menu">
+      <button class="washi-btn" id="export-jpg" type="button">Pull JPG Print</button>
+      <button class="washi-btn" id="export-svg" type="button">Pull SVG Print</button>
+    </div>
+  </div>
+
+  <button class="water-cup-hotspot" id="clear" type="button" title="Pour fresh water to clear the bath" aria-label="Fresh Water - Clear Bath"></button>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const SIM = 512;
+  const MG_LEVELS = 6;
+  const INK = 2048;
+  const MAP = 1024;
+  const ENERGY_RES = 8;
+  const DT = 1 / 60;
+  const LOCAL_BATH_SIZE = 800;
+
+  // Normalized stage coordinates [x, y] for the 4 corners of the inner water surface:
+  // Order: Top-Left (TL), Top-Right (TR), Bottom-Right (BR), Bottom-Left (BL)
+  const DEFAULT_BATH_QUAD = [
+    [0.3255, 0.1140], // TL: nested into top-left inner shadow crease
+    [0.77, 0.1145],   // TR: nested into top-right inner shadow crease
+    [0.795, 0.8585],  // BR: meets the bottom-right meniscus crease
+    [0.3175, 0.8585]  // BL: meets the bottom-left meniscus crease
+  ];
+
+  let bathQuad = DEFAULT_BATH_QUAD.map(pt => [pt[0], pt[1]]);
+  try {
+    const saved = localStorage.getItem("suminagashi_bath_quad_v2");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length === 4) bathQuad = parsed;
+    }
+  } catch (_) {}
+
+  // Forward and inverse homography matrices between stage pixels (x, y) and UV [0, 1]^2
+  let fwdHomography = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  let invHomography = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+
+  let dynamicPalette = [
+    ["Sumi Black", "#161514"],
+    ["Aged Washi", "#b8b0a2"]
+  ];
+
+  const input = {
+    x: 0.5, y: 0.5,
+    xPrev: 0.5, yPrev: 0.5,
+    stampX: 0.5, stampY: 0.5,
+    vX: 0.0, vY: 0.0,
+    dirX: 1.0, dirY: 0.0,
+    prevDirX: 1.0, prevDirY: 0.0,
+    down: false, tap: false, inside: false
+  };
+
+  let ink = hexToPack(dynamicPalette[0][1]);
+  let stepCount = 0;
+  let isSpreading = false;
+  let pouredDrop = false;
+  let hasAdvectedSinceBake = false;
+
+  const INK_RADIUS = 0.034 * 0.72;
+  const STICK_BASE_RADIUS = 0.015;
+
+  let activeTool = 1;
+  let sumiMode = true;
+  let currentSwatchIndex = 0;
+
+  let diffValue = 0.68;
+  let glideValue = 0.34;
+  let vortValue = 1.0;
+
+  let dropSizeMult = 1.0;
+  let flowRateMult = 1.0;
+
+  let stylusRadiusMult = 1.0;
+  let stylusDragMult = 1.0;
+
+  const stage = document.getElementById("studio-stage");
+  const bath = document.getElementById("bath");
+  const view = document.getElementById("view");
+  const ring = document.getElementById("ring");
+  const ringCtx = ring.getContext("2d");
+  const toolCursor = document.getElementById("tool-cursor");
+
+  // alpha: true + premultipliedAlpha: false allows PASS_DISPLAY to feather edges/corners smoothly
+  const gl = view.getContext("webgl2", {
+    alpha: true,
+    premultipliedAlpha: false,
+    antialias: false,
+    depth: false,
+    stencil: false,
+    preserveDrawingBuffer: true
+  });
+  if (!gl) throw new Error("WebGL2 is required to draw the bath.");
+
+  if (!gl.getExtension("EXT_color_buffer_float")) {
+    throw new Error("This browser cannot keep floating-point fluid textures on the GPU.");
+  }
+
+  function pack(r, g, b) { return (r & 255) | ((g & 255) << 8) | ((b & 255) << 16); }
+  function hexToPack(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return pack((n >> 16) & 255, (n >> 8) & 255, n & 255);
+  }
+
+  function tension() { return 0.35 + (diffValue * 2.15); }
+  function viscosity() { return 2.4 - (diffValue * 1.9); }
+  function ekmanDamping() {
+    return 0.35 + Math.pow(1.0 - glideValue, 2.0) * 6.5;
+  }
+
+  // =========================================================
+  // 2D Projective Homography (CSS matrix3d + Inverse Unprojection)
+  // =========================================================
+  function updateBathHomography() {
+    const rect = stage.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    if (W < 10 || H < 10) return;
+
+    const x0 = bathQuad[0][0] * W, y0 = bathQuad[0][1] * H;
+    const x1 = bathQuad[1][0] * W, y1 = bathQuad[1][1] * H;
+    const x2 = bathQuad[2][0] * W, y2 = bathQuad[2][1] * H;
+    const x3 = bathQuad[3][0] * W, y3 = bathQuad[3][1] * H;
+
+    const dx1 = x1 - x2, dx2 = x3 - x2, sx = x0 - x1 + x2 - x3;
+    const dy1 = y1 - y2, dy2 = y3 - y2, sy = y0 - y1 + y2 - y3;
+    const det = dx1 * dy2 - dx2 * dy1 || 1e-9;
+
+    const g = (sx * dy2 - dx2 * sy) / det;
+    const h = (dx1 * sy - sx * dy1) / det;
+
+    const a = x1 - x0 + g * x1;
+    const b = x3 - x0 + h * x3;
+    const c = x0;
+    const d = y1 - y0 + g * y1;
+    const e = y3 - y0 + h * y3;
+    const f = y0;
+
+    fwdHomography = [a, b, c, d, e, f, g, h, 1];
+
+    // Adjugate of H_unit for mapping stage pixel (x, y) back to UV [0, 1]^2
+    invHomography = [
+      e - f * h, c * h - b, b * f - c * e,
+      f * g - d, a - c * g, c * d - a * f,
+      d * h - e * g, b * g - a * h, a * e - b * d
+    ];
+
+    const S = LOCAL_BATH_SIZE;
+    const m3d = [
+      a / S, d / S, 0, g / S,
+      b / S, e / S, 0, h / S,
+      0,     0,     1, 0,
+      c,     f,     0, 1
+    ];
+    bath.style.transform = `matrix3d(${m3d.join(",")})`;
+
+    document.querySelectorAll(".corner-pin").forEach(pin => {
+      const idx = parseInt(pin.getAttribute("data-corner"), 10);
+      pin.style.left = (bathQuad[idx][0] * 100).toFixed(2) + "%";
+      pin.style.top = (bathQuad[idx][1] * 100).toFixed(2) + "%";
+      pin.setAttribute(
+        "data-label",
+        `${["TL", "TR", "BR", "BL"][idx]} (${(bathQuad[idx][0] * 100).toFixed(1)}%, ${(bathQuad[idx][1] * 100).toFixed(1)}%)`
+      );
+    });
+  }
+
+  function worldFromEvent(e) {
+    const rect = stage.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const M = invHomography;
+    const w = M[6] * x + M[7] * y + M[8] || 1e-9;
+    const u = (M[0] * x + M[1] * y + M[2]) / w;
+    const v = (M[3] * x + M[4] * y + M[5]) / w;
+    return [Math.max(0, Math.min(1, u)), Math.max(0, Math.min(1, v))];
+  }
+
+  function stageFromWorld(u, v) {
+    const H = fwdHomography;
+    const w = H[6] * u + H[7] * v + H[8] || 1e-9;
+    return [
+      (H[0] * u + H[1] * v + H[2]) / w,
+      (H[3] * u + H[4] * v + H[5]) / w
+    ];
+  }
+
+  function syncToolCursorImage() {
+    const targetSrc = activeTool === 0 ? "brush.png" : "stick.png";
+    if (toolCursor.getAttribute("src") !== targetSrc) {
+      toolCursor.setAttribute("src", targetSrc);
+    }
+    // Fine-tune tip anchor for brush.png vs stick.png
+    if (activeTool === 0) {
+      toolCursor.style.transformOrigin = "7.2% 90.2%";
+    } else {
+      toolCursor.style.transformOrigin = "7.8% 92.2%";
+    }
+  }
+
+  const VERT = `#version 300 es
+layout(location=0) in vec2 aPos;
+out vec2 vUv;
+void main() {
+  vUv = aPos * 0.5 + 0.5;
+  gl_Position = vec4(aPos, 0.0, 1.0);
+}`;
+
+  const FRAG = `#version 300 es
+precision highp float;
+precision highp int;
+
+uniform sampler2D uInk;
+uniform sampler2D uMap;
+uniform sampler2D uForward;
+uniform sampler2D uVel;
+uniform sampler2D uSurf;
+uniform sampler2D uPhi;
+uniform sampler2D uInertVel;
+uniform sampler2D uPress;
+uniform sampler2D uCurl;
+uniform sampler2D uAuxA;
+uniform sampler2D uAuxB;
+
+uniform float uN;
+uniform float uMapSize;
+uniform float uInkSize;
+uniform float uTargetSize;
+uniform float uTexelSize;
+uniform float uDt;
+uniform float uRadius;
+uniform vec2 uCenter;
+uniform vec2 uPrevCenter;
+uniform vec3 uInkColor;
+uniform vec3 uWater;
+uniform int uPass;
+uniform int uIsNewDrop;
+
+uniform float uMass;
+uniform float uSeq;
+uniform float uRate;
+
+uniform int uTool;
+uniform float uToolDrag;
+uniform vec2 uRakeDir;
+uniform vec2 uPrevRakeDir;
+uniform float uStickRadius;
+
+uniform float uAlpha;
+uniform float uScale;
+uniform float uDamping;
+uniform float uViscDiff;
+uniform float uVortConf;
+uniform float uFrameDt;
+uniform int uIsExport;
+
+in vec2 vUv;
+out vec4 fragColor;
+
+float catmull(int k, float t) {
+  if (k == 0) return t * (-0.5 + t * (1.0 - 0.5 * t));
+  if (k == 1) return 1.0 + t * t * (-2.5 + 1.5 * t);
+  if (k == 2) return t * (0.5 + t * (2.0 - 1.5 * t));
+  return t * t * (-0.5 + 0.5 * t);
+}
+
+vec2 mapFetch(sampler2D tex, int x, int y) {
+  int last = int(uMapSize) - 1;
+  return texelFetch(tex, ivec2(clamp(x, 0, last), clamp(y, 0, last)), 0).rg;
+}
+
+vec2 bicubic(sampler2D tex, vec2 uv) {
+  vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  vec2 sum = vec2(0.0);
+  for (int j = 0; j < 4; j++) {
+    float wy = catmull(j, f.y);
+    vec2 row = vec2(0.0);
+    for (int k = 0; k < 4; k++) {
+      row += mapFetch(tex, i.x - 1 + k, i.y - 1 + j) * catmull(k, f.x);
+    }
+    sum += row * wy;
+  }
+  return clamp(sum, vec2(0.0), vec2(1.0));
+}
+
+vec2 mapBilinear(sampler2D tex, vec2 uv) {
+  vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(uMapSize) - 1;
+  vec2 a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).rg;
+  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).rg;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float distAt(vec2 origin) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(uInkSize) - 1;
+  float a = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0).a;
+  float b = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
+  float c = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
+  float d = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).a;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float distBicubicClamped(vec2 origin) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(uInkSize) - 1;
+  float sum = 0.0;
+  for (int j = 0; j < 4; j++) {
+    float wy = catmull(j, f.y);
+    float row = 0.0;
+    for (int k = 0; k < 4; k++) {
+      ivec2 c = clamp(i + ivec2(k - 1, j - 1), ivec2(0), ivec2(last));
+      row += texelFetch(uInk, c, 0).a * catmull(k, f.x);
+    }
+    sum += row * wy;
+  }
+  float a = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0).a;
+  float b = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
+  float c = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
+  float d = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).a;
+  float minD = min(min(a, b), min(c, d));
+  float maxD = max(max(a, b), max(c, d));
+  return clamp(sum, minD, maxD);
+}
+
+vec3 pureColorAt(vec2 origin, float targetSign) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(uInkSize) - 1;
+  vec4 s00 = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0);
+  vec4 s10 = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0);
+  vec4 s01 = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0);
+  vec4 s11 = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0);
+
+  float w00 = (1.0 - f.x) * (1.0 - f.y);
+  float w10 = f.x * (1.0 - f.y);
+  float w01 = (1.0 - f.x) * f.y;
+  float w11 = f.x * f.y;
+
+  bool wantPos = (targetSign >= 0.0);
+  vec3 bestColor = s00.rgb;
+  float bestWeight = -1.0;
+
+  if ((s00.a >= 0.0) == wantPos && w00 > bestWeight) { bestWeight = w00; bestColor = s00.rgb; }
+  if ((s10.a >= 0.0) == wantPos && w10 > bestWeight) { bestWeight = w10; bestColor = s10.rgb; }
+  if ((s01.a >= 0.0) == wantPos && w01 > bestWeight) { bestWeight = w01; bestColor = s01.rgb; }
+  if ((s11.a >= 0.0) == wantPos && w11 > bestWeight) { bestWeight = w11; bestColor = s11.rgb; }
+
+  if (bestWeight < 0.0) {
+    bestColor = s00.rgb; bestWeight = w00;
+    if (w10 > bestWeight) { bestWeight = w10; bestColor = s10.rgb; }
+    if (w01 > bestWeight) { bestWeight = w01; bestColor = s01.rgb; }
+    if (w11 > bestWeight) { bestWeight = w11; bestColor = s11.rgb; }
+  }
+  return bestColor;
+}
+
+vec2 simBilinearRG(sampler2D tex, vec2 world) {
+  vec2 p = clamp(world * uN - 0.5, vec2(0.0), vec2(uN - 1.0));
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(uN) - 1;
+  vec2 a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).rg;
+  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).rg;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float coarseBilinearR(sampler2D tex, vec2 uv, float coarseSize) {
+  vec2 p = clamp(uv * coarseSize - 0.5, vec2(0.0), vec2(coarseSize - 1.0));
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  int last = int(coarseSize) - 1;
+  float a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).r;
+  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).r;
+  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).r;
+  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).r;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+vec2 dmcTrace(vec2 uv, float dt) {
+  vec2 vel = simBilinearRG(uVel, uv);
+  float h = uTexelSize;
+
+  float dirX = vel.x <= 0.0 ? -h : h;
+  float velUpX = simBilinearRG(uVel, uv + vec2(dirX, 0.0)).x;
+  float aX = (vel.x - velUpX) / -dirX;
+  float dx = abs(aX) > 1e-7 ? (1.0 - exp(clamp(-aX * dt, -25.0, 25.0))) / aX * vel.x : vel.x * dt;
+
+  float dirY = vel.y <= 0.0 ? -h : h;
+  float velUpY = simBilinearRG(uVel, uv + vec2(0.0, dirY)).y;
+  float aY = (vel.y - velUpY) / -dirY;
+  float dy = abs(aY) > 1e-7 ? (1.0 - exp(clamp(-aY * dt, -25.0, 25.0))) / aY * vel.y : vel.y * dt;
+
+  return clamp(uv - vec2(dx, dy), vec2(0.0), vec2(1.0));
+}
+
+void main() {
+  if (uPass == 0) {
+    vec2 world = vec2(vUv.x, 1.0 - vUv.y);
+    vec2 origin = bicubic(uMap, world);
+    float d = distAt(origin);
+    vec3 c = pureColorAt(origin, d);
+    float fw = max(fwidth(d), 1e-5);
+    vec2 g = vec2(dFdx(d), dFdy(d));
+    float pixels = abs(d) / fw;
+    vec2 pixelStep = g * (-d / max(dot(g, g), 1e-8));
+    vec2 worldStep = pixelStep.x * dFdx(world) + pixelStep.y * dFdy(world);
+    vec2 otherOrigin = bicubic(uMap, world + 2.0 * worldStep);
+    vec3 other = pureColorAt(otherOrigin, -d);
+
+    float keep = (uIsExport == 1) ? 1.0 : (pixels >= 1.0 ? 1.0 : 0.5 + 0.5 * pixels);
+    vec3 baseCol = mix(other, c, keep);
+
+    // Full-bleed unshadowed output when pulling JPG/SVG prints
+    if (uIsExport == 1) {
+      fragColor = vec4(baseCol, 1.0);
+      return;
+    }
+
+    // Rounded-box signed distance for curved meniscus corners (wider rounding at BL & BR)
+    vec2 halfSize = vec2(0.5);
+    vec2 p = world - halfSize;
+    float rCorner = mix(0.024, 0.042, smoothstep(-0.1, 0.25, p.y));
+    vec2 q = abs(p) - (halfSize - vec2(rCorner));
+    float boxDist = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rCorner;
+
+    // inwardDist is 0 on the rounded meniscus boundary and positive inside the bath
+    float inwardDist = max(0.0, -boxDist);
+
+    // Smooth alpha feathering across the outer rim and rounded bottom corners
+    float edgeAlpha = smoothstep(0.0, 0.026, inwardDist);
+
+    // Directional wall & corner ambient occlusion so bright water grades into the wet wood shadow
+    float topShadow = smoothstep(0.0, 0.095, world.y);
+    float botShadow = smoothstep(0.0, 0.065, 1.0 - world.y);
+    float sideShadow = smoothstep(0.0, 0.052, min(world.x, 1.0 - world.x));
+    float cornerAO = smoothstep(0.0, 0.072, inwardDist);
+
+    float wallFactor = (0.28 + 0.72 * topShadow)
+                     * (0.35 + 0.65 * botShadow)
+                     * (0.38 + 0.62 * sideShadow)
+                     * (0.22 + 0.78 * cornerAO);
+
+    vec3 darkMeniscus = vec3(0.065, 0.052, 0.042);
+    vec3 shaded = mix(darkMeniscus, baseCol, clamp(wallFactor, 0.0, 1.0));
+
+    // Subtle concave water meniscus rim glint + studio window sheen
+    float rimGlint = exp(-pow((inwardDist - 0.013) / 0.0045, 2.0))
+                   * smoothstep(0.08, 0.35, world.y)
+                   * 0.11;
+    float windowSheen = exp(-length((world - vec2(0.76, 0.18)) * vec2(1.4, 2.2)) * 3.2) * 0.07;
+
+    shaded += vec3(0.95, 0.92, 0.86) * (rimGlint + windowSheen);
+
+    fragColor = vec4(shaded, edgeAlpha);
+  }
+  else if (uPass == 1) {
+    vec2 world = gl_FragCoord.xy / uTargetSize;
+    vec2 prev = dmcTrace(world, uDt);
+    fragColor = vec4(mapBilinear(uMap, prev), 0.0, 1.0);
+  }
+  else if (uPass == 2) {
+    vec2 origin = gl_FragCoord.xy / uTargetSize;
+    vec2 world = mapBilinear(uForward, origin);
+    vec2 vel = simBilinearRG(uVel, world);
+    fragColor = vec4(clamp(world + vel * uDt, vec2(0.0), vec2(1.0)), 0.0, 1.0);
+  }
+  else if (uPass == 3) {
+    fragColor = vec4(gl_FragCoord.xy / uTargetSize, 0.0, 1.0);
+  }
+  else if (uPass == 4) {
+    vec2 world = gl_FragCoord.xy / uTargetSize;
+    vec2 origin = bicubic(uMap, world);
+    float d = distBicubicClamped(origin);
+    vec3 c = pureColorAt(origin, d);
+    fragColor = vec4(c, d);
+  }
+  else if (uPass == 5) {
+    vec2 origin = gl_FragCoord.xy / uTargetSize;
+    vec2 placed = mapBilinear(uForward, origin);
+    float radial = length(placed - uCenter) - uRadius;
+
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    vec4 old = texelFetch(uInk, coord, 0);
+
+    vec2 centerOrigin = bicubic(uMap, uCenter);
+    float centerD = distAt(centerOrigin);
+    vec3 centerColor = pureColorAt(centerOrigin, centerD);
+    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005);
+
+    if (uIsNewDrop == 1 && !sameColorAsCenter) {
+      float newSign = centerD >= 0.0 ? -1.0 : 1.0;
+      if (radial <= 0.0) {
+        fragColor = vec4(uInkColor, newSign * (-radial));
+      } else {
+        float sgn = old.a >= 0.0 ? 1.0 : -1.0;
+        fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
+      }
+    } else {
+      float keepSign = centerD >= 0.0 ? 1.0 : -1.0;
+      if (radial <= 0.0) {
+        bool oldSameColor = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (keepSign >= 0.0));
+        float dIn = oldSameColor ? max(abs(old.a), -radial) : (-radial);
+        fragColor = vec4(uInkColor, keepSign * dIn);
+      } else {
+        if (distance(old.rgb, uInkColor) < 0.005) {
+          fragColor = old;
+        } else {
+          float sgn = old.a >= 0.0 ? 1.0 : -1.0;
+          fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
+        }
+      }
+    }
+  }
+  else if (uPass == 6) {
+    fragColor = vec4(uWater, 1.0);
+  }
+  else if (uPass == 7) {
+    vec2 origin = gl_FragCoord.xy / uTargetSize;
+    float d = distance(origin, uCenter);
+    vec2 surf = texelFetch(uSurf, ivec2(gl_FragCoord.xy), 0).rg;
+    if (d < uRadius) {
+      float ker = cos(d / uRadius * 1.57079632679);
+      float k2 = ker * ker;
+      surf.r = min(surf.r + uMass * k2, 14.0);
+      surf.g = mix(surf.g, 0.0, k2 * 0.65);
+    }
+    fragColor = vec4(surf, 0.0, 1.0);
+  }
+  else if (uPass == 8) {
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+    vec2 prev = dmcTrace(uv, uDt);
+    vec2 surf = simBilinearRG(uSurf, prev);
+
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    float uL = coord.x == 0 ? 0.0 : texelFetch(uVel, coord - ivec2(1, 0), 0).x;
+    float uR = coord.x == last ? 0.0 : texelFetch(uVel, coord + ivec2(1, 0), 0).x;
+    float vB = coord.y == 0 ? 0.0 : texelFetch(uVel, coord - ivec2(0, 1), 0).y;
+    float vT = coord.y == last ? 0.0 : texelFetch(uVel, coord + ivec2(0, 1), 0).y;
+
+    float div = (uR - uL + vT - vB) / (2.0 * uTexelSize);
+    float factor = exp(clamp(-div * uDt, -1.2, 1.2));
+    float newS = clamp(surf.r * factor, 0.0, 14.0);
+    float newAge = clamp(surf.g + 0.045 * uDt, 0.0, 1.0);
+    fragColor = vec4(newS, newAge, 0.0, 1.0);
+  }
+  else if (uPass == 9) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    float s = 0.0;
+    float age = 0.0;
+    for (int j = -1; j <= 1; j++) {
+      for (int i = -1; i <= 1; i++) {
+        vec2 sc = texelFetch(uSurf, clamp(coord + ivec2(i, j), ivec2(0), ivec2(last)), 0).rg;
+        s += sc.r;
+        age += sc.g;
+      }
+    }
+    s /= 9.0;
+    age /= 9.0;
+    float mobility = 1.0 - 0.35 * age;
+    float excess = max(0.0, s - uSeq);
+    float rhs = min(uRate * mobility * excess, 14.0);
+    fragColor = vec4(2.0 * rhs, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 10) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    float h = 1.0 / uTargetSize;
+    float h2 = h * h;
+
+    float uC = texelFetch(uAuxA, coord, 0).r;
+    float uL = coord.x == 0 ? uC : texelFetch(uAuxA, coord - ivec2(1, 0), 0).r;
+    float uR = coord.x == last ? uC : texelFetch(uAuxA, coord + ivec2(1, 0), 0).r;
+    float uB = coord.y == 0 ? uC : texelFetch(uAuxA, coord - ivec2(0, 1), 0).r;
+    float uT = coord.y == last ? uC : texelFetch(uAuxA, coord + ivec2(0, 1), 0).r;
+    float fC = texelFetch(uAuxB, coord, 0).r;
+
+    float uStar = (uL + uR + uB + uT - h2 * fC) / (4.0 + uAlpha * h2);
+    fragColor = vec4(mix(uC, uStar, 0.8), 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 11) {
+    fragColor = vec4(0.0);
+  }
+  else if (uPass == 12) {
+    ivec2 coordC = ivec2(gl_FragCoord.xy);
+    int fineSize = int(uTargetSize) * 2;
+    int lastF = fineSize - 1;
+    float hf = 1.0 / float(fineSize);
+    float hf2 = hf * hf;
+    float diag = 4.0 + uAlpha * hf2;
+
+    float resSum = 0.0;
+    for (int dy = 0; dy < 2; dy++) {
+      for (int dx = 0; dx < 2; dx++) {
+        ivec2 cF = coordC * 2 + ivec2(dx, dy);
+        float uC = texelFetch(uAuxA, cF, 0).r;
+        float uL = cF.x == 0 ? uC : texelFetch(uAuxA, cF - ivec2(1, 0), 0).r;
+        float uR = cF.x == lastF ? uC : texelFetch(uAuxA, cF + ivec2(1, 0), 0).r;
+        float uB = cF.y == 0 ? uC : texelFetch(uAuxA, cF - ivec2(0, 1), 0).r;
+        float uT = cF.y == lastF ? uC : texelFetch(uAuxA, cF + ivec2(0, 1), 0).r;
+        float fF = texelFetch(uAuxB, cF, 0).r;
+
+        float lap = (uL + uR + uB + uT - diag * uC) / hf2;
+        resSum += (fF - lap);
+      }
+    }
+    fragColor = vec4(resSum * 0.25, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 13) {
+    ivec2 coordF = ivec2(gl_FragCoord.xy);
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+    float uFine = texelFetch(uAuxA, coordF, 0).r;
+    float eCoarse = coarseBilinearR(uAuxB, uv, uTargetSize * 0.5);
+    fragColor = vec4(uFine + eCoarse, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 14) {
+    float val = texelFetch(uAuxA, ivec2(gl_FragCoord.xy), 0).r;
+    fragColor = vec4(val * uScale, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 15) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+    float curl = (wR.y - wL.y - (wT.x - wB.x)) / (2.0 * uTexelSize);
+    fragColor = vec4(curl, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 16) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+
+    vec2 prevUv = dmcTrace(uv, uDt);
+    vec2 wAdv = simBilinearRG(uInertVel, prevUv);
+
+    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wAvg = 0.25 * (wL + wR + wB + wT);
+    vec2 w = mix(wAdv, wAvg, clamp(uViscDiff * uDt * 18.0, 0.0, 0.45));
+
+    w *= exp(-uDamping * uDt);
+
+    if (uVortConf > 1e-5) {
+      float cC = texelFetch(uCurl, coord, 0).r;
+      float cL = abs(texelFetch(uCurl, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).r);
+      float cR = abs(texelFetch(uCurl, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).r);
+      float cB = abs(texelFetch(uCurl, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).r);
+      float cT = abs(texelFetch(uCurl, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).r);
+      vec2 gradAbsCurl = vec2(cR - cL, cT - cB) * 0.5;
+      float gLen = length(gradAbsCurl);
+      if (gLen > 1e-5) {
+        vec2 N = gradAbsCurl / gLen;
+        vec2 fVort = uVortConf * uTexelSize * vec2(N.y * cC, -N.x * cC);
+        w += fVort * uDt;
+      }
+    }
+
+    if (uTool > 0) {
+      float R = uStickRadius;
+      float R2 = R * R;
+      float invFrameDt = 1.0 / max(uFrameDt, 0.004);
+
+      vec2 a = uPrevCenter;
+      vec2 b = uCenter;
+      vec2 ab = b - a;
+      float ab2 = dot(ab, ab);
+      float t = ab2 > 1e-8 ? clamp(dot(uv - a, ab) / ab2, 0.0, 1.0) : 1.0;
+      vec2 closest = a + t * ab;
+      vec2 r = uv - closest;
+      float d2 = dot(r, r);
+
+      if (d2 < R2 * 9.0) {
+        vec2 tineVel = ab * invFrameDt * uToolDrag;
+        float speed = length(tineVel);
+        if (speed > 3.2) tineVel *= 3.2 / speed;
+
+        float core = exp(-d2 / (R2 * 1.15));
+        w = mix(w, tineVel * 0.68, clamp(core * 0.85, 0.0, 0.92));
+
+        float E = exp(-d2 / (R2 * 1.6));
+        float crossProd = tineVel.x * r.y - tineVel.y * r.x;
+        vec2 dipole = E * vec2(
+          tineVel.x - 1.5 * r.y * crossProd / R2,
+          tineVel.y + 1.5 * r.x * crossProd / R2
+        );
+        w += dipole * uDt * 3.5;
+      }
+    }
+
+    float edgeX = min(uv.x, 1.0 - uv.x);
+    float edgeY = min(uv.y, 1.0 - uv.y);
+    w.x *= smoothstep(0.0, uTexelSize * 2.5, edgeX);
+    w.y *= smoothstep(0.0, uTexelSize * 2.5, edgeY);
+
+    float sp = length(w);
+    if (sp > 1.35) w *= 1.35 / sp;
+
+    fragColor = vec4(w, 0.0, 1.0);
+  }
+  else if (uPass == 17) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    float wL = coord.x == 0 ? 0.0 : texelFetch(uInertVel, coord - ivec2(1, 0), 0).x;
+    float wR = coord.x == last ? 0.0 : texelFetch(uInertVel, coord + ivec2(1, 0), 0).x;
+    float wB = coord.y == 0 ? 0.0 : texelFetch(uInertVel, coord - ivec2(0, 1), 0).y;
+    float wT = coord.y == last ? 0.0 : texelFetch(uInertVel, coord + ivec2(0, 1), 0).y;
+    float div = (wR - wL + wT - wB) / (2.0 * uTexelSize);
+    fragColor = vec4(div, 0.0, 0.0, 1.0);
+  }
+  else if (uPass == 18) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    vec2 w = texelFetch(uInertVel, coord, 0).rg;
+
+    float pC = texelFetch(uPress, coord, 0).r;
+    float pL = coord.x == 0 ? pC : texelFetch(uPress, coord - ivec2(1, 0), 0).r;
+    float pR = coord.x == last ? pC : texelFetch(uPress, coord + ivec2(1, 0), 0).r;
+    float pB = coord.y == 0 ? pC : texelFetch(uPress, coord - ivec2(0, 1), 0).r;
+    float pT = coord.y == last ? pC : texelFetch(uPress, coord + ivec2(0, 1), 0).r;
+
+    vec2 gradP = vec2(pR - pL, pT - pB) / (2.0 * uTexelSize);
+    vec2 wProj = w - gradP;
+
+    if (coord.x == 0 || coord.x == last) wProj.x = 0.0;
+    if (coord.y == 0 || coord.y == last) wProj.y = 0.0;
+
+    fragColor = vec4(wProj, 0.0, 1.0);
+  }
+  else if (uPass == 19) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+
+    float pL = 0.0, pR = 0.0, pB = 0.0, pT = 0.0;
+    for (int i = -1; i <= 1; i++) {
+      pL += texelFetch(uPhi, clamp(coord + ivec2(-1, i), ivec2(0), ivec2(last)), 0).r;
+      pR += texelFetch(uPhi, clamp(coord + ivec2( 1, i), ivec2(0), ivec2(last)), 0).r;
+      pB += texelFetch(uPhi, clamp(coord + ivec2(i, -1), ivec2(0), ivec2(last)), 0).r;
+      pT += texelFetch(uPhi, clamp(coord + ivec2(i,  1), ivec2(0), ivec2(last)), 0).r;
+    }
+
+    vec2 vMarangoni = vec2(0.0);
+    if (coord.x > 0 && coord.x < last) vMarangoni.x = ((pR - pL) / 3.0) / (2.0 * uTexelSize);
+    if (coord.y > 0 && coord.y < last) vMarangoni.y = ((pT - pB) / 3.0) / (2.0 * uTexelSize);
+
+    float spM = length(vMarangoni);
+    if (spM > 0.45) vMarangoni *= 0.45 / spM;
+
+    vec2 wInert = texelFetch(uInertVel, coord, 0).rg;
+    vec2 totalVel = wInert + vMarangoni;
+
+    fragColor = vec4(totalVel, 0.0, 1.0);
+  }
+  else if (uPass == 20) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int last = int(uTargetSize) - 1;
+    vec4 center = texelFetch(uInk, coord, 0);
+    float dC = center.a;
+    float h = 1.0 / uTargetSize;
+
+    if (abs(dC) < h * 1.6) {
+      fragColor = center;
+      return;
+    }
+
+    float dL = texelFetch(uInk, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
+    float dR = texelFetch(uInk, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
+    float dB = texelFetch(uInk, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
+    float dT = texelFetch(uInk, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
+
+    float sgn = dC >= 0.0 ? 1.0 : -1.0;
+    float gradMag = length(vec2(dR - dL, dT - dB)) / (2.0 * h);
+    float dNew = dC - 0.30 * h * sgn * (gradMag - 1.0);
+    if (dNew * dC <= 0.0) dNew = dC;
+    fragColor = vec4(center.rgb, dNew);
+  }
+  else if (uPass == 21) {
+    ivec2 block = ivec2(gl_FragCoord.xy);
+    int stride = int(uN) / int(uTargetSize);
+    ivec2 base = block * stride;
+    float maxAct = 0.0;
+    for (int y = 0; y < 64; y += 4) {
+      if (y >= stride) break;
+      for (int x = 0; x < 64; x += 4) {
+        if (x >= stride) break;
+        ivec2 c = base + ivec2(x, y);
+        vec2 v = texelFetch(uVel, c, 0).rg;
+        float s = texelFetch(uSurf, c, 0).r;
+        float act = length(v) + max(0.0, s - uSeq) * 0.5;
+        maxAct = max(maxAct, act);
+      }
+    }
+    fragColor = vec4(maxAct, 0.0, 0.0, 1.0);
+  }
+}`;
+
+  function compile(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(shader) || "shader compile failed");
+    }
+    return shader;
+  }
+
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    throw new Error(gl.getProgramInfoLog(program) || "program link failed");
+  }
+  gl.useProgram(program);
+
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  gl.disable(gl.BLEND);
+  gl.disable(gl.DITHER);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+
+  const uPass = gl.getUniformLocation(program, "uPass");
+  const uIsNewDropLoc = gl.getUniformLocation(program, "uIsNewDrop");
+  const uDt = gl.getUniformLocation(program, "uDt");
+  const uRadius = gl.getUniformLocation(program, "uRadius");
+  const uCenter = gl.getUniformLocation(program, "uCenter");
+  const uPrevCenter = gl.getUniformLocation(program, "uPrevCenter");
+  const uInkColor = gl.getUniformLocation(program, "uInkColor");
+  const uWater = gl.getUniformLocation(program, "uWater");
+  const uTargetSize = gl.getUniformLocation(program, "uTargetSize");
+
+  const uMassLoc = gl.getUniformLocation(program, "uMass");
+  const uSeqLoc = gl.getUniformLocation(program, "uSeq");
+  const uRateLoc = gl.getUniformLocation(program, "uRate");
+
+  const uTool = gl.getUniformLocation(program, "uTool");
+  const uToolDragLoc = gl.getUniformLocation(program, "uToolDrag");
+  const uRakeDir = gl.getUniformLocation(program, "uRakeDir");
+  const uPrevRakeDir = gl.getUniformLocation(program, "uPrevRakeDir");
+  const uStickRadius = gl.getUniformLocation(program, "uStickRadius");
+
+  const uAlphaLoc = gl.getUniformLocation(program, "uAlpha");
+  const uScaleLoc = gl.getUniformLocation(program, "uScale");
+  const uDampingLoc = gl.getUniformLocation(program, "uDamping");
+  const uViscDiffLoc = gl.getUniformLocation(program, "uViscDiff");
+  const uVortConfLoc = gl.getUniformLocation(program, "uVortConf");
+  const uFrameDtLoc = gl.getUniformLocation(program, "uFrameDt");
+  const uIsExportLoc = gl.getUniformLocation(program, "uIsExport");
+
+  gl.uniform1f(gl.getUniformLocation(program, "uN"), SIM);
+  gl.uniform1f(gl.getUniformLocation(program, "uMapSize"), MAP);
+  gl.uniform1f(gl.getUniformLocation(program, "uInkSize"), INK);
+  gl.uniform1f(gl.getUniformLocation(program, "uTexelSize"), 1.0 / SIM);
+
+  gl.uniform1i(gl.getUniformLocation(program, "uInk"), 0);
+  gl.uniform1i(gl.getUniformLocation(program, "uMap"), 1);
+  gl.uniform1i(gl.getUniformLocation(program, "uForward"), 2);
+  gl.uniform1i(gl.getUniformLocation(program, "uVel"), 3);
+  gl.uniform1i(gl.getUniformLocation(program, "uSurf"), 4);
+  gl.uniform1i(gl.getUniformLocation(program, "uPhi"), 5);
+  gl.uniform1i(gl.getUniformLocation(program, "uInertVel"), 6);
+  gl.uniform1i(gl.getUniformLocation(program, "uPress"), 7);
+  gl.uniform1i(gl.getUniformLocation(program, "uCurl"), 8);
+  gl.uniform1i(gl.getUniformLocation(program, "uAuxA"), 9);
+  gl.uniform1i(gl.getUniformLocation(program, "uAuxB"), 10);
+
+  gl.uniform3f(uWater, 184 / 255, 176 / 255, 162 / 255);
+
+  const PASS_DISPLAY = 0, PASS_BACK = 1, PASS_FWD = 2, PASS_IDENTITY = 3;
+  const PASS_BAKE = 4, PASS_STAMP = 5, PASS_CLEAR = 6, PASS_SPLAT = 7;
+  const PASS_ADVECT_SURF = 8, PASS_SURF_RHS = 9, PASS_MG_SMOOTH = 10, PASS_ZERO = 11;
+  const PASS_MG_RESTRICT = 12, PASS_MG_PROLONG = 13, PASS_WARM_START = 14;
+  const PASS_VORTICITY = 15, PASS_ADVECT_INERTIAL = 16, PASS_NS_DIV = 17;
+  const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
+
+  function makeTarget(w, h, internal, format, type) {
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, null);
+    const fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return { tex, fbo, w, h };
+  }
+
+  const inkTex = [
+    makeTarget(INK, INK, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT),
+    makeTarget(INK, INK, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT)
+  ];
+  const back = [makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT)];
+  const fwd = [makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT)];
+
+  const surfTex = [makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT)];
+  const inertVelTex = [makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT)];
+  const velTex = makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT);
+  const curlTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
+  let phiTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
+  let pressTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
+
+  const mgSol = [];
+  const mgRhs = [];
+  for (let l = 0; l < MG_LEVELS; l++) {
+    const sz = SIM >> l;
+    mgSol.push([
+      makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT),
+      makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT)
+    ]);
+    mgRhs.push(makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT));
+  }
+
+  const energyTarget = makeTarget(ENERGY_RES, ENERGY_RES, gl.R32F, gl.RED, gl.FLOAT);
+  const energyPbo = gl.createBuffer();
+  gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
+  gl.bufferData(gl.PIXEL_PACK_BUFFER, ENERGY_RES * ENERGY_RES * 4, gl.STREAM_READ);
+  gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+  const energyReadBuf = new Float32Array(ENERGY_RES * ENERGY_RES);
+  let pendingSync = null;
+
+  let inkI = 0, backI = 0, fwdI = 0, surfI = 0, inertI = 0;
+
+  function bindInputs(targetTex, auxATex = null, auxBTex = null) {
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, targetTex === inkTex[inkI].tex ? null : inkTex[inkI].tex);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, targetTex === back[backI].tex ? null : back[backI].tex);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, targetTex === fwd[fwdI].tex ? null : fwd[fwdI].tex);
+    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, targetTex === velTex.tex ? null : velTex.tex);
+    gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, targetTex === surfTex[surfI].tex ? null : surfTex[surfI].tex);
+    gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, targetTex === phiTex.tex ? null : phiTex.tex);
+    gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, targetTex === inertVelTex[inertI].tex ? null : inertVelTex[inertI].tex);
+    gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D, targetTex === pressTex.tex ? null : pressTex.tex);
+    gl.activeTexture(gl.TEXTURE8); gl.bindTexture(gl.TEXTURE_2D, targetTex === curlTex.tex ? null : curlTex.tex);
+    gl.activeTexture(gl.TEXTURE9); gl.bindTexture(gl.TEXTURE_2D, (auxATex && targetTex !== auxATex) ? auxATex : null);
+    gl.activeTexture(gl.TEXTURE10); gl.bindTexture(gl.TEXTURE_2D, (auxBTex && targetTex !== auxBTex) ? auxBTex : null);
+    gl.activeTexture(gl.TEXTURE0);
+  }
+
+  function drawTo(target, pass, auxATex = null, auxBTex = null) {
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    gl.uniform1i(uIsExportLoc, 0);
+
+    if (!target) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, view.width, view.height);
+    } else {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+      gl.viewport(0, 0, target.w, target.h);
+      gl.uniform1f(uTargetSize, target.w);
+    }
+
+    gl.uniform1i(uPass, pass);
+    bindInputs(target ? target.tex : null, auxATex, auxBTex);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  function solveMultigridVCycle(alpha, numVCycles) {
+    gl.uniform1f(uAlphaLoc, alpha);
+    const curIdx = new Int32Array(MG_LEVELS);
+
+    for (let cycle = 0; cycle < numVCycles; cycle++) {
+      for (let l = 0; l < MG_LEVELS - 1; l++) {
+        const preSmoothSteps = (l === 0) ? 2 : 3;
+        for (let s = 0; s < preSmoothSteps; s++) {
+          const src = curIdx[l];
+          const dst = 1 - src;
+          drawTo(mgSol[l][dst], PASS_MG_SMOOTH, mgSol[l][src].tex, mgRhs[l].tex);
+          curIdx[l] = dst;
+        }
+        drawTo(mgRhs[l + 1], PASS_MG_RESTRICT, mgSol[l][curIdx[l]].tex, mgRhs[l].tex);
+        drawTo(mgSol[l + 1][0], PASS_ZERO);
+        curIdx[l + 1] = 0;
+      }
+
+      const coarsest = MG_LEVELS - 1;
+      for (let s = 0; s < 10; s++) {
+        const src = curIdx[coarsest];
+        const dst = 1 - src;
+        drawTo(mgSol[coarsest][dst], PASS_MG_SMOOTH, mgSol[coarsest][src].tex, mgRhs[coarsest].tex);
+        curIdx[coarsest] = dst;
+      }
+
+      for (let l = MG_LEVELS - 2; l >= 0; l--) {
+        const src = curIdx[l];
+        const dst = 1 - src;
+        drawTo(mgSol[l][dst], PASS_MG_PROLONG, mgSol[l][src].tex, mgSol[l + 1][curIdx[l + 1]].tex);
+        curIdx[l] = dst;
+
+        const postSmoothSteps = (l === 0) ? 2 : 3;
+        for (let s = 0; s < postSmoothSteps; s++) {
+          const sSrc = curIdx[l];
+          const sDst = 1 - sSrc;
+          drawTo(mgSol[l][sDst], PASS_MG_SMOOTH, mgSol[l][sSrc].tex, mgRhs[l].tex);
+          curIdx[l] = sDst;
+        }
+      }
+    }
+    return curIdx[0];
+  }
+
+  function pollAsyncGpuActivity(isActivelyWorking) {
+    if (isActivelyWorking) {
+      if (pendingSync) {
+        gl.deleteSync(pendingSync);
+        pendingSync = null;
+      }
+      return;
+    }
+
+    if (pendingSync) {
+      const status = gl.clientWaitSync(pendingSync, 0, 0);
+      if (status === gl.ALREADY_SIGNALED || status === gl.CONDITION_SATISFIED) {
+        gl.deleteSync(pendingSync);
+        pendingSync = null;
+
+        gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
+        gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, energyReadBuf);
+        gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+
+        let maxActivity = 0;
+        for (let i = 0; i < energyReadBuf.length; i++) {
+          if (energyReadBuf[i] > maxActivity) maxActivity = energyReadBuf[i];
+        }
+
+        if (maxActivity <= 0.00045) {
+          isSpreading = false;
+          drawTo(velTex, PASS_ZERO);
+          drawTo(inertVelTex[0], PASS_ZERO);
+          drawTo(inertVelTex[1], PASS_ZERO);
+        }
+      }
+    } else if (stepCount % 10 === 0) {
+      drawTo(energyTarget, PASS_ENERGY);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, energyTarget.fbo);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
+      gl.readPixels(0, 0, ENERGY_RES, ENERGY_RES, gl.RED, gl.FLOAT, 0);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      pendingSync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    }
+  }
+
+  function exportHighRes(mimeType, isSvg = false) {
+    const exportSize = isSvg ? 4096 : INK;
+
+    const exportFbo = gl.createFramebuffer();
+    const exportTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, exportTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, exportSize, exportSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
+
+    gl.viewport(0, 0, exportSize, exportSize);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    gl.uniform1i(uIsExportLoc, 1);
+    gl.uniform1i(uPass, PASS_DISPLAY);
+    gl.uniform1f(uTargetSize, exportSize);
+
+    bindInputs(null);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+    gl.uniform1i(uIsExportLoc, 0);
+
+    const pixels = new Uint8Array(exportSize * exportSize * 4);
+    gl.readPixels(0, 0, exportSize, exportSize, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    gl.deleteTexture(exportTex);
+    gl.deleteFramebuffer(exportFbo);
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = exportSize;
+    tempCanvas.height = exportSize;
+    const ctx = tempCanvas.getContext("2d");
+    const imgData = ctx.createImageData(exportSize, exportSize);
+
+    for (let y = 0; y < exportSize; y++) {
+      const topY = exportSize - 1 - y;
+      const srcOffset = y * exportSize * 4;
+      const dstOffset = topY * exportSize * 4;
+      imgData.data.set(pixels.subarray(srcOffset, srcOffset + exportSize * 4), dstOffset);
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, view.width, view.height);
+
+    return tempCanvas.toDataURL(mimeType, 1.0);
+  }
+
+  function gpuClear() {
+    if (pendingSync) {
+      gl.deleteSync(pendingSync);
+      pendingSync = null;
+    }
+    drawTo(inkTex[1 - inkI], PASS_CLEAR); inkI = 1 - inkI;
+    drawTo(back[1 - backI], PASS_IDENTITY); backI = 1 - backI;
+    drawTo(fwd[1 - fwdI], PASS_IDENTITY); fwdI = 1 - fwdI;
+    drawTo(surfTex[0], PASS_ZERO); drawTo(surfTex[1], PASS_ZERO);
+    drawTo(inertVelTex[0], PASS_ZERO); drawTo(inertVelTex[1], PASS_ZERO);
+    drawTo(phiTex, PASS_ZERO);
+    drawTo(pressTex, PASS_ZERO);
+    drawTo(velTex, PASS_ZERO);
+    drawTo(curlTex, PASS_ZERO);
+    stepCount = 0;
+    isSpreading = false;
+    hasAdvectedSinceBake = false;
+  }
+
+  function gpuBake() {
+    if (!hasAdvectedSinceBake) return;
+    drawTo(inkTex[1 - inkI], PASS_BAKE); inkI = 1 - inkI;
+    for (let r = 0; r < 2; r++) {
+      drawTo(inkTex[1 - inkI], PASS_REDISTANCE);
+      inkI = 1 - inkI;
+    }
+    drawTo(back[1 - backI], PASS_IDENTITY); backI = 1 - backI;
+    drawTo(fwd[1 - fwdI], PASS_IDENTITY); fwdI = 1 - fwdI;
+    hasAdvectedSinceBake = false;
+  }
+
+  function gpuStamp(isNewDrop) {
+    if (isNewDrop && hasAdvectedSinceBake) {
+      gpuBake();
+    }
+    gl.uniform1i(uIsNewDropLoc, isNewDrop ? 1 : 0);
+    gl.uniform3f(
+      uInkColor,
+      (ink & 255) / 255,
+      ((ink >> 8) & 255) / 255,
+      ((ink >> 16) & 255) / 255
+    );
+    gl.uniform2f(uCenter, input.x, input.y);
+    gl.uniform1f(uRadius, INK_RADIUS * dropSizeMult);
+    drawTo(inkTex[1 - inkI], PASS_STAMP);
+    inkI = 1 - inkI;
+    input.stampX = input.x;
+    input.stampY = input.y;
+  }
+
+  function seedInitialBath() {
+    gpuClear();
+    const drops = [
+      [0.48, 0.50, 1.4],
+      [0.48, 0.50, 1.2],
+      [0.35, 0.38, 1.1],
+      [0.35, 0.38, 0.9],
+      [0.64, 0.62, 1.3],
+      [0.64, 0.62, 1.0],
+      [0.52, 0.48, 1.2],
+      [0.52, 0.48, 0.95]
+    ];
+    const savedTool = activeTool;
+    activeTool = 0;
+    drops.forEach(([x, y, sz], idx) => {
+      ink = hexToPack(dynamicPalette[idx % dynamicPalette.length][1]);
+      input.x = x;
+      input.y = y;
+      dropSizeMult = sz;
+      input.tap = true;
+      for (let i = 0; i < 8; i++) {
+        step(DT, DT);
+      }
+    });
+    dropSizeMult = 1.0;
+    ink = hexToPack(dynamicPalette[currentSwatchIndex][1]);
+
+    activeTool = 1;
+    input.down = true;
+    const path = [
+      [0.25, 0.30], [0.45, 0.28], [0.65, 0.45],
+      [0.50, 0.60], [0.32, 0.72], [0.70, 0.75]
+    ];
+    for (let p = 0; p < path.length - 1; p++) {
+      const [x0, y0] = path[p];
+      const [x1, y1] = path[p + 1];
+      for (let s = 0; s < 10; s++) {
+        const t = s / 10;
+        input.xPrev = input.x;
+        input.yPrev = input.y;
+        input.x = x0 + (x1 - x0) * t;
+        input.y = y0 + (y1 - y0) * t;
+        step(DT, DT);
+      }
+    }
+    input.down = false;
+    activeTool = savedTool;
+    drawTo(null, PASS_DISPLAY);
+  }
+
+  function reset() {
+    input.tap = false;
+    gpuClear();
+    drawTo(null, PASS_DISPLAY);
+  }
+
+  function step(dt, frameDelta) {
+    const isActivelyWorking = input.down || input.tap;
+
+    if (isActivelyWorking) {
+      if (!isSpreading) {
+        isSpreading = true;
+      }
+      if (activeTool === 0) {
+        const radius = INK_RADIUS * dropSizeMult;
+        const addedMass = (4.4 * dt + (input.tap ? 1.35 : 0)) * flowRateMult;
+        gl.uniform1f(uMassLoc, addedMass);
+        gl.uniform2f(uCenter, input.x, input.y);
+        gl.uniform1f(uRadius, radius);
+        drawTo(surfTex[1 - surfI], PASS_SPLAT);
+        surfI = 1 - surfI;
+
+        if (input.tap) {
+          gpuStamp(true);
+        } else {
+          const movedDist = Math.hypot(input.x - input.stampX, input.y - input.stampY);
+          if (movedDist > radius * 0.30) {
+            gpuStamp(false);
+          }
+        }
+      }
+      input.tap = false;
+    }
+
+    if (!isSpreading) return false;
+
+    const T = tension();
+    const V = viscosity();
+    gl.uniform1f(uSeqLoc, 0.042 / T);
+    gl.uniform1f(uRateLoc, 10.5 * T / V);
+
+    drawTo(mgRhs[0], PASS_SURF_RHS);
+    gl.uniform1f(uScaleLoc, 0.85);
+    drawTo(mgSol[0][0], PASS_WARM_START, phiTex.tex);
+    const phiFinalIdx = solveMultigridVCycle(0.06, 2);
+    const tmpPhi = phiTex;
+    phiTex = mgSol[0][phiFinalIdx];
+    mgSol[0][phiFinalIdx] = tmpPhi;
+
+    if (vortValue > 1e-5) {
+      drawTo(curlTex, PASS_VORTICITY);
+    }
+
+    gl.uniform1f(uDt, dt);
+    gl.uniform1f(uFrameDtLoc, frameDelta);
+    gl.uniform1f(uDampingLoc, ekmanDamping());
+    gl.uniform1f(uViscDiffLoc, 0.15 + 0.35 * (1.0 - diffValue));
+    gl.uniform1f(uVortConfLoc, vortValue * 8.5);
+
+    gl.uniform1i(uTool, isActivelyWorking ? activeTool : 0);
+    gl.uniform1f(uToolDragLoc, stylusDragMult);
+    gl.uniform2f(uCenter, input.x, input.y);
+    gl.uniform2f(uPrevCenter, input.xPrev, input.yPrev);
+    gl.uniform2f(uRakeDir, input.dirX, input.dirY);
+    gl.uniform2f(uPrevRakeDir, input.prevDirX, input.prevDirY);
+    gl.uniform1f(uStickRadius, STICK_BASE_RADIUS * stylusRadiusMult);
+
+    drawTo(inertVelTex[1 - inertI], PASS_ADVECT_INERTIAL);
+    inertI = 1 - inertI;
+
+    drawTo(mgRhs[0], PASS_NS_DIV);
+    gl.uniform1f(uScaleLoc, 0.80);
+    drawTo(mgSol[0][0], PASS_WARM_START, pressTex.tex);
+    const pressFinalIdx = solveMultigridVCycle(0.0005, 1);
+    const tmpPress = pressTex;
+    pressTex = mgSol[0][pressFinalIdx];
+    mgSol[0][pressFinalIdx] = tmpPress;
+
+    drawTo(inertVelTex[1 - inertI], PASS_NS_PROJECT);
+    inertI = 1 - inertI;
+
+    drawTo(velTex, PASS_COMBINE_VEL);
+
+    const sub = 3;
+    const sdt = dt / sub;
+    gl.uniform1f(uDt, sdt);
+    for (let s = 0; s < sub; s++) {
+      drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF); surfI = 1 - surfI;
+      drawTo(back[1 - backI], PASS_BACK); backI = 1 - backI;
+      drawTo(fwd[1 - fwdI], PASS_FWD); fwdI = 1 - fwdI;
+    }
+
+    hasAdvectedSinceBake = true;
+    stepCount++;
+    if (stepCount % 750 === 0) gpuBake();
+
+    pollAsyncGpuActivity(isActivelyWorking);
+
+    return true;
+  }
+
+  function drawRing() {
+    const w = ring.width;
+    const h = ring.height;
+    ringCtx.clearRect(0, 0, w, h);
+
+    if (!(input.inside || input.down)) {
+      toolCursor.classList.remove("visible", "pressing");
+      return;
+    }
+
+    ringCtx.strokeStyle = "rgba(235, 225, 210, 0.65)";
+    ringCtx.lineWidth = Math.max(1.2, w / 480);
+
+    const radius = (activeTool === 0)
+      ? 0.034 * Math.sqrt(0.72) * w * dropSizeMult
+      : STICK_BASE_RADIUS * w * stylusRadiusMult;
+
+    ringCtx.beginPath();
+    ringCtx.arc(input.x * w, input.y * h, radius, 0, Math.PI * 2);
+    ringCtx.stroke();
+
+    // Position the skeuomorphic tool sprite so its tip hovers directly over the area circle center
+    syncToolCursorImage();
+    const [stageX, stageY] = stageFromWorld(input.x, input.y);
+    toolCursor.style.left = `${stageX}px`;
+    toolCursor.style.top = `${stageY}px`;
+    toolCursor.classList.add("visible");
+    toolCursor.classList.toggle("pressing", input.down);
+  }
+
+  function layout() {
+    updateBathHomography();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const px = Math.round(LOCAL_BATH_SIZE * dpr);
+    if (view.width !== px || view.height !== px) {
+      view.width = px;
+      view.height = px;
+      ring.width = px;
+      ring.height = px;
+    }
+    drawTo(null, PASS_DISPLAY);
+    drawRing();
+  }
+
+  view.addEventListener("pointerdown", (e) => {
+    view.setPointerCapture(e.pointerId);
+    const p = worldFromEvent(e);
+    input.x = p[0]; input.y = p[1];
+    input.xPrev = p[0]; input.yPrev = p[1];
+    input.vX = 0; input.vY = 0;
+    input.prevDirX = input.dirX;
+    input.prevDirY = input.dirY;
+    input.down = true; input.tap = true; input.inside = true;
+    pouredDrop = true;
+    drawRing();
+    e.preventDefault();
+  });
+
+  view.addEventListener("pointermove", (e) => {
+    const p = worldFromEvent(e);
+    input.x = p[0]; input.y = p[1];
+    input.inside = true;
+  });
+
+  function cycleColor() {
+    if (dynamicPalette.length === 0) return;
+    currentSwatchIndex = (currentSwatchIndex + 1) % dynamicPalette.length;
+    const buttons = document.querySelectorAll(".swatch");
+    if (buttons[currentSwatchIndex]) buttons[currentSwatchIndex].click();
+  }
+
+  function endPointer(e) {
+    input.down = false;
+    if (pouredDrop) {
+      if (sumiMode && activeTool === 0) cycleColor();
+      pouredDrop = false;
+    }
+    if (e && e.pointerId !== undefined && view.hasPointerCapture(e.pointerId)) {
+      view.releasePointerCapture(e.pointerId);
+    }
+    drawRing();
+  }
+
+  view.addEventListener("pointerup", endPointer);
+  view.addEventListener("pointercancel", endPointer);
+  view.addEventListener("pointerleave", () => {
+    input.inside = false;
+    if (!input.down) drawRing();
+  });
+  view.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  // =========================================================
+  // Interactive Corner Calibration ('P' Key to Toggle, 'R' to Reset)
+  // =========================================================
+  let activePin = null;
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "p" || e.key === "P") {
+      document.querySelectorAll(".corner-pin").forEach(pin => pin.classList.toggle("visible"));
+    } else if ((e.key === "r" || e.key === "R") && document.querySelector(".corner-pin.visible")) {
+      bathQuad = DEFAULT_BATH_QUAD.map(pt => [pt[0], pt[1]]);
+      localStorage.removeItem("suminagashi_bath_quad_v2");
+      updateBathHomography();
+    }
+  });
+
+  document.querySelectorAll(".corner-pin").forEach(pin => {
+    pin.addEventListener("pointerdown", (e) => {
+      pin.setPointerCapture(e.pointerId);
+      activePin = parseInt(pin.getAttribute("data-corner"), 10);
+      e.stopPropagation();
+      e.preventDefault();
+    });
+    pin.addEventListener("pointermove", (e) => {
+      if (activePin === null) return;
+      const rect = stage.getBoundingClientRect();
+      const nx = Math.max(0.05, Math.min(0.95, (e.clientX - rect.left) / rect.width));
+      const ny = Math.max(0.05, Math.min(0.95, (e.clientY - rect.top) / rect.height));
+      bathQuad[activePin] = [nx, ny];
+      updateBathHomography();
+    });
+    pin.addEventListener("pointerup", (e) => {
+      if (activePin !== null) {
+        activePin = null;
+        try {
+          localStorage.setItem("suminagashi_bath_quad_v2", JSON.stringify(bathQuad));
+        } catch (_) {}
+        console.log("Updated BATH_QUAD:", JSON.stringify(bathQuad));
+      }
+      if (pin.hasPointerCapture(e.pointerId)) pin.releasePointerCapture(e.pointerId);
+    });
+  });
+
+  // Tool Hotspot Selection (Brushes vs Bamboo Stick)
+  document.querySelectorAll(".tool-hotspot").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tool-hotspot").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".top-view").forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      activeTool = parseInt(btn.getAttribute("data-tool"), 10);
+      const panel = document.getElementById(`panel-${activeTool}`);
+      if (panel) panel.classList.add("active");
+
+      syncToolCursorImage();
+      if (input.inside) drawRing();
+    });
+  });
+
+  // Washi Paper Stack Export Menu Toggle
+  const washiTrigger = document.getElementById("washi-trigger");
+  const washiMenu = document.getElementById("washi-menu");
+  washiTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    washiMenu.classList.toggle("open");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!washiMenu.contains(e.target) && e.target !== washiTrigger) {
+      washiMenu.classList.remove("open");
+    }
+  });
+
+  function renderPalette() {
+    const swatchBox = document.getElementById("swatches");
+    swatchBox.innerHTML = "";
+    dynamicPalette.forEach(([name, hex], index) => {
+      const wrap = document.createElement("div");
+      wrap.className = "swatch-wrap";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "swatch";
+      button.title = name;
+      button.setAttribute("aria-label", name);
+      button.style.background = hex;
+      button.setAttribute("aria-pressed", currentSwatchIndex === index ? "true" : "false");
+      button.addEventListener("click", () => {
+        currentSwatchIndex = index;
+        selectPack(hexToPack(hex), button);
+      });
+
+      wrap.appendChild(button);
+
+      if (dynamicPalette.length > 1) {
+        const del = document.createElement("div");
+        del.className = "swatch-del";
+        del.innerHTML = "&times;";
+        del.title = "Remove ink";
+        del.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dynamicPalette.splice(index, 1);
+          if (currentSwatchIndex >= dynamicPalette.length) {
+            currentSwatchIndex = Math.max(0, dynamicPalette.length - 1);
+          }
+          renderPalette();
+          const buttons = document.querySelectorAll(".swatch");
+          if (buttons[currentSwatchIndex]) buttons[currentSwatchIndex].click();
+        });
+        wrap.appendChild(del);
+      }
+
+      swatchBox.appendChild(wrap);
+    });
+  }
+
+  renderPalette();
+
+  // Clicking "+ Add Color" opens the native color picker and creates/updates the new dish
+  const picker = document.getElementById("picker");
+  let activeNewColorIndex = -1;
+
+  picker.addEventListener("click", () => {
+    activeNewColorIndex = -1;
+  });
+
+  function addOrUpdatePickedColor(hex) {
+    if (activeNewColorIndex === -1 || activeNewColorIndex >= dynamicPalette.length) {
+      dynamicPalette.push(["Custom Ink", hex]);
+      activeNewColorIndex = dynamicPalette.length - 1;
+      currentSwatchIndex = activeNewColorIndex;
+      renderPalette();
+      const buttons = document.querySelectorAll(".swatch");
+      if (buttons[currentSwatchIndex]) {
+        selectPack(hexToPack(hex), buttons[currentSwatchIndex]);
+      }
+    } else {
+      dynamicPalette[activeNewColorIndex][1] = hex;
+      currentSwatchIndex = activeNewColorIndex;
+      const buttons = document.querySelectorAll(".swatch");
+      const btn = buttons[activeNewColorIndex];
+      if (btn) {
+        btn.style.background = hex;
+        selectPack(hexToPack(hex), btn);
+      }
+    }
+  }
+
+  picker.addEventListener("input", () => {
+    addOrUpdatePickedColor(picker.value);
+  });
+
+  picker.addEventListener("change", () => {
+    addOrUpdatePickedColor(picker.value);
+    activeNewColorIndex = -1;
+  });
+
+  function selectPack(packed, el) {
+    ink = packed;
+    document.querySelectorAll(".swatch").forEach((node) => {
+      node.setAttribute("aria-pressed", node === el ? "true" : "false");
+    });
+  }
+
+  document.getElementById("sumi-mode").addEventListener("change", (e) => { sumiMode = e.target.checked; });
+
+  const waterSwatchLabel = document.getElementById("water-swatch-label");
+  document.getElementById("bath-color").addEventListener("input", (e) => {
+    const hex = e.target.value;
+    if (waterSwatchLabel) waterSwatchLabel.style.background = hex;
+    const n = parseInt(hex.slice(1), 16);
+    gl.useProgram(program);
+    gl.uniform3f(uWater, ((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+    reset();
+  });
+
+  document.getElementById("diffusion").addEventListener("input", (e) => {
+    diffValue = parseFloat(e.target.value);
+    document.getElementById("diffusion-read").textContent = Math.round(diffValue * 100) + "%";
+  });
+
+  document.getElementById("glide").addEventListener("input", (e) => {
+    glideValue = parseFloat(e.target.value);
+    document.getElementById("glide-read").textContent = Math.round(glideValue * 100) + "%";
+  });
+
+  document.getElementById("vorticity").addEventListener("input", (e) => {
+    vortValue = parseFloat(e.target.value);
+    document.getElementById("vorticity-read").textContent = Math.round(vortValue * 100) + "%";
+  });
+
+  document.getElementById("size").addEventListener("input", (e) => {
+    dropSizeMult = parseFloat(e.target.value);
+    document.getElementById("size-read").textContent = dropSizeMult.toFixed(1) + "x";
+    if (input.inside) drawRing();
+  });
+  document.getElementById("flow").addEventListener("input", (e) => {
+    flowRateMult = parseFloat(e.target.value);
+    document.getElementById("flow-read").textContent = flowRateMult.toFixed(1) + "x";
+  });
+
+  document.getElementById("stick-size").addEventListener("input", (e) => {
+    stylusRadiusMult = parseFloat(e.target.value);
+    document.getElementById("stick-size-read").textContent = stylusRadiusMult.toFixed(1) + "x";
+    if (input.inside) drawRing();
+  });
+  document.getElementById("stick-drag").addEventListener("input", (e) => {
+    stylusDragMult = parseFloat(e.target.value);
+    document.getElementById("stick-drag-read").textContent = stylusDragMult.toFixed(1) + "x";
+  });
+
+  document.getElementById("clear").addEventListener("click", reset);
+
+  document.getElementById("export-jpg").addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.href = exportHighRes("image/jpeg", false);
+    a.download = "suminagashi.jpg";
+    a.click();
+    washiMenu.classList.remove("open");
+  });
+
+  document.getElementById("export-svg").addEventListener("click", () => {
+    const exportSize = 4096;
+    const data = exportHighRes("image/png", true);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}"><image href="${data}" width="${exportSize}" height="${exportSize}" /></svg>`;
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "suminagashi.svg";
+    a.click();
+    washiMenu.classList.remove("open");
+  });
+
+  window.addEventListener("resize", layout);
+
+  let last = performance.now();
+  let acc = 0;
+
+  function frame(now) {
+    let delta = (now - last) / 1000;
+    last = now;
+    if (delta > 0.05) delta = 0.05;
+
+    input.prevDirX = input.dirX;
+    input.prevDirY = input.dirY;
+
+    const dx = input.x - input.xPrev;
+    const dy = input.y - input.yPrev;
+    const dist = Math.hypot(dx, dy);
+
+    if (input.down && delta > 1e-5) {
+      input.vX = dx / delta;
+      input.vY = dy / delta;
+      if (dist > 0.0008) {
+        const targetDirX = dx / dist;
+        const targetDirY = dy / dist;
+        const casterTurn = Math.min(1.0, dist / 0.032);
+        input.dirX += (targetDirX - input.dirX) * casterTurn;
+        input.dirY += (targetDirY - input.dirY) * casterTurn;
+        const dLen = Math.hypot(input.dirX, input.dirY) || 1.0;
+        input.dirX /= dLen;
+        input.dirY /= dLen;
+      }
+    } else {
+      input.vX = 0;
+      input.vY = 0;
+    }
+
+    acc += delta;
+    let steps = 0;
+    let painted = false;
+    while (acc >= DT && steps < 2) {
+      if (step(DT, Math.max(delta, DT))) painted = true;
+      input.xPrev = input.x;
+      input.yPrev = input.y;
+      input.prevDirX = input.dirX;
+      input.prevDirY = input.dirY;
+      acc -= DT;
+      steps++;
+    }
+    if (steps === 2) acc = 0;
+
+    if (painted) drawTo(null, PASS_DISPLAY);
+    if (steps > 0 || input.inside || input.down) drawRing();
+    requestAnimationFrame(frame);
+  }
+
+  layout();
+  seedInitialBath();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
