@@ -154,6 +154,12 @@
     gap: 0.6cqw;
   }
 
+  .header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 0.45cqw;
+  }
+
   .section-header h2 {
     margin: 0;
     font-size: 0.95cqw;
@@ -202,9 +208,13 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.55cqw;
-    max-height: 3.1cqw;
+    max-height: 4.8cqw;
     overflow-y: auto;
-    padding: 0.15cqw;
+    padding: 0.2cqw 0.15cqw;
+  }
+
+  .swatches-list {
+    display: contents;
   }
 
   .swatch-wrap {
@@ -262,44 +272,49 @@
     display: block;
   }
 
-  .add-ink-row {
-    display: flex;
-    align-items: center;
-    margin-top: 0.25cqw;
-  }
-
-  .btn-add-color {
+  .btn-add-color,
+  .btn-float-image {
     position: relative;
-    flex: 1;
-    height: 1.65cqw;
     border-radius: 0.25cqw;
-    border: 1px solid rgba(75, 58, 40, 0.4);
-    background: rgba(238, 230, 214, 0.75);
+    border: 1px solid rgba(75, 58, 40, 0.45);
+    background: rgba(238, 230, 214, 0.78);
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 0.72cqw;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4cqw;
     overflow: hidden;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
 
-  .btn-add-color:hover {
-    background: rgba(248, 242, 230, 0.95);
-  }
-
-  .add-color-preview {
-    width: 0.85cqw;
-    height: 0.85cqw;
-    border-radius: 50%;
-    border: 1px solid rgba(40, 30, 20, 0.55);
-    background: #1d4e89;
+  .btn-add-color {
+    width: 2.05cqw;
+    height: 2.05cqw;
+    font-size: 1.15cqw;
+    line-height: 1;
     flex-shrink: 0;
-    pointer-events: none;
+  }
+
+  .btn-float-image {
+    height: 1.65cqw;
+    padding: 0 0.55cqw;
+    font-size: 0.72cqw;
+    letter-spacing: 0.04em;
+    gap: 0.35cqw;
+  }
+
+  .btn-add-color:hover,
+  .btn-float-image:hover {
+    background: rgba(248, 242, 230, 0.96);
+    border-color: rgba(75, 58, 40, 0.7);
+  }
+
+  .btn-add-color:active,
+  .btn-float-image:active {
+    transform: scale(0.96);
   }
 
   .btn-add-color input[type="color"] {
@@ -424,6 +439,12 @@
     color: var(--ink-text);
   }
 
+  .water-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5cqw;
+  }
+
   .water-swatch-btn {
     width: 1.85cqw;
     height: 1.85cqw;
@@ -435,8 +456,9 @@
       0 0 0 1px rgba(45, 32, 20, 0.65);
     overflow: hidden;
     cursor: pointer;
-    background: #1c1e21;
+    background: #b8b0a2;
     padding: 0;
+    flex-shrink: 0;
   }
 
   .water-swatch-btn input {
@@ -711,6 +733,135 @@
   .water-cup-hotspot:active {
     transform: scale(0.96);
   }
+
+  /* =========================================================
+     Square Image Crop Modal Overlay
+     ========================================================= */
+  .crop-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(14, 10, 7, 0.76);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    place-items: center;
+    z-index: 100;
+  }
+
+  .crop-modal-backdrop.open {
+    display: grid;
+  }
+
+  .crop-modal-card {
+    width: 31cqw;
+    background-color: #d6cbb8;
+    background-image:
+      radial-gradient(circle at 20% 25%, rgba(246, 240, 228, 0.72), transparent 55%),
+      radial-gradient(circle at 80% 75%, rgba(175, 158, 134, 0.45), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(60, 45, 30, 0.025) 0px, rgba(60, 45, 30, 0.025) 1px, transparent 1px, transparent 3px);
+    border-radius: 0.55cqw;
+    border: 1px solid rgba(55, 42, 28, 0.75);
+    box-shadow:
+      inset 0 0 1.6cqw rgba(68, 50, 32, 0.42),
+      inset 0 1px 0 rgba(255, 250, 240, 0.55),
+      0 1.4cqw 3.8cqw rgba(0, 0, 0, 0.82);
+    padding: 1.25cqw 1.45cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85cqw;
+  }
+
+  .crop-viewport-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.35cqw;
+    overflow: hidden;
+    border: 2px solid rgba(48, 36, 24, 0.75);
+    box-shadow:
+      inset 0 0 1.2cqw rgba(0, 0, 0, 0.65),
+      0 1px 0 rgba(255, 250, 240, 0.55);
+    background: #1c1814;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .crop-viewport-wrap:active {
+    cursor: grabbing;
+  }
+
+  .crop-viewport-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .crop-grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(255, 248, 235, 0.22) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 248, 235, 0.22) 1px, transparent 1px);
+    background-size: 33.333% 33.333%;
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 235, 0.25);
+  }
+
+  .crop-hint {
+    font-size: 0.72cqw;
+    color: var(--muted-text);
+    text-align: center;
+    margin: -0.25cqw 0 0;
+    font-style: italic;
+  }
+
+  .crop-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6cqw;
+    padding-top: 0.25cqw;
+    border-top: 1px solid rgba(75, 58, 40, 0.25);
+  }
+
+  .crop-btn {
+    flex: 1;
+    height: 2.1cqw;
+    border-radius: 0.28cqw;
+    font-family: inherit;
+    font-size: 0.78cqw;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+  }
+
+  .crop-btn:active {
+    transform: scale(0.98);
+  }
+
+  .crop-btn-secondary {
+    background: rgba(238, 230, 214, 0.8);
+    color: var(--ink-text);
+    border: 1px solid rgba(75, 58, 40, 0.45);
+  }
+
+  .crop-btn-secondary:hover {
+    background: rgba(248, 242, 230, 0.98);
+  }
+
+  .crop-btn-primary {
+    background: linear-gradient(180deg, #9e311d, #782212);
+    color: #f7efe2;
+    border: 1px solid #4f1409;
+    box-shadow:
+      0 0.2cqw 0.45cqw rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 195, 170, 0.35);
+  }
+
+  .crop-btn-primary:hover {
+    background: linear-gradient(180deg, #b33822, #8c2815);
+  }
 </style>
 </head>
 <body>
@@ -739,12 +890,10 @@
           <span class="mini-hanko">墨</span>
         </div>
 
-        <div class="colors" id="swatches"></div>
-
-        <div class="add-ink-row">
-          <label class="btn-add-color" id="add-to-palette" title="Click to choose and add a new ink color">
-            <span class="add-color-preview" id="add-color-preview"></span>
-            <span>+ Add Color</span>
+        <div class="colors">
+          <div class="swatches-list" id="swatches"></div>
+          <label class="btn-add-color" id="add-to-palette" title="Add custom ink color">
+            <span aria-hidden="true">+</span>
             <input id="picker" type="color" value="#1d4e89" aria-label="Add custom ink color">
           </label>
         </div>
@@ -808,16 +957,24 @@
     <div class="section-header">
       <div class="header-title-group">
         <h2>Water Bath</h2>
+      </div>
+      <div class="header-right-group">
+        <button class="btn-float-image" id="float-image-btn" type="button" title="Upload and crop an image to float on the water bath">
+          + Float Image
+        </button>
         <span class="mini-hanko">墨</span>
       </div>
+      <input id="image-upload-input" type="file" accept="image/*" hidden>
     </div>
 
     <div class="bath-controls-list">
       <div class="water-color-row">
         <span>Water Color</span>
-        <label class="water-swatch-btn" id="water-swatch-label" title="Change bath water color">
-          <input id="bath-color" type="color" value="#b8b0a2" aria-label="Water Color">
-        </label>
+        <div class="water-row-actions">
+          <label class="water-swatch-btn" id="water-swatch-label" title="Change bath water color">
+            <input id="bath-color" type="color" value="#b8b0a2" aria-label="Water Color">
+          </label>
+        </div>
       </div>
 
       <label class="craft-slider">
@@ -872,6 +1029,41 @@
 
   <button class="water-cup-hotspot" id="clear" type="button" title="Pour fresh water to clear the bath" aria-label="Fresh Water - Clear Bath"></button>
 
+  <!-- 6. SQUARE IMAGE CROP MODAL -->
+  <div class="crop-modal-backdrop" id="crop-modal" role="dialog" aria-modal="true" aria-labelledby="crop-modal-title">
+    <div class="crop-modal-card">
+      <div class="section-header">
+        <div class="header-title-group">
+          <h2 id="crop-modal-title">Square Bath Crop</h2>
+          <span class="mini-hanko">墨</span>
+        </div>
+        <button class="btn-float-image" id="crop-reselect-btn" type="button" title="Choose a different image file">
+          Change File
+        </button>
+      </div>
+
+      <div class="crop-viewport-wrap" id="crop-viewport">
+        <canvas id="crop-canvas" width="640" height="640"></canvas>
+        <div class="crop-grid-overlay"></div>
+      </div>
+
+      <p class="crop-hint">Drag image to frame square &bull; Scroll or slide to zoom</p>
+
+      <label class="craft-slider">
+        <div class="craft-slider-header">
+          <span>Crop Zoom</span>
+          <strong id="crop-zoom-read">1.00x</strong>
+        </div>
+        <input id="crop-zoom" type="range" min="1.0" max="4.0" step="0.01" value="1.0">
+      </label>
+
+      <div class="crop-actions">
+        <button class="crop-btn crop-btn-secondary" id="crop-cancel" type="button">Cancel</button>
+        <button class="crop-btn crop-btn-primary" id="crop-confirm" type="button">Float in Bath</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -918,8 +1110,8 @@
   const DEFAULT_BATH_QUAD = [
     [0.3255, 0.1140], // TL: nested into top-left inner shadow crease
     [0.77, 0.1145],   // TR: nested into top-right inner shadow crease
-    [0.795, 0.8585],  // BR: meets the bottom-right meniscus crease
-    [0.3175, 0.8585]  // BL: meets the bottom-left meniscus crease
+    [0.798, 0.856],  // BR: meets the bottom-right meniscus crease
+    [0.314, 0.858]  // BL: meets the bottom-left meniscus crease
   ];
 
   let bathQuad = DEFAULT_BATH_QUAD.map(pt => [pt[0], pt[1]]);
@@ -1002,8 +1194,9 @@
 
   function tension() { return 0.35 + (diffValue * 2.15); }
   function viscosity() { return 2.4 - (diffValue * 1.9); }
+  // Reversed viscosity behavior: 0% flows freely (low damping), 100% is thick fluid (high damping)
   function ekmanDamping() {
-    return 0.35 + Math.pow(1.0 - glideValue, 2.0) * 6.5;
+    return 0.35 + Math.pow(glideValue, 2.0) * 6.5;
   }
 
   // =========================================================
@@ -1234,6 +1427,8 @@ float distBicubicClamped(vec2 origin) {
   return clamp(sum, minD, maxD);
 }
 
+// Sign-masked bilinear sampling keeps level-set ink boundaries razor-sharp
+// while smoothly interpolating continuous-tone uploaded images.
 vec3 pureColorAt(vec2 origin, float targetSign) {
   vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
   ivec2 i = ivec2(floor(p));
@@ -1250,21 +1445,18 @@ vec3 pureColorAt(vec2 origin, float targetSign) {
   float w11 = f.x * f.y;
 
   bool wantPos = (targetSign >= 0.0);
-  vec3 bestColor = s00.rgb;
-  float bestWeight = -1.0;
+  vec3 colorSum = vec3(0.0);
+  float weightSum = 0.0;
 
-  if ((s00.a >= 0.0) == wantPos && w00 > bestWeight) { bestWeight = w00; bestColor = s00.rgb; }
-  if ((s10.a >= 0.0) == wantPos && w10 > bestWeight) { bestWeight = w10; bestColor = s10.rgb; }
-  if ((s01.a >= 0.0) == wantPos && w01 > bestWeight) { bestWeight = w01; bestColor = s01.rgb; }
-  if ((s11.a >= 0.0) == wantPos && w11 > bestWeight) { bestWeight = w11; bestColor = s11.rgb; }
+  if ((s00.a >= 0.0) == wantPos) { colorSum += s00.rgb * w00; weightSum += w00; }
+  if ((s10.a >= 0.0) == wantPos) { colorSum += s10.rgb * w10; weightSum += w10; }
+  if ((s01.a >= 0.0) == wantPos) { colorSum += s01.rgb * w01; weightSum += w01; }
+  if ((s11.a >= 0.0) == wantPos) { colorSum += s11.rgb * w11; weightSum += w11; }
 
-  if (bestWeight < 0.0) {
-    bestColor = s00.rgb; bestWeight = w00;
-    if (w10 > bestWeight) { bestWeight = w10; bestColor = s10.rgb; }
-    if (w01 > bestWeight) { bestWeight = w01; bestColor = s01.rgb; }
-    if (w11 > bestWeight) { bestWeight = w11; bestColor = s11.rgb; }
+  if (weightSum > 1e-5) {
+    return colorSum / weightSum;
   }
-  return bestColor;
+  return s00.rgb * w00 + s10.rgb * w10 + s01.rgb * w01 + s11.rgb * w11;
 }
 
 vec2 simBilinearRG(sampler2D tex, vec2 world) {
@@ -1345,28 +1537,25 @@ void main() {
     float edgeAlpha = smoothstep(0.0, 0.026, inwardDist);
 
     // Directional wall & corner ambient occlusion so bright water grades into the wet wood shadow
-    float topShadow = smoothstep(0.0, 0.095, world.y);
-    float botShadow = smoothstep(0.0, 0.065, 1.0 - world.y);
-    float sideShadow = smoothstep(0.0, 0.052, min(world.x, 1.0 - world.x));
-    float cornerAO = smoothstep(0.0, 0.072, inwardDist);
+      float topShadow = smoothstep(0.0, 0.095, world.y);
+      float botShadow = smoothstep(0.0, 0.075, 1.0 - world.y);
+      float sideShadow = smoothstep(0.0, 0.055, min(world.x, 1.0 - world.x));
+      float cornerAO = smoothstep(0.0, 0.055, inwardDist);
 
-    float wallFactor = (0.28 + 0.72 * topShadow)
-                     * (0.35 + 0.65 * botShadow)
-                     * (0.38 + 0.62 * sideShadow)
-                     * (0.22 + 0.78 * cornerAO);
+      float wallFactor = (0.28 + 0.72 * topShadow)
+                       * (0.12 + 0.88 * botShadow)
+                       * (0.30 + 0.70 * sideShadow)
+                       * (0.05 + 0.95 * cornerAO);
 
-    vec3 darkMeniscus = vec3(0.065, 0.052, 0.042);
-    vec3 shaded = mix(darkMeniscus, baseCol, clamp(wallFactor, 0.0, 1.0));
+      vec3 darkMeniscus = vec3(0.065, 0.052, 0.042);
+      vec3 shaded = mix(darkMeniscus, baseCol, clamp(wallFactor, 0.0, 1.0));
 
-    // Subtle concave water meniscus rim glint + studio window sheen
-    float rimGlint = exp(-pow((inwardDist - 0.013) / 0.0045, 2.0))
-                   * smoothstep(0.08, 0.35, world.y)
-                   * 0.11;
-    float windowSheen = exp(-length((world - vec2(0.76, 0.18)) * vec2(1.4, 2.2)) * 3.2) * 0.07;
+      // Studio window sheen (masked by wallFactor so it never brightens the shadowed wood crease)
+      float windowSheen = exp(-length((world - vec2(0.76, 0.18)) * vec2(1.4, 2.2)) * 3.2) * 0.07 * wallFactor;
 
-    shaded += vec3(0.95, 0.92, 0.86) * (rimGlint + windowSheen);
+      shaded += vec3(0.95, 0.92, 0.86) * windowSheen;
 
-    fragColor = vec4(shaded, edgeAlpha);
+      fragColor = vec4(shaded, edgeAlpha);
   }
   else if (uPass == 1) {
     vec2 world = gl_FragCoord.xy / uTargetSize;
@@ -1400,7 +1589,7 @@ void main() {
     vec2 centerOrigin = bicubic(uMap, uCenter);
     float centerD = distAt(centerOrigin);
     vec3 centerColor = pureColorAt(centerOrigin, centerD);
-    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005);
+    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
 
     if (uIsNewDrop == 1 && !sameColorAsCenter) {
       float newSign = centerD >= 0.0 ? -1.0 : 1.0;
@@ -1412,12 +1601,12 @@ void main() {
       }
     } else {
       float keepSign = centerD >= 0.0 ? 1.0 : -1.0;
+      bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (keepSign >= 0.0));
       if (radial <= 0.0) {
-        bool oldSameColor = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (keepSign >= 0.0));
-        float dIn = oldSameColor ? max(abs(old.a), -radial) : (-radial);
+        float dIn = oldMatchesDrop ? max(abs(old.a), -radial) : (-radial);
         fragColor = vec4(uInkColor, keepSign * dIn);
       } else {
-        if (distance(old.rgb, uInkColor) < 0.005) {
+        if (oldMatchesDrop) {
           fragColor = old;
         } else {
           float sgn = old.a >= 0.0 ? 1.0 : -1.0;
@@ -1711,6 +1900,11 @@ void main() {
     }
     fragColor = vec4(maxAct, 0.0, 0.0, 1.0);
   }
+  else if (uPass == 22) {
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+    vec3 imgCol = texture(uAuxA, uv).rgb;
+    fragColor = vec4(imgCol, 1.0);
+  }
 }`;
 
   function compile(type, source) {
@@ -1795,6 +1989,7 @@ void main() {
   const PASS_MG_RESTRICT = 12, PASS_MG_PROLONG = 13, PASS_WARM_START = 14;
   const PASS_VORTICITY = 15, PASS_ADVECT_INERTIAL = 16, PASS_NS_DIV = 17;
   const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
+  const PASS_LOAD_IMAGE = 22;
 
   function makeTarget(w, h, internal, format, type) {
     const tex = gl.createTexture();
@@ -1824,6 +2019,15 @@ void main() {
   const curlTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
   let phiTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
   let pressTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
+
+  // Texture used for transferring cropped 2D canvas images into inkTex
+  const uploadTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, uploadTex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.bindTexture(gl.TEXTURE_2D, null);
 
   const mgSol = [];
   const mgRhs = [];
@@ -2037,6 +2241,21 @@ void main() {
     stepCount = 0;
     isSpreading = false;
     hasAdvectedSinceBake = false;
+  }
+
+  function placeImageInBath(squareCanvas) {
+    input.tap = false;
+    input.down = false;
+    gpuClear();
+
+    gl.bindTexture(gl.TEXTURE_2D, uploadTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, squareCanvas);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    drawTo(inkTex[1 - inkI], PASS_LOAD_IMAGE, uploadTex);
+    inkI = 1 - inkI;
+
+    drawTo(null, PASS_DISPLAY);
   }
 
   function gpuBake() {
@@ -2266,11 +2485,172 @@ void main() {
   }
 
   // =========================================================
+  // Square Image Upload & Interactive Cropper
+  // =========================================================
+  const floatImageBtn = document.getElementById("float-image-btn");
+  const imageUploadInput = document.getElementById("image-upload-input");
+  const cropModal = document.getElementById("crop-modal");
+  const cropViewport = document.getElementById("crop-viewport");
+  const cropCanvas = document.getElementById("crop-canvas");
+  const cropZoomSlider = document.getElementById("crop-zoom");
+  const cropZoomRead = document.getElementById("crop-zoom-read");
+  const cropCancelBtn = document.getElementById("crop-cancel");
+  const cropConfirmBtn = document.getElementById("crop-confirm");
+  const cropReselectBtn = document.getElementById("crop-reselect-btn");
+
+  const cropState = {
+    img: null,
+    zoom: 1.0,
+    normX: 0.0,
+    normY: 0.0,
+    dragging: false,
+    startX: 0,
+    startY: 0,
+    startNormX: 0,
+    startNormY: 0
+  };
+
+  function clampCropOffsets() {
+    if (!cropState.img) return;
+    const iw = cropState.img.naturalWidth || cropState.img.width;
+    const ih = cropState.img.naturalHeight || cropState.img.height;
+    const minDim = Math.max(1, Math.min(iw, ih));
+    const normW = (iw / minDim) * cropState.zoom;
+    const normH = (ih / minDim) * cropState.zoom;
+    const maxNormX = Math.max(0, (normW - 1.0) * 0.5);
+    const maxNormY = Math.max(0, (normH - 1.0) * 0.5);
+    cropState.normX = Math.max(-maxNormX, Math.min(maxNormX, cropState.normX));
+    cropState.normY = Math.max(-maxNormY, Math.min(maxNormY, cropState.normY));
+  }
+
+  function renderCroppedSquare(targetCanvas) {
+    if (!cropState.img) return;
+    const size = targetCanvas.width;
+    const ctx = targetCanvas.getContext("2d");
+    const iw = cropState.img.naturalWidth || cropState.img.width;
+    const ih = cropState.img.naturalHeight || cropState.img.height;
+    const baseScale = size / Math.max(1, Math.min(iw, ih));
+    const scale = baseScale * cropState.zoom;
+    const dw = iw * scale;
+    const dh = ih * scale;
+
+    clampCropOffsets();
+
+    const dx = (size - dw) * 0.5 + cropState.normX * size;
+    const dy = (size - dh) * 0.5 + cropState.normY * size;
+
+    ctx.clearRect(0, 0, size, size);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(cropState.img, dx, dy, dw, dh);
+  }
+
+  function openCropModalWithFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      cropState.img = img;
+      cropState.zoom = 1.0;
+      cropState.normX = 0.0;
+      cropState.normY = 0.0;
+      cropZoomSlider.value = "1.0";
+      cropZoomRead.textContent = "1.00x";
+      renderCroppedSquare(cropCanvas);
+      cropModal.classList.add("open");
+    };
+    img.src = url;
+  }
+
+  function closeCropModal() {
+    cropModal.classList.remove("open");
+    cropState.dragging = false;
+  }
+
+  floatImageBtn.addEventListener("click", () => {
+    imageUploadInput.value = "";
+    imageUploadInput.click();
+  });
+
+  cropReselectBtn.addEventListener("click", () => {
+    imageUploadInput.value = "";
+    imageUploadInput.click();
+  });
+
+  imageUploadInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) openCropModalWithFile(file);
+  });
+
+  cropZoomSlider.addEventListener("input", (e) => {
+    cropState.zoom = parseFloat(e.target.value);
+    cropZoomRead.textContent = cropState.zoom.toFixed(2) + "x";
+    renderCroppedSquare(cropCanvas);
+  });
+
+  cropViewport.addEventListener("pointerdown", (e) => {
+    if (!cropState.img) return;
+    cropViewport.setPointerCapture(e.pointerId);
+    cropState.dragging = true;
+    cropState.startX = e.clientX;
+    cropState.startY = e.clientY;
+    cropState.startNormX = cropState.normX;
+    cropState.startNormY = cropState.normY;
+    e.preventDefault();
+  });
+
+  cropViewport.addEventListener("pointermove", (e) => {
+    if (!cropState.dragging) return;
+    const rect = cropViewport.getBoundingClientRect();
+    const dx = (e.clientX - cropState.startX) / Math.max(1, rect.width);
+    const dy = (e.clientY - cropState.startY) / Math.max(1, rect.height);
+    cropState.normX = cropState.startNormX + dx;
+    cropState.normY = cropState.startNormY + dy;
+    renderCroppedSquare(cropCanvas);
+  });
+
+  function endCropDrag(e) {
+    cropState.dragging = false;
+    if (e && e.pointerId !== undefined && cropViewport.hasPointerCapture(e.pointerId)) {
+      cropViewport.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  cropViewport.addEventListener("pointerup", endCropDrag);
+  cropViewport.addEventListener("pointercancel", endCropDrag);
+
+  cropViewport.addEventListener("wheel", (e) => {
+    if (!cropState.img) return;
+    e.preventDefault();
+    const nextZoom = Math.max(1.0, Math.min(4.0, cropState.zoom - e.deltaY * 0.002));
+    cropState.zoom = nextZoom;
+    cropZoomSlider.value = nextZoom.toFixed(2);
+    cropZoomRead.textContent = nextZoom.toFixed(2) + "x";
+    renderCroppedSquare(cropCanvas);
+  }, { passive: false });
+
+  cropCancelBtn.addEventListener("click", closeCropModal);
+
+  cropModal.addEventListener("click", (e) => {
+    if (e.target === cropModal) closeCropModal();
+  });
+
+  cropConfirmBtn.addEventListener("click", () => {
+    if (!cropState.img) return;
+    const finalCanvas = document.createElement("canvas");
+    finalCanvas.width = INK;
+    finalCanvas.height = INK;
+    renderCroppedSquare(finalCanvas);
+    placeImageInBath(finalCanvas);
+    closeCropModal();
+  });
+
+  // =========================================================
   // Color Picker: Preview while dragging, commit 1 color when closed
   // =========================================================
   const picker = document.getElementById("picker");
   const addColorBtn = document.getElementById("add-to-palette");
-  const addColorPreview = document.getElementById("add-color-preview");
   let hasUncommittedColor = false;
   let pendingPickedHex = picker.value;
 
@@ -2293,30 +2673,24 @@ void main() {
 
   picker.addEventListener("input", () => {
     pendingPickedHex = picker.value;
-    addColorPreview.style.background = pendingPickedHex;
     if (isIOSDevice) {
-      // On iPadOS, input & change fire continuously while dragging; wait until dialog closes
       hasUncommittedColor = true;
     }
   });
 
   picker.addEventListener("change", () => {
     pendingPickedHex = picker.value;
-    addColorPreview.style.background = pendingPickedHex;
     if (isIOSDevice) {
       hasUncommittedColor = true;
     } else {
-      // On desktop browsers, change fires once when the color dialog closes
       commitSingleNewColor(pendingPickedHex);
     }
   });
 
-  // When the iPad color popover closes, blur fires on the input
   picker.addEventListener("blur", () => {
     flushPendingColorIfAny();
   });
 
-  // Also flush if the user taps anywhere outside the "+ Add Color" button
   document.addEventListener("pointerdown", (e) => {
     if (hasUncommittedColor && !addColorBtn.contains(e.target)) {
       flushPendingColorIfAny();
@@ -2376,6 +2750,10 @@ void main() {
   // =========================================================
   let activePin = null;
   window.addEventListener("keydown", (e) => {
+    if (cropModal.classList.contains("open")) {
+      if (e.key === "Escape") closeCropModal();
+      return;
+    }
     if (e.key === "p" || e.key === "P") {
       document.querySelectorAll(".corner-pin").forEach(pin => pin.classList.toggle("visible"));
     } else if ((e.key === "r" || e.key === "R") && document.querySelector(".corner-pin.visible")) {
