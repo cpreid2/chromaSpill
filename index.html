@@ -2929,15 +2929,290 @@ void main() {
     washiMenu.classList.remove("open");
   });
 
+function exportTrueVectorSVG(gridSize = 2048, viewBoxSize = 2048) {
+    // 1. Render unshadowed flat-color bath at full 2048x2048 INK resolution
+    const exportFbo = gl.createFramebuffer();
+    const exportTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, exportTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gridSize, gridSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
+
+    gl.viewport(0, 0, gridSize, gridSize);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    gl.uniform1i(uIsExportLoc, 1);
+    gl.uniform1i(uPass, PASS_DISPLAY);
+    gl.uniform1f(uTargetSize, gridSize);
+    bindInputs(null);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.uniform1i(uIsExportLoc, 0);
+
+    const pixels = new Uint8Array(gridSize * gridSize * 4);
+    gl.readPixels(0, 0, gridSize, gridSize, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    gl.deleteTexture(exportTex);
+    gl.deleteFramebuffer(exportFbo);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, view.width, view.height);
+
+    // 2. Build Palette (0 = Water Bath, 1..K = Sumi Inks)
+    const waterHex = (document.getElementById("bath-color").value || "#b8b0a2").toLowerCase();
+    const hexToRgb = (hex) => {
+      const n = parseInt(hex.slice(1), 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+
+    const layers = [{ name: "Water_Bath", hex: waterHex, rgb: hexToRgb(waterHex) }];
+    const seenHex = new Set([waterHex]);
+
+    dynamicPalette.forEach(([name, hex]) => {
+      const lower = hex.toLowerCase();
+      if (!seenHex.has(lower)) {
+        seenHex.add(lower);
+        layers.push({ name, hex: lower, rgb: hexToRgb(lower) });
+      }
+    });
+
+    const N = gridSize;
+    const labelGrid = new Uint8Array(N * N);
+
+    // Flip Y from WebGL bottom-left to SVG top-left
+    for (let y = 0; y < N; y++) {
+      const srcRow = (N - 1 - y) * N * 4;
+      const dstRow = y * N;
+      for (let x = 0; x < N; x++) {
+        const i = srcRow + x * 4;
+        const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+        let bestK = 0;
+        let bestDist = 1e9;
+        for (let k = 0; k < layers.length; k++) {
+          const dr = layers[k].rgb[0] - r;
+          const dg = layers[k].rgb[1] - g;
+          const db = layers[k].rgb[2] - b;
+          const d2 = dr * dr + dg * dg + db * db;
+          if (d2 < bestDist) {
+            bestDist = d2;
+            bestK = k;
+          }
+        }
+        labelGrid[dstRow + x] = bestK;
+      }
+    }
+
+    // Taubin zero-shrinkage smoothing on unit-step vertex loops
+    function smoothClosedLoop(pts, iterations = 5) {
+      const len = pts.length;
+      if (len < 6) return pts;
+      let curr = pts.map(p => [p[0], p[1]]);
+      let next = pts.map(p => [p[0], p[1]]);
+      const isBorder = (p) => (p[0] <= 0 || p[0] >= N || p[1] <= 0 || p[1] >= N);
+
+      const step = (src, dst, w) => {
+        for (let i = 0; i < len; i++) {
+          const p = src[i];
+          if (isBorder(p)) {
+            dst[i][0] = p[0];
+            dst[i][1] = p[1];
+            continue;
+          }
+          const prev = src[(i - 1 + len) % len];
+          const nxt = src[(i + 1) % len];
+          dst[i][0] = p[0] + w * (0.5 * (prev[0] + nxt[0]) - p[0]);
+          dst[i][1] = p[1] + w * (0.5 * (prev[1] + nxt[1]) - p[1]);
+        }
+      };
+
+      for (let it = 0; it < iterations; it++) {
+        step(curr, next, 0.50);
+        step(next, curr, -0.52);
+      }
+      return curr;
+    }
+
+    // Ramer-Douglas-Peucker simplification to collapse collinear runs
+    function simplifyClosedLoop(pts, epsilon = 0.45) {
+      if (pts.length <= 6) return pts;
+      function sqSegDist(p, p1, p2) {
+        let x = p1[0], y = p1[1], dx = p2[0] - x, dy = p2[1] - y;
+        if (dx !== 0 || dy !== 0) {
+          const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
+          if (t > 1) { x = p2[0]; y = p2[1]; }
+          else if (t > 0) { x += dx * t; y += dy * t; }
+        }
+        dx = p[0] - x; dy = p[1] - y;
+        return dx * dx + dy * dy;
+      }
+      function rdp(start, end, arr, out) {
+        let maxD = 0, index = start;
+        for (let i = start + 1; i < end; i++) {
+          const d = sqSegDist(arr[i], arr[start], arr[end]);
+          if (d > maxD) { maxD = d; index = i; }
+        }
+        if (maxD > epsilon * epsilon) {
+          rdp(start, index, arr, out);
+          out.push(arr[index]);
+          rdp(index, end, arr, out);
+        }
+      }
+      let splitIdx = Math.floor(pts.length / 2);
+      const half1 = [pts[0]];
+      rdp(0, splitIdx, pts, half1);
+      half1.push(pts[splitIdx]);
+
+      const half2 = [pts[splitIdx]];
+      const closedPts = pts.concat([pts[0]]);
+      rdp(splitIdx, closedPts.length - 1, closedPts, half2);
+
+      return half1.concat(half2.slice(1));
+    }
+
+    // Convex-hull-bounded Midpoint B-Spline (elevated to Cubic Bezier 'C' commands)
+    const scale = viewBoxSize / N;
+    function loopToBSplinePath(pts) {
+      const len = pts.length;
+      if (len < 3) return "";
+
+      const mid = (a, b) => [0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])];
+      const m0 = mid(pts[len - 1], pts[0]);
+      let d = `M ${(m0[0] * scale).toFixed(2)} ${(m0[1] * scale).toFixed(2)}`;
+      let prevMid = m0;
+
+      for (let i = 0; i < len; i++) {
+        const p = pts[i];
+        const nextP = pts[(i + 1) % len];
+        const currMid = mid(p, nextP);
+
+        // Degree-elevated quadratic midpoint spline -> exact cubic Bezier inside triangle(prevMid, p, currMid)
+        const cp1x = ((prevMid[0] + 2.0 * p[0]) / 3.0) * scale;
+        const cp1y = ((prevMid[1] + 2.0 * p[1]) / 3.0) * scale;
+        const cp2x = ((currMid[0] + 2.0 * p[0]) / 3.0) * scale;
+        const cp2y = ((currMid[1] + 2.0 * p[1]) / 3.0) * scale;
+        const x = currMid[0] * scale;
+        const y = currMid[1] * scale;
+
+        d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${x.toFixed(2)} ${y.toFixed(2)}`;
+        prevMid = currMid;
+      }
+      return d + " Z";
+    }
+
+    // 3. Eulerian Grid-Boundary Tracer (4 cardinal directions: 0=E, 1=S, 2=W, 3=N)
+    const VW = N + 1;
+    const outMask = new Uint8Array(VW * VW);
+    const DX = [1, 0, -1, 0];
+    const DY = [0, 1, 0, -1];
+    const svgGroups = [];
+
+    for (let k = 1; k < layers.length; k++) {
+      outMask.fill(0);
+
+      // Emit directed boundary edges around every pixel of layer k
+      for (let y = 0; y < N; y++) {
+        const row = y * N;
+        const vRow0 = y * VW;
+        const vRow1 = (y + 1) * VW;
+        for (let x = 0; x < N; x++) {
+          if (labelGrid[row + x] !== k) continue;
+
+          // Top edge (East: vTL -> vTR)
+          if (y === 0 || labelGrid[row - N + x] !== k) {
+            outMask[vRow0 + x] |= 1;
+          }
+          // Right edge (South: vTR -> vBR)
+          if (x === N - 1 || labelGrid[row + x + 1] !== k) {
+            outMask[vRow0 + x + 1] |= 2;
+          }
+          // Bottom edge (West: vBR -> vBL)
+          if (y === N - 1 || labelGrid[row + N + x] !== k) {
+            outMask[vRow1 + x + 1] |= 4;
+          }
+          // Left edge (North: vBL -> vTL)
+          if (x === 0 || labelGrid[row + x - 1] !== k) {
+            outMask[vRow1 + x] |= 8;
+          }
+        }
+      }
+
+      const pathStrings = [];
+      for (let sy = 0; sy <= N; sy++) {
+        const vRow = sy * VW;
+        for (let sx = 0; sx <= N; sx++) {
+          let mask = outMask[vRow + sx];
+          if (mask === 0) continue;
+
+          for (let initDir = 0; initDir < 4; initDir++) {
+            if (!(outMask[vRow + sx] & (1 << initDir))) continue;
+
+            const loop = [];
+            let vx = sx, vy = sy, dir = initDir;
+
+            while (true) {
+              loop.push([vx, vy]);
+              const vIdx = vy * VW + vx;
+              outMask[vIdx] &= ~(1 << dir);
+
+              vx += DX[dir];
+              vy += DY[dir];
+              if (vx === sx && vy === sy) break;
+
+              const nextMask = outMask[vy * VW + vx];
+              if (nextMask === 0) break;
+
+              // Right-hand rule turn priority keeps saddle points from crossing
+              const rDir = (dir + 1) & 3;
+              const sDir = dir;
+              const lDir = (dir + 3) & 3;
+              const bDir = (dir + 2) & 3;
+
+              if (nextMask & (1 << rDir)) dir = rDir;
+              else if (nextMask & (1 << sDir)) dir = sDir;
+              else if (nextMask & (1 << lDir)) dir = lDir;
+              else dir = bDir;
+            }
+
+            if (loop.length >= 4) {
+              const smoothed = smoothClosedLoop(loop, 5);
+              const simplified = simplifyClosedLoop(smoothed, 0.45);
+              if (simplified.length >= 3) {
+                pathStrings.push(loopToBSplinePath(simplified));
+              }
+            }
+          }
+        }
+      }
+
+      if (pathStrings.length > 0) {
+        const safeId = layers[k].name.replace(/[^a-zA-Z0-9_-]/g, "_");
+        svgGroups.push(
+          `  <g id="${safeId}_layer_${k}">\n` +
+          `    <path fill="${layers[k].hex}" fill-rule="evenodd" d="${pathStrings.join(" ")}" />\n` +
+          `  </g>`
+        );
+      }
+    }
+
+    return [
+      `<?xml version="1.0" encoding="UTF-8"?>`,
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" width="${viewBoxSize}" height="${viewBoxSize}">`,
+      `  <rect id="water_bath" width="${viewBoxSize}" height="${viewBoxSize}" fill="${waterHex}" />`,
+      ...svgGroups,
+      `</svg>`
+    ].join("\n");
+  }
+
   document.getElementById("export-svg").addEventListener("click", () => {
-    const exportSize = 4096;
-    const data = exportHighRes("image/png", true);
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}"><image href="${data}" width="${exportSize}" height="${exportSize}" /></svg>`;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const svgString = exportTrueVectorSVG(2048, 2048);
+    const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = "suminagashi.svg";
     a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
     washiMenu.classList.remove("open");
   });
 
