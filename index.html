@@ -3135,7 +3135,7 @@ void main() {
     gl.useProgram(program);
   }
 
-  const MAX_GPU_TEX = Math.min(isIOSDevice ? 2048 : 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+  const MAX_GPU_TEX = Math.min(isIOSDevice ? 3072 : 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
 
   function resizeSimulationIfNeeded(stageW, stageH, dpr) {
     let nextDomX = 1.0;
@@ -3151,15 +3151,8 @@ void main() {
       nextDomY = stageH / minSide;
 
       const mgAlign = 1 << (MG_LEVELS - 1); // 32: guarantees exact halving across all 6 MG levels
-      if (isIOSDevice) {
-        // Keep total cell count matched to 512x512 (~256k cells) so iPad maintains 60fps across full screen
-        const isoBase = BASE_SIM / Math.sqrt(nextDomX * nextDomY);
-        nextSimW = Math.min(768, Math.max(384, Math.round((isoBase * nextDomX) / mgAlign) * mgAlign));
-        nextSimH = Math.min(768, Math.max(384, Math.round((isoBase * nextDomY) / mgAlign) * mgAlign));
-      } else {
-        nextSimW = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomX) / mgAlign) * mgAlign));
-        nextSimH = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomY) / mgAlign) * mgAlign));
-      }
+      nextSimW = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomX) / mgAlign) * mgAlign));
+      nextSimH = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomY) / mgAlign) * mgAlign));
 
       const rawPxW = Math.max(Math.round(stageW * dpr), Math.round(BASE_INK * nextDomX));
       const rawPxH = Math.max(Math.round(stageH * dpr), Math.round(BASE_INK * nextDomY));
@@ -3332,7 +3325,7 @@ void main() {
 
       const coarsest = MG_LEVELS - 1;
       const coarseRhsTex = mgRhs[coarsest].tex;
-      for (let s = 0; s < 6; s++) {
+      for (let s = 0; s < 10; s++) {
         const src = mgCurIdx[coarsest];
         const dst = 1 - src;
         drawMg(mgSol[coarsest][dst], PASS_MG_SMOOTH, mgSol[coarsest][src].tex, coarseRhsTex);
@@ -4463,7 +4456,7 @@ void main() {
 
     drawTo(velTex, PASS_COMBINE_VEL);
 
-    const sub = 2;
+    const sub = 3;
     const sdt = dt / sub;
     gl.uniform1f(uDt, sdt);
     for (let s = 0; s < sub; s++) {
@@ -4550,7 +4543,7 @@ void main() {
     const W = Math.max(64, rect.width);
     const H = Math.max(64, rect.height);
     const rawDpr = window.devicePixelRatio || 1;
-    const viewDpr = isIOSDevice ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
+    const viewDpr = Math.min(2, rawDpr);
     const ringDpr = isIOSDevice ? 1 : Math.min(1.5, rawDpr);
 
     if (isFullScreenMode) {
