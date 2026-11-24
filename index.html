@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>chromaSpill</title>
 <style>
   :root {
@@ -345,6 +347,154 @@
     justify-content: space-around;
     flex: 1;
     padding: 0.4cqw 0;
+  }
+
+  /* Bamboo Stick: Stir / Pins segmented toggle */
+  .mode-toggle {
+    display: flex;
+    border: 1px solid rgba(75, 58, 40, 0.55);
+    border-radius: 0.25cqw;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  }
+
+  .mode-toggle button {
+    font-family: inherit;
+    font-size: 0.61cqw;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.18cqw 0.42cqw;
+    background: rgba(238, 230, 214, 0.78);
+    color: var(--ink-text);
+    border: 0;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .mode-toggle button + button {
+    border-left: 1px solid rgba(75, 58, 40, 0.45);
+  }
+
+  .mode-toggle button:hover {
+    background: rgba(248, 242, 230, 0.96);
+  }
+
+  .mode-toggle button.active {
+    background: linear-gradient(180deg, #5e2418, #3d160e);
+    color: #f3e9d8;
+  }
+
+  .mode-toggle button.active:hover {
+    background: linear-gradient(180deg, #6e2b1d, #4a1b12);
+  }
+
+  .mode-toggle button.active + button.active {
+    border-left-color: rgba(243, 233, 216, 0.38);
+  }
+
+  /* Pin / slingshot controls (visible in Pins mode only) */
+  .pin-controls {
+    display: none;
+    flex-direction: column;
+    gap: 0.3cqw;
+    padding-top: 0.35cqw;
+    border-top: 1px solid rgba(75, 58, 40, 0.2);
+  }
+
+  .pin-controls.active {
+    display: flex;
+  }
+
+  .pin-hint {
+    margin: 0;
+    font-size: 0.6cqw;
+    font-style: italic;
+    color: var(--muted-text);
+    text-align: center;
+  }
+
+  .pin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4cqw;
+  }
+
+  .pin-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4cqw;
+  }
+
+  .pin-count {
+    font-size: 0.72cqw;
+    font-weight: 600;
+    color: var(--muted-text);
+    white-space: nowrap;
+  }
+
+  .btn-float-image.btn-fire {
+    background: linear-gradient(180deg, #9e311d, #782212);
+    color: #f7efe2;
+    border-color: #4f1409;
+  }
+
+  .btn-float-image.btn-fire:hover {
+    background: linear-gradient(180deg, #b33822, #8c2815);
+  }
+
+  .btn-float-image.btn-fire:disabled {
+    opacity: 0.4;
+    cursor: default;
+    transform: none;
+  }
+
+  .grid-dropdown-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .grid-menu {
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    gap: 0.25cqw;
+    background: #dfd5c3;
+    padding: 0.35cqw;
+    border-radius: 0.3cqw;
+    border: 1px solid rgba(60, 45, 30, 0.6);
+    box-shadow: 0 0.8cqw 1.8cqw rgba(0, 0, 0, 0.65);
+    min-width: 6.8cqw;
+    z-index: 50;
+  }
+
+  .grid-menu.open {
+    display: flex;
+  }
+
+  .grid-menu button {
+    background: #efe7d8;
+    border: 1px solid rgba(90, 70, 50, 0.4);
+    color: var(--ink-text);
+    padding: 0.28cqw 0.5cqw;
+    font-family: inherit;
+    font-size: 0.68cqw;
+    font-weight: 700;
+    border-radius: 0.2cqw;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .grid-menu button:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
   }
 
   .bath-controls-list {
@@ -862,6 +1012,372 @@
   .crop-btn-primary:hover {
     background: linear-gradient(180deg, #b33822, #8c2815);
   }
+
+  /* =========================================================
+     Full-Screen Mode & Docked Hoverable Parameter Windows
+     ========================================================= */
+  .btn-icon-only {
+    width: 1.65cqw;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .btn-icon-only svg {
+    width: 0.92cqw;
+    height: 0.92cqw;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-icon-only .fs-icon-compress {
+    display: none;
+  }
+
+  .studio-stage.fullscreen-mode .btn-icon-only .fs-icon-expand {
+    display: none;
+  }
+
+  .studio-stage.fullscreen-mode .btn-icon-only .fs-icon-compress {
+    display: block;
+  }
+
+  .dock-tab {
+    display: none;
+  }
+
+  .fs-only-label {
+    display: none;
+  }
+
+  .fs-corner-exit {
+    display: none;
+  }
+
+  .studio-stage.fullscreen-mode {
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    background-image: none;
+    background-color: #14100d;
+    box-shadow: none;
+  }
+
+  /* Left Docked Hoverable Parchment Windows (Same Core Top/Middle/Bottom Layout) */
+  .studio-stage.fullscreen-mode .parchment-card {
+    overflow: visible;
+    width: clamp(276px, 21.5cqmax, 365px);
+    padding: 1.05cqmax 1.3cqmax;
+    border-radius: 0.45cqmax;
+    z-index: 35;
+    box-shadow:
+      inset 0 0 1.4cqmax rgba(68, 50, 32, 0.42),
+      inset 0 1px 0 rgba(255, 250, 240, 0.5),
+      0 10px 30px rgba(0, 0, 0, 0.72);
+    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  .studio-stage.fullscreen-mode .top-slot {
+    left: 0;
+    top: max(12px, env(safe-area-inset-top, 12px));
+    height: clamp(210px, 28cqmax, 310px);
+    transform: translateX(calc(-100% + 6px));
+  }
+
+  .studio-stage.fullscreen-mode .bath-slot {
+    left: 0;
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    height: clamp(230px, 31.5cqmax, 340px);
+    transform: translateX(calc(-100% + 6px));
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .studio-stage.fullscreen-mode .top-slot:hover,
+    .studio-stage.fullscreen-mode .bath-slot:hover {
+      transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
+    }
+  }
+
+  .studio-stage.fullscreen-mode .top-slot.dock-open,
+  .studio-stage.fullscreen-mode .bath-slot.dock-open {
+    transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
+  }
+
+  /* Protruding Parchment Handle Tabs on Docked Windows */
+  .studio-stage.fullscreen-mode .dock-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    padding: 12px 4px;
+    background-color: #d6cbb8;
+    background-image: linear-gradient(90deg, #c6b9a3, #dfd4c2);
+    border: 1px solid rgba(55, 42, 28, 0.75);
+    border-left: none;
+    border-radius: 0 7px 7px 0;
+    box-shadow: 4px 3px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 250, 240, 0.55);
+    color: var(--ink-text);
+    font-family: inherit;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .studio-stage.fullscreen-mode .dock-tab-kanji {
+    font-size: 12px;
+    font-weight: 700;
+    color: #9e2a1b;
+    line-height: 1;
+  }
+
+  .studio-stage.fullscreen-mode .dock-tab-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-text);
+  }
+
+  /* Middle-Left Tool Selector Plaques in Fullscreen */
+  .studio-stage.fullscreen-mode .tool-hotspot {
+    left: max(10px, env(safe-area-inset-left, 10px));
+    width: auto;
+    height: auto;
+    z-index: 34;
+    opacity: 0.82;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .studio-stage.fullscreen-mode .tool-hotspot:hover,
+  .studio-stage.fullscreen-mode .tool-hotspot.active {
+    opacity: 1;
+  }
+
+  .studio-stage.fullscreen-mode .tool-hotspot[data-tool="0"] {
+    top: calc(50% - 34px);
+  }
+
+  .studio-stage.fullscreen-mode .tool-hotspot[data-tool="1"] {
+    top: calc(50% + 4px);
+  }
+
+  .studio-stage.fullscreen-mode .plaque-label {
+    width: auto;
+    height: auto;
+    padding: 7px 12px;
+    border-radius: 5px;
+    font-size: 11px;
+  }
+
+  /* Right-Side Docked Print & Clear Plaques + Quick Exit Fullscreen Button */
+  .studio-stage.fullscreen-mode .washi-hotspot-wrap {
+    left: auto;
+    right: max(12px, env(safe-area-inset-right, 12px));
+    top: max(12px, env(safe-area-inset-top, 12px));
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 36;
+  }
+
+  .studio-stage.fullscreen-mode .washi-hotspot {
+    width: auto;
+    height: 32px;
+    padding: 0 12px;
+    transform: none;
+    background: rgba(214, 203, 184, 0.9);
+    border: 1px solid rgba(55, 42, 28, 0.72);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-text);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.82;
+  }
+
+  .studio-stage.fullscreen-mode .washi-hotspot:hover {
+    transform: translateY(-1px);
+    opacity: 1;
+    background: rgba(235, 226, 210, 0.98);
+  }
+
+  .studio-stage.fullscreen-mode .washi-export-menu {
+    left: auto;
+    right: 0;
+    transform: none;
+    top: calc(100% + 6px);
+    width: max(150px, 10cqmax);
+    padding: 8px;
+    gap: 6px;
+    border-radius: 6px;
+  }
+
+  .studio-stage.fullscreen-mode .washi-btn {
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 4px;
+  }
+
+  .studio-stage.fullscreen-mode .fs-only-label {
+    display: inline;
+  }
+
+  .studio-stage.fullscreen-mode .fs-corner-exit {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 6px;
+    background: rgba(214, 203, 184, 0.9);
+    border: 1px solid rgba(55, 42, 28, 0.72);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
+    color: var(--ink-text);
+    cursor: pointer;
+    opacity: 0.82;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .studio-stage.fullscreen-mode .fs-corner-exit:hover {
+    opacity: 1;
+    background: rgba(235, 226, 210, 0.98);
+  }
+
+  .studio-stage.fullscreen-mode .fs-corner-exit svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .studio-stage.fullscreen-mode .water-cup-hotspot {
+    left: auto;
+    right: max(12px, env(safe-area-inset-right, 12px));
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    width: auto;
+    height: 32px;
+    padding: 0 12px;
+    background: rgba(214, 203, 184, 0.9);
+    border: 1px solid rgba(55, 42, 28, 0.72);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
+    color: var(--ink-text);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 34;
+    opacity: 0.82;
+  }
+
+  .studio-stage.fullscreen-mode .water-cup-hotspot::before {
+    display: none;
+  }
+
+  .studio-stage.fullscreen-mode .water-cup-hotspot:hover {
+    opacity: 1;
+    background: rgba(235, 226, 210, 0.98);
+  }
+
+  /* Keep card inner typography & touch controls comfortable in portrait iPad fullscreen */
+  .studio-stage.fullscreen-mode .section-header h2 { font-size: max(12px, 0.95cqmax); }
+  .studio-stage.fullscreen-mode .craft-slider-header,
+  .studio-stage.fullscreen-mode .water-color-row { font-size: max(11.5px, 0.84cqmax); }
+  .studio-stage.fullscreen-mode .craft-slider-header strong { font-size: max(11px, 0.82cqmax); }
+  .studio-stage.fullscreen-mode .btn-float-image {
+    height: max(24px, 1.65cqmax);
+    padding: 0 max(8px, 0.55cqmax);
+    font-size: max(10.5px, 0.72cqmax);
+  }
+  .studio-stage.fullscreen-mode .btn-icon-only {
+    width: max(24px, 1.65cqmax);
+    padding: 0;
+  }
+  .studio-stage.fullscreen-mode .btn-icon-only svg {
+    width: max(13px, 0.92cqmax);
+    height: max(13px, 0.92cqmax);
+  }
+  .studio-stage.fullscreen-mode .swatch {
+    width: max(26px, 2.05cqmax);
+    height: max(26px, 2.05cqmax);
+  }
+  .studio-stage.fullscreen-mode .btn-add-color {
+    width: max(26px, 2.0cqmax);
+    height: max(26px, 2.0cqmax);
+    font-size: max(15px, 1.15cqmax);
+  }
+  .studio-stage.fullscreen-mode .water-swatch-btn {
+    width: max(24px, 1.85cqmax);
+    height: max(24px, 1.85cqmax);
+  }
+  .studio-stage.fullscreen-mode .mode-toggle button {
+    font-size: max(9.5px, 0.61cqmax);
+    padding: max(3px, 0.18cqmax) max(6px, 0.42cqmax);
+  }
+  .studio-stage.fullscreen-mode .cycle-toggle,
+  .studio-stage.fullscreen-mode .pin-count {
+    font-size: max(10.5px, 0.72cqmax);
+  }
+  .studio-stage.fullscreen-mode .craft-slider input[type="range"] {
+    height: max(7px, 0.55cqmax);
+  }
+  .studio-stage.fullscreen-mode .craft-slider input[type="range"]::-webkit-slider-thumb {
+    width: max(18px, 1.4cqmax);
+    height: max(18px, 1.4cqmax);
+  }
+  .studio-stage.fullscreen-mode .grid-menu button {
+    font-size: max(11px, 0.7cqmax);
+    padding: max(5px, 0.3cqmax) max(8px, 0.5cqmax);
+  }
+  .studio-stage.fullscreen-mode .crop-modal-card {
+    width: min(88vw, 480px);
+    max-height: 92dvh;
+    padding: 18px 20px;
+    gap: 12px;
+    border-radius: 8px;
+  }
+  .studio-stage.fullscreen-mode .crop-viewport-wrap {
+    max-height: 54dvh;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .studio-stage.fullscreen-mode .crop-hint {
+    font-size: 12px;
+  }
+  .studio-stage.fullscreen-mode .crop-btn {
+    height: 34px;
+    font-size: 12px;
+    border-radius: 5px;
+  }
+  .studio-stage.fullscreen-mode .tool-cursor {
+    width: 9.5cqmax;
+    height: 9.5cqmax;
+  }
 </style>
 </head>
 <body>
@@ -876,7 +1392,11 @@
 <div class="studio-stage" id="studio-stage">
 
   <!-- 1. TOP CARD OVERLAY: Sumi Inks (Tool 0) OR Bamboo Stick (Tool 1) -->
-  <div class="parchment-card top-slot">
+  <div class="parchment-card top-slot" id="top-dock-card">
+    <button class="dock-tab" id="top-dock-tab" type="button" title="Hover or tap for Tool Parameters">
+      <span class="dock-tab-kanji">墨</span>
+      <span class="dock-tab-text" id="top-dock-tab-text">Stick</span>
+    </button>
     <!-- View 0: Sumi Ink Palette + Brush Sliders -->
     <div class="top-view" id="panel-0">
       <div>
@@ -884,10 +1404,16 @@
           <div class="header-title-group">
             <h2>Sumi Inks</h2>
           </div>
-          <label class="cycle-toggle" title="Automatically alternate ink dishes on each drop">
-            <input type="checkbox" id="sumi-mode" checked> Auto-cycle
-          </label>
-          <span class="mini-hanko">墨</span>
+          <div class="header-right-group">
+            <div class="mode-toggle" role="group" aria-label="Ink mode">
+              <button type="button" class="active" data-ink-mode="drop" aria-pressed="true" title="Drop and pour ink directly onto the bath">Drop</button>
+              <button type="button" data-ink-mode="push" aria-pressed="false" title="Toggle Push with Drop: hold & drag to pour fluid while pushing pin, touch anywhere to relocate">Push</button>
+            </div>
+            <label class="cycle-toggle" title="Automatically alternate ink dishes on each drop">
+              <input type="checkbox" id="sumi-mode" checked> Auto
+            </label>
+            <span class="mini-hanko">墨</span>
+          </div>
         </div>
 
         <div class="colors">
@@ -899,7 +1425,7 @@
         </div>
       </div>
 
-      <div class="compact-sliders">
+      <div class="compact-sliders" id="brush-sliders">
         <label class="craft-slider">
           <div class="craft-slider-header">
             <span>Drop Size</span>
@@ -907,7 +1433,7 @@
           </div>
           <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
         </label>
-        <label class="craft-slider">
+        <label class="craft-slider" id="pour-slider-wrap">
           <div class="craft-slider-header">
             <span>Pour Rate</span>
             <strong id="flow-read">1.0x</strong>
@@ -915,13 +1441,40 @@
           <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
         </label>
       </div>
+
+      <div class="pin-controls" id="ink-pin-controls">
+        <div class="pin-row">
+          <span class="pin-count" id="ink-pin-count">1 push pin</span>
+          <div class="pin-row-actions">
+            <div class="grid-dropdown-wrap">
+              <button class="btn-float-image btn-grid" id="ink-grid-btn" type="button" title="Place symmetric grid of push pins">Grid &blacktriangledown;</button>
+              <div class="grid-menu" id="ink-grid-menu">
+                <button type="button" data-grid-tool="ink" data-grid="1pin">1 Pin (Center)</button>
+                <button type="button" data-grid-tool="ink" data-grid="2x2">2 &times; 2 (4)</button>
+                <button type="button" data-grid-tool="ink" data-grid="3x3">3 &times; 3 (9)</button>
+                <button type="button" data-grid-tool="ink" data-grid="4x4">4 &times; 4 (16)</button>
+                <button type="button" data-grid-tool="ink" data-grid="ring6">Ring (6)</button>
+                <button type="button" data-grid-tool="ink" data-grid="ring8">Ring (8)</button>
+                <button type="button" data-grid-tool="ink" data-grid="cross">Cross (5)</button>
+              </div>
+            </div>
+            <button class="btn-float-image" id="ink-pin-clear" type="button" title="Clear push pins (Delete)">Clear</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- View 1: Bamboo Stick Parameters -->
     <div class="top-view active" id="panel-1">
       <div class="section-header">
         <h2>Bamboo Stick</h2>
-        <span class="mini-hanko">墨</span>
+        <div class="header-right-group">
+          <div class="mode-toggle" role="group" aria-label="Stick mode">
+            <button type="button" class="active" data-stick-mode="stir" aria-pressed="true" title="Stir the bath directly with the stick">Stir</button>
+            <button type="button" data-stick-mode="pins" aria-pressed="false" title="Place pins, aim slingshots, then sweep or release">Pins</button>
+          </div>
+          <span class="mini-hanko">墨</span>
+        </div>
       </div>
 
       <div class="stick-sliders-wrap">
@@ -940,6 +1493,32 @@
           <input id="stick-drag" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
         </label>
       </div>
+
+      <div class="pin-controls" id="pin-controls">
+        <p class="pin-hint">Tap: pin &bull; Drag pin back: slingshot &bull; Drag water: sweep</p>
+        <div class="pin-row">
+          <span class="pin-count" id="pin-count">No pins</span>
+          <div class="pin-row-actions">
+            <div class="grid-dropdown-wrap">
+              <button class="btn-float-image btn-grid" id="stick-grid-btn" type="button" title="Place symmetric grid of stick pins">Grid &blacktriangledown;</button>
+              <div class="grid-menu" id="stick-grid-menu">
+                <button type="button" data-grid-tool="stick" data-grid="1pin">1 Pin (Center)</button>
+                <button type="button" data-grid-tool="stick" data-grid="2x2">2 &times; 2 (4)</button>
+                <button type="button" data-grid-tool="stick" data-grid="3x3">3 &times; 3 (9)</button>
+                <button type="button" data-grid-tool="stick" data-grid="4x4">4 &times; 4 (16)</button>
+                <button type="button" data-grid-tool="stick" data-grid="ring6">Ring (6)</button>
+                <button type="button" data-grid-tool="stick" data-grid="ring8">Ring (8)</button>
+                <button type="button" data-grid-tool="stick" data-grid="cross">Cross (5)</button>
+              </div>
+            </div>
+            <label class="cycle-toggle" title="Keep pins at their landing spots after a sweep or release">
+              <input type="checkbox" id="pin-keep"> Keep
+            </label>
+            <button class="btn-float-image" id="pin-clear" type="button" title="Remove all pins (Delete)">Clear</button>
+            <button class="btn-float-image btn-fire" id="pin-fire" type="button" title="Release all slingshot pins (F)" disabled>Release</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -953,14 +1532,26 @@
   </button>
 
   <!-- 3. BOTTOM CARD OVERLAY: Water Bath Controls -->
-  <div class="parchment-card bath-slot">
+  <div class="parchment-card bath-slot" id="bath-dock-card">
+    <button class="dock-tab" id="bath-dock-tab" type="button" title="Hover or tap for Water Bath Parameters">
+      <span class="dock-tab-kanji">水</span>
+      <span class="dock-tab-text">Bath</span>
+    </button>
     <div class="section-header">
       <div class="header-title-group">
         <h2>Water Bath</h2>
       </div>
       <div class="header-right-group">
+        <button class="btn-float-image btn-icon-only" id="fullscreen-btn" type="button" title="Toggle Full Screen Bath" aria-label="Toggle Full Screen">
+          <svg class="fs-icon-expand" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <svg class="fs-icon-compress" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+          </svg>
+        </button>
         <button class="btn-float-image" id="float-image-btn" type="button" title="Upload and crop an image to float on the water bath">
-          + Float Image
+          Image
         </button>
         <span class="mini-hanko">墨</span>
       </div>
@@ -970,11 +1561,9 @@
     <div class="bath-controls-list">
       <div class="water-color-row">
         <span>Water Color</span>
-        <div class="water-row-actions">
-          <label class="water-swatch-btn" id="water-swatch-label" title="Change bath water color">
-            <input id="bath-color" type="color" value="#b8b0a2" aria-label="Water Color">
-          </label>
-        </div>
+        <label class="water-swatch-btn" id="water-swatch-label" title="Change bath water color">
+          <input id="bath-color" type="color" value="#b8b0a2" aria-label="Water Color">
+        </label>
       </div>
 
       <label class="craft-slider">
@@ -1020,14 +1609,23 @@
 
   <!-- 5. RIGHT SIDE HOTSPOTS: Washi Print Stack & Fresh Water Cup -->
   <div class="washi-hotspot-wrap">
-    <button class="washi-hotspot" id="washi-trigger" type="button" title="Click to pull a print onto Washi paper" aria-label="Pull Washi Print"></button>
+    <button class="washi-hotspot" id="washi-trigger" type="button" title="Click to pull a print onto Washi paper" aria-label="Pull Washi Print">
+      <span class="fs-only-label">紙 Print &blacktriangledown;</span>
+    </button>
+    <button class="fs-corner-exit" id="fs-corner-exit" type="button" title="Exit Full Screen" aria-label="Exit Full Screen">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+      </svg>
+    </button>
     <div class="washi-export-menu" id="washi-menu">
       <button class="washi-btn" id="export-jpg" type="button">Pull JPG Print</button>
       <button class="washi-btn" id="export-svg" type="button">Pull SVG Print</button>
     </div>
   </div>
 
-  <button class="water-cup-hotspot" id="clear" type="button" title="Pour fresh water to clear the bath" aria-label="Fresh Water - Clear Bath"></button>
+  <button class="water-cup-hotspot" id="clear" type="button" title="Pour fresh water to clear the bath" aria-label="Fresh Water - Clear Bath">
+    <span class="fs-only-label">清 Clear</span>
+  </button>
 
   <!-- 6. SQUARE IMAGE CROP MODAL -->
   <div class="crop-modal-backdrop" id="crop-modal" role="dialog" aria-modal="true" aria-labelledby="crop-modal-title">
@@ -1094,16 +1692,31 @@
     return;
   }
 
+  // Since iPhones are filtered above, iOS / touch-Mac here specifically identifies iPad
   const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || "") ||
     (/Macintosh/i.test(navigator.userAgent || "") && navigator.maxTouchPoints > 1);
 
-  const SIM = 512;
+  const BASE_SIM = 512;
   const MG_LEVELS = 6;
-  const INK = 2048;
-  const MAP = 1024;
+  const BASE_INK = 2048;
+  const BASE_MAP = 1024;
   const ENERGY_RES = 8;
   const DT = 1 / 60;
   const RENDER_BATH_SIZE = 800;
+
+  let simW = BASE_SIM;
+  let simH = BASE_SIM;
+  let mapW = BASE_MAP;
+  let mapH = BASE_MAP;
+  let inkW = BASE_INK;
+  let inkH = BASE_INK;
+  let domainX = 1.0;
+  let domainY = 1.0;
+  // Default to opening directly in Full Screen mode on iPad
+  let isFullScreenMode = isIOSDevice;
+  if (isFullScreenMode) {
+    stage.classList.add("fullscreen-mode");
+  }
 
   // Normalized stage coordinates [x, y] for the 4 corners of the inner water surface:
   // Order: Top-Left (TL), Top-Right (TR), Bottom-Right (BR), Bottom-Left (BL)
@@ -1207,6 +1820,15 @@
     const W = rect.width;
     const H = rect.height;
     if (W < 10 || H < 10) return;
+
+    if (isFullScreenMode) {
+      bath.style.width = `${W}px`;
+      bath.style.height = `${H}px`;
+      bath.style.transform = "none";
+      fwdHomography = [W, 0, 0, 0, H, 0, 0, 0, 1];
+      invHomography = [1 / W, 0, 0, 0, 1 / H, 0, 0, 0, 1];
+      return;
+    }
 
     // Keep bath local CSS box strictly smaller than stage height so WebKit never clips before matrix3d
     const S = Math.max(64, Math.round(Math.min(W, H) * 0.75));
@@ -1316,11 +1938,11 @@ uniform sampler2D uCurl;
 uniform sampler2D uAuxA;
 uniform sampler2D uAuxB;
 
-uniform float uN;
-uniform float uMapSize;
-uniform float uInkSize;
-uniform float uTargetSize;
-uniform float uTexelSize;
+uniform vec2 uSimSize;
+uniform vec2 uMapSize;
+uniform vec2 uInkSize;
+uniform vec2 uTargetSize;
+uniform vec2 uDomain;
 uniform float uDt;
 uniform float uRadius;
 uniform vec2 uCenter;
@@ -1347,6 +1969,16 @@ uniform float uViscDiff;
 uniform float uVortConf;
 uniform float uFrameDt;
 uniform int uIsExport;
+uniform int uIsFullScreen;
+uniform vec2 uOldInkSize;
+uniform vec2 uResizeScale;
+
+// Pin / Slingshot mode: up to MAX_PINS moving tine segments per step.
+// uPinSeg[i] = (prev.xy, cur.xy), uPinVel[i] = physical tine velocity.
+#define MAX_PINS 32
+uniform int uPinCount;
+uniform vec4 uPinSeg[MAX_PINS];
+uniform vec2 uPinVel[MAX_PINS];
 
 in vec2 vUv;
 out vec4 fragColor;
@@ -1359,8 +1991,8 @@ float catmull(int k, float t) {
 }
 
 vec2 mapFetch(sampler2D tex, int x, int y) {
-  int last = int(uMapSize) - 1;
-  return texelFetch(tex, ivec2(clamp(x, 0, last), clamp(y, 0, last)), 0).rg;
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  return texelFetch(tex, clamp(ivec2(x, y), ivec2(0), last), 0).rg;
 }
 
 vec2 bicubic(sampler2D tex, vec2 uv) {
@@ -1379,65 +2011,97 @@ vec2 bicubic(sampler2D tex, vec2 uv) {
   return clamp(sum, vec2(0.0), vec2(1.0));
 }
 
+// Monotonicity-clamped Catmull-Rom prevents numerical diffusion of curved flow-map
+// filaments during rapid low-viscosity spinning while remaining 100% overshoot-free.
+vec2 mapBicubicClamped(sampler2D tex, vec2 uv) {
+  vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  vec2 sum = vec2(0.0);
+  for (int j = 0; j < 4; j++) {
+    float wy = catmull(j, f.y);
+    vec2 row = vec2(0.0);
+    for (int k = 0; k < 4; k++) {
+      row += mapFetch(tex, i.x - 1 + k, i.y - 1 + j) * catmull(k, f.x);
+    }
+    sum += row * wy;
+  }
+  vec2 a = mapFetch(tex, i.x, i.y);
+  vec2 b = mapFetch(tex, i.x + 1, i.y);
+  vec2 c = mapFetch(tex, i.x, i.y + 1);
+  vec2 d = mapFetch(tex, i.x + 1, i.y + 1);
+  vec2 lo = min(min(a, b), min(c, d));
+  vec2 hi = max(max(a, b), max(c, d));
+  return clamp(sum, lo, hi);
+}
+
 vec2 mapBilinear(sampler2D tex, vec2 uv) {
   vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  int last = int(uMapSize) - 1;
-  vec2 a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).rg;
-  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
-  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).rg;
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  vec2 a = texelFetch(tex, clamp(i, ivec2(0), last), 0).rg;
+  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).rg;
+  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).rg;
+  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).rg;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float distAtSize(sampler2D tex, vec2 origin, vec2 texSize) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * texSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  ivec2 last = ivec2(texSize) - ivec2(1);
+  float a = texelFetch(tex, clamp(i, ivec2(0), last), 0).a;
+  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).a;
+  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).a;
+  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).a;
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
 float distAt(vec2 origin) {
-  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
-  ivec2 i = ivec2(floor(p));
-  vec2 f = p - vec2(i);
-  int last = int(uInkSize) - 1;
-  float a = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0).a;
-  float b = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
-  float c = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
-  float d = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).a;
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+  return distAtSize(uInk, origin, uInkSize);
 }
 
-float distBicubicClamped(vec2 origin) {
-  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
+float distBicubicClampedSize(sampler2D tex, vec2 origin, vec2 texSize) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * texSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  int last = int(uInkSize) - 1;
+  ivec2 last = ivec2(texSize) - ivec2(1);
   float sum = 0.0;
   for (int j = 0; j < 4; j++) {
     float wy = catmull(j, f.y);
     float row = 0.0;
     for (int k = 0; k < 4; k++) {
-      ivec2 c = clamp(i + ivec2(k - 1, j - 1), ivec2(0), ivec2(last));
-      row += texelFetch(uInk, c, 0).a * catmull(k, f.x);
+      ivec2 c = clamp(i + ivec2(k - 1, j - 1), ivec2(0), last);
+      row += texelFetch(tex, c, 0).a * catmull(k, f.x);
     }
     sum += row * wy;
   }
-  float a = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0).a;
-  float b = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
-  float c = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
-  float d = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).a;
+  float a = texelFetch(tex, clamp(i, ivec2(0), last), 0).a;
+  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).a;
+  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).a;
+  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).a;
   float minD = min(min(a, b), min(c, d));
   float maxD = max(max(a, b), max(c, d));
   return clamp(sum, minD, maxD);
 }
 
+float distBicubicClamped(vec2 origin) {
+  return distBicubicClampedSize(uInk, origin, uInkSize);
+}
+
 // Sign-masked bilinear sampling keeps level-set ink boundaries razor-sharp
 // while smoothly interpolating continuous-tone uploaded images.
-vec3 pureColorAt(vec2 origin, float targetSign) {
-  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * uInkSize - 0.5;
+vec3 pureColorAtSize(sampler2D tex, vec2 origin, float targetSign, vec2 texSize) {
+  vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * texSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  int last = int(uInkSize) - 1;
-  vec4 s00 = texelFetch(uInk, clamp(i, ivec2(0), ivec2(last)), 0);
-  vec4 s10 = texelFetch(uInk, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0);
-  vec4 s01 = texelFetch(uInk, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0);
-  vec4 s11 = texelFetch(uInk, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0);
+  ivec2 last = ivec2(texSize) - ivec2(1);
+  vec4 s00 = texelFetch(tex, clamp(i, ivec2(0), last), 0);
+  vec4 s10 = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0);
+  vec4 s01 = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0);
+  vec4 s11 = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0);
 
   float w00 = (1.0 - f.x) * (1.0 - f.y);
   float w10 = f.x * (1.0 - f.y);
@@ -1459,45 +2123,82 @@ vec3 pureColorAt(vec2 origin, float targetSign) {
   return s00.rgb * w00 + s10.rgb * w10 + s01.rgb * w01 + s11.rgb * w11;
 }
 
+vec3 pureColorAt(vec2 origin, float targetSign) {
+  return pureColorAtSize(uInk, origin, targetSign, uInkSize);
+}
+
 vec2 simBilinearRG(sampler2D tex, vec2 world) {
-  vec2 p = clamp(world * uN - 0.5, vec2(0.0), vec2(uN - 1.0));
+  vec2 p = clamp(world * uSimSize - 0.5, vec2(0.0), uSimSize - 1.0);
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  int last = int(uN) - 1;
-  vec2 a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).rg;
-  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
-  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).rg;
+  ivec2 last = ivec2(uSimSize) - ivec2(1);
+  vec2 a = texelFetch(tex, clamp(i, ivec2(0), last), 0).rg;
+  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).rg;
+  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).rg;
+  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).rg;
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
-float coarseBilinearR(sampler2D tex, vec2 uv, float coarseSize) {
-  vec2 p = clamp(uv * coarseSize - 0.5, vec2(0.0), vec2(coarseSize - 1.0));
+float coarseBilinearR(sampler2D tex, vec2 uv, vec2 coarseSize) {
+  vec2 p = clamp(uv * coarseSize - 0.5, vec2(0.0), coarseSize - 1.0);
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  int last = int(coarseSize) - 1;
-  float a = texelFetch(tex, clamp(i, ivec2(0), ivec2(last)), 0).r;
-  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), ivec2(last)), 0).r;
-  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), ivec2(last)), 0).r;
-  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), ivec2(last)), 0).r;
+  ivec2 last = ivec2(coarseSize) - ivec2(1);
+  float a = texelFetch(tex, clamp(i, ivec2(0), last), 0).r;
+  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).r;
+  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).r;
+  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).r;
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
-vec2 dmcTrace(vec2 uv, float dt) {
-  vec2 vel = simBilinearRG(uVel, uv);
-  float h = uTexelSize;
+// 4th-order Runge-Kutta backward & forward characteristic tracing in physical domain
+vec2 rk4Back(vec2 uv, float dt) {
+  vec2 invDom = 1.0 / uDomain;
+  vec2 k1 = simBilinearRG(uVel, uv) * invDom;
+  vec2 k2 = simBilinearRG(uVel, clamp(uv - 0.5 * dt * k1, vec2(0.0), vec2(1.0))) * invDom;
+  vec2 k3 = simBilinearRG(uVel, clamp(uv - 0.5 * dt * k2, vec2(0.0), vec2(1.0))) * invDom;
+  vec2 k4 = simBilinearRG(uVel, clamp(uv - dt * k3, vec2(0.0), vec2(1.0))) * invDom;
+  return clamp(uv - (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+}
 
-  float dirX = vel.x <= 0.0 ? -h : h;
-  float velUpX = simBilinearRG(uVel, uv + vec2(dirX, 0.0)).x;
-  float aX = (vel.x - velUpX) / -dirX;
-  float dx = abs(aX) > 1e-7 ? (1.0 - exp(clamp(-aX * dt, -25.0, 25.0))) / aX * vel.x : vel.x * dt;
+vec2 rk4Fwd(vec2 uv, float dt) {
+  vec2 invDom = 1.0 / uDomain;
+  vec2 k1 = simBilinearRG(uVel, uv) * invDom;
+  vec2 k2 = simBilinearRG(uVel, clamp(uv + 0.5 * dt * k1, vec2(0.0), vec2(1.0))) * invDom;
+  vec2 k3 = simBilinearRG(uVel, clamp(uv + 0.5 * dt * k2, vec2(0.0), vec2(1.0))) * invDom;
+  vec2 k4 = simBilinearRG(uVel, clamp(uv + dt * k3, vec2(0.0), vec2(1.0))) * invDom;
+  return clamp(uv + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+}
 
-  float dirY = vel.y <= 0.0 ? -h : h;
-  float velUpY = simBilinearRG(uVel, uv + vec2(0.0, dirY)).y;
-  float aY = (vel.y - velUpY) / -dirY;
-  float dy = abs(aY) > 1e-7 ? (1.0 - exp(clamp(-aY * dt, -25.0, 25.0))) / aY * vel.y : vel.y * dt;
+// Shared bamboo-tine forcing in isotropic physical coordinates (uv * uDomain)
+vec2 applyTine(vec2 w, vec2 uv, vec2 a, vec2 b, vec2 tineVel, float R) {
+  float R2 = R * R;
+  vec2 uvP = uv * uDomain;
+  vec2 aP = a * uDomain;
+  vec2 bP = b * uDomain;
+  vec2 ab = bP - aP;
+  float ab2 = dot(ab, ab);
+  float t = ab2 > 1e-8 ? clamp(dot(uvP - aP, ab) / ab2, 0.0, 1.0) : 1.0;
+  vec2 closest = aP + t * ab;
+  vec2 r = uvP - closest;
+  float d2 = dot(r, r);
 
-  return clamp(uv - vec2(dx, dy), vec2(0.0), vec2(1.0));
+  if (d2 < R2 * 9.0) {
+    float speed = length(tineVel);
+    if (speed > 3.2) tineVel *= 3.2 / speed;
+
+    float core = exp(-d2 / (R2 * 1.15));
+    w = mix(w, tineVel * 0.68, clamp(core * 0.85, 0.0, 0.92));
+
+    float E = exp(-d2 / (R2 * 1.6));
+    float crossProd = tineVel.x * r.y - tineVel.y * r.x;
+    vec2 dipole = E * vec2(
+      tineVel.x - 1.5 * r.y * crossProd / R2,
+      tineVel.y + 1.5 * r.x * crossProd / R2
+    );
+    w += dipole * uDt * 3.5;
+  }
+  return w;
 }
 
 void main() {
@@ -1520,6 +2221,19 @@ void main() {
     // Full-bleed unshadowed output when pulling JPG/SVG prints
     if (uIsExport == 1) {
       fragColor = vec4(baseCol, 1.0);
+      return;
+    }
+
+    // Edge-to-edge full-screen bath mode (subtle bezel vignette + studio window sheen)
+    if (uIsFullScreen == 1) {
+      float sideVig = smoothstep(0.0, 0.018, min(world.x, 1.0 - world.x))
+                    * smoothstep(0.0, 0.018, min(world.y, 1.0 - world.y));
+      float rimFactor = 0.72 + 0.28 * sideVig;
+      vec3 darkBezel = vec3(0.065, 0.052, 0.042);
+      vec3 fsShaded = mix(darkBezel, baseCol, rimFactor);
+      float fsSheen = exp(-length((world - vec2(0.76, 0.18)) * vec2(1.4, 2.2)) * 3.2) * 0.055 * sideVig;
+      fsShaded += vec3(0.95, 0.92, 0.86) * fsSheen;
+      fragColor = vec4(fsShaded, 1.0);
       return;
     }
 
@@ -1559,14 +2273,13 @@ void main() {
   }
   else if (uPass == 1) {
     vec2 world = gl_FragCoord.xy / uTargetSize;
-    vec2 prev = dmcTrace(world, uDt);
-    fragColor = vec4(mapBilinear(uMap, prev), 0.0, 1.0);
+    vec2 prev = rk4Back(world, uDt);
+    fragColor = vec4(mapBicubicClamped(uMap, prev), 0.0, 1.0);
   }
   else if (uPass == 2) {
     vec2 origin = gl_FragCoord.xy / uTargetSize;
     vec2 world = mapBilinear(uForward, origin);
-    vec2 vel = simBilinearRG(uVel, world);
-    fragColor = vec4(clamp(world + vel * uDt, vec2(0.0), vec2(1.0)), 0.0, 1.0);
+    fragColor = vec4(rk4Fwd(world, uDt), 0.0, 1.0);
   }
   else if (uPass == 3) {
     fragColor = vec4(gl_FragCoord.xy / uTargetSize, 0.0, 1.0);
@@ -1581,7 +2294,7 @@ void main() {
   else if (uPass == 5) {
     vec2 origin = gl_FragCoord.xy / uTargetSize;
     vec2 placed = mapBilinear(uForward, origin);
-    float radial = length(placed - uCenter) - uRadius;
+    float radial = length((placed - uCenter) * uDomain) - uRadius;
 
     ivec2 coord = ivec2(gl_FragCoord.xy);
     vec4 old = texelFetch(uInk, coord, 0);
@@ -1591,20 +2304,25 @@ void main() {
     vec3 centerColor = pureColorAt(centerOrigin, centerD);
     bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
 
+    // Always choose a level-set sign that keeps our own ink's sign when pouring onto
+    // same-color ink, and strictly contrasts (-sign) when pouring onto water or another ink
+    // (including when low-viscosity swirling sweeps background fluid under uCenter mid-pour).
+    float targetSign = sameColorAsCenter
+      ? (centerD >= 0.0 ? 1.0 : -1.0)
+      : (centerD >= 0.0 ? -1.0 : 1.0);
+
     if (uIsNewDrop == 1 && !sameColorAsCenter) {
-      float newSign = centerD >= 0.0 ? -1.0 : 1.0;
       if (radial <= 0.0) {
-        fragColor = vec4(uInkColor, newSign * (-radial));
+        fragColor = vec4(uInkColor, targetSign * (-radial));
       } else {
         float sgn = old.a >= 0.0 ? 1.0 : -1.0;
         fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
       }
     } else {
-      float keepSign = centerD >= 0.0 ? 1.0 : -1.0;
-      bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (keepSign >= 0.0));
+      bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (targetSign >= 0.0));
       if (radial <= 0.0) {
         float dIn = oldMatchesDrop ? max(abs(old.a), -radial) : (-radial);
-        fragColor = vec4(uInkColor, keepSign * dIn);
+        fragColor = vec4(uInkColor, targetSign * dIn);
       } else {
         if (oldMatchesDrop) {
           fragColor = old;
@@ -1620,7 +2338,7 @@ void main() {
   }
   else if (uPass == 7) {
     vec2 origin = gl_FragCoord.xy / uTargetSize;
-    float d = distance(origin, uCenter);
+    float d = length((origin - uCenter) * uDomain);
     vec2 surf = texelFetch(uSurf, ivec2(gl_FragCoord.xy), 0).rg;
     if (d < uRadius) {
       float ker = cos(d / uRadius * 1.57079632679);
@@ -1632,17 +2350,18 @@ void main() {
   }
   else if (uPass == 8) {
     vec2 uv = gl_FragCoord.xy / uTargetSize;
-    vec2 prev = dmcTrace(uv, uDt);
+    vec2 prev = rk4Back(uv, uDt);
     vec2 surf = simBilinearRG(uSurf, prev);
 
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
     float uL = coord.x == 0 ? 0.0 : texelFetch(uVel, coord - ivec2(1, 0), 0).x;
-    float uR = coord.x == last ? 0.0 : texelFetch(uVel, coord + ivec2(1, 0), 0).x;
+    float uR = coord.x == last.x ? 0.0 : texelFetch(uVel, coord + ivec2(1, 0), 0).x;
     float vB = coord.y == 0 ? 0.0 : texelFetch(uVel, coord - ivec2(0, 1), 0).y;
-    float vT = coord.y == last ? 0.0 : texelFetch(uVel, coord + ivec2(0, 1), 0).y;
+    float vT = coord.y == last.y ? 0.0 : texelFetch(uVel, coord + ivec2(0, 1), 0).y;
 
-    float div = (uR - uL + vT - vB) / (2.0 * uTexelSize);
+    float div = (uR - uL) / (2.0 * h.x) + (vT - vB) / (2.0 * h.y);
     float factor = exp(clamp(-div * uDt, -1.2, 1.2));
     float newS = clamp(surf.r * factor, 0.0, 14.0);
     float newAge = clamp(surf.g + 0.045 * uDt, 0.0, 1.0);
@@ -1650,12 +2369,12 @@ void main() {
   }
   else if (uPass == 9) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
     float s = 0.0;
     float age = 0.0;
     for (int j = -1; j <= 1; j++) {
       for (int i = -1; i <= 1; i++) {
-        vec2 sc = texelFetch(uSurf, clamp(coord + ivec2(i, j), ivec2(0), ivec2(last)), 0).rg;
+        vec2 sc = texelFetch(uSurf, clamp(coord + ivec2(i, j), ivec2(0), last), 0).rg;
         s += sc.r;
         age += sc.g;
       }
@@ -1669,18 +2388,19 @@ void main() {
   }
   else if (uPass == 10) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
-    float h = 1.0 / uTargetSize;
-    float h2 = h * h;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
+    float invHx2 = 1.0 / (h.x * h.x);
+    float invHy2 = 1.0 / (h.y * h.y);
 
     float uC = texelFetch(uAuxA, coord, 0).r;
     float uL = coord.x == 0 ? uC : texelFetch(uAuxA, coord - ivec2(1, 0), 0).r;
-    float uR = coord.x == last ? uC : texelFetch(uAuxA, coord + ivec2(1, 0), 0).r;
+    float uR = coord.x == last.x ? uC : texelFetch(uAuxA, coord + ivec2(1, 0), 0).r;
     float uB = coord.y == 0 ? uC : texelFetch(uAuxA, coord - ivec2(0, 1), 0).r;
-    float uT = coord.y == last ? uC : texelFetch(uAuxA, coord + ivec2(0, 1), 0).r;
+    float uT = coord.y == last.y ? uC : texelFetch(uAuxA, coord + ivec2(0, 1), 0).r;
     float fC = texelFetch(uAuxB, coord, 0).r;
 
-    float uStar = (uL + uR + uB + uT - h2 * fC) / (4.0 + uAlpha * h2);
+    float uStar = ((uL + uR) * invHx2 + (uB + uT) * invHy2 - fC) / (2.0 * (invHx2 + invHy2) + uAlpha);
     fragColor = vec4(mix(uC, uStar, 0.8), 0.0, 0.0, 1.0);
   }
   else if (uPass == 11) {
@@ -1688,11 +2408,12 @@ void main() {
   }
   else if (uPass == 12) {
     ivec2 coordC = ivec2(gl_FragCoord.xy);
-    int fineSize = int(uTargetSize) * 2;
-    int lastF = fineSize - 1;
-    float hf = 1.0 / float(fineSize);
-    float hf2 = hf * hf;
-    float diag = 4.0 + uAlpha * hf2;
+    ivec2 fineSize = ivec2(uTargetSize) * 2;
+    ivec2 lastF = fineSize - ivec2(1);
+    vec2 hf = uDomain / vec2(fineSize);
+    float invHx2 = 1.0 / (hf.x * hf.x);
+    float invHy2 = 1.0 / (hf.y * hf.y);
+    float diag = 2.0 * (invHx2 + invHy2) + uAlpha;
 
     float resSum = 0.0;
     for (int dy = 0; dy < 2; dy++) {
@@ -1700,12 +2421,12 @@ void main() {
         ivec2 cF = coordC * 2 + ivec2(dx, dy);
         float uC = texelFetch(uAuxA, cF, 0).r;
         float uL = cF.x == 0 ? uC : texelFetch(uAuxA, cF - ivec2(1, 0), 0).r;
-        float uR = cF.x == lastF ? uC : texelFetch(uAuxA, cF + ivec2(1, 0), 0).r;
+        float uR = cF.x == lastF.x ? uC : texelFetch(uAuxA, cF + ivec2(1, 0), 0).r;
         float uB = cF.y == 0 ? uC : texelFetch(uAuxA, cF - ivec2(0, 1), 0).r;
-        float uT = cF.y == lastF ? uC : texelFetch(uAuxA, cF + ivec2(0, 1), 0).r;
+        float uT = cF.y == lastF.y ? uC : texelFetch(uAuxA, cF + ivec2(0, 1), 0).r;
         float fF = texelFetch(uAuxB, cF, 0).r;
 
-        float lap = (uL + uR + uB + uT - diag * uC) / hf2;
+        float lap = (uL + uR) * invHx2 + (uB + uT) * invHy2 - diag * uC;
         resSum += (fF - lap);
       }
     }
@@ -1724,26 +2445,29 @@ void main() {
   }
   else if (uPass == 15) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
-    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
-    float curl = (wR.y - wL.y - (wT.x - wB.x)) / (2.0 * uTexelSize);
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
+    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), last), 0).rg;
+    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), last), 0).rg;
+    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), last), 0).rg;
+    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), last), 0).rg;
+    float curl = (wR.y - wL.y) / (2.0 * h.x) - (wT.x - wB.x) / (2.0 * h.y);
     fragColor = vec4(curl, 0.0, 0.0, 1.0);
   }
   else if (uPass == 16) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
     vec2 uv = gl_FragCoord.xy / uTargetSize;
+    vec2 h = uDomain / uTargetSize;
+    float hAvg = 0.5 * (h.x + h.y);
 
-    vec2 prevUv = dmcTrace(uv, uDt);
+    vec2 prevUv = rk4Back(uv, uDt);
     vec2 wAdv = simBilinearRG(uInertVel, prevUv);
 
-    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
-    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).rg;
+    vec2 wL = texelFetch(uInertVel, clamp(coord - ivec2(1, 0), ivec2(0), last), 0).rg;
+    vec2 wR = texelFetch(uInertVel, clamp(coord + ivec2(1, 0), ivec2(0), last), 0).rg;
+    vec2 wB = texelFetch(uInertVel, clamp(coord - ivec2(0, 1), ivec2(0), last), 0).rg;
+    vec2 wT = texelFetch(uInertVel, clamp(coord + ivec2(0, 1), ivec2(0), last), 0).rg;
     vec2 wAvg = 0.25 * (wL + wR + wB + wT);
     vec2 w = mix(wAdv, wAvg, clamp(uViscDiff * uDt * 18.0, 0.0, 0.45));
 
@@ -1751,55 +2475,35 @@ void main() {
 
     if (uVortConf > 1e-5) {
       float cC = texelFetch(uCurl, coord, 0).r;
-      float cL = abs(texelFetch(uCurl, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).r);
-      float cR = abs(texelFetch(uCurl, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).r);
-      float cB = abs(texelFetch(uCurl, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).r);
-      float cT = abs(texelFetch(uCurl, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).r);
-      vec2 gradAbsCurl = vec2(cR - cL, cT - cB) * 0.5;
+      float cL = abs(texelFetch(uCurl, clamp(coord - ivec2(1, 0), ivec2(0), last), 0).r);
+      float cR = abs(texelFetch(uCurl, clamp(coord + ivec2(1, 0), ivec2(0), last), 0).r);
+      float cB = abs(texelFetch(uCurl, clamp(coord - ivec2(0, 1), ivec2(0), last), 0).r);
+      float cT = abs(texelFetch(uCurl, clamp(coord + ivec2(0, 1), ivec2(0), last), 0).r);
+      vec2 gradAbsCurl = vec2((cR - cL) / (2.0 * h.x), (cT - cB) / (2.0 * h.y));
       float gLen = length(gradAbsCurl);
       if (gLen > 1e-5) {
         vec2 N = gradAbsCurl / gLen;
-        vec2 fVort = uVortConf * uTexelSize * vec2(N.y * cC, -N.x * cC);
+        vec2 fVort = uVortConf * hAvg * vec2(N.y * cC, -N.x * cC);
         w += fVort * uDt;
       }
     }
 
     if (uTool > 0) {
-      float R = uStickRadius;
-      float R2 = R * R;
       float invFrameDt = 1.0 / max(uFrameDt, 0.004);
-
-      vec2 a = uPrevCenter;
-      vec2 b = uCenter;
-      vec2 ab = b - a;
-      float ab2 = dot(ab, ab);
-      float t = ab2 > 1e-8 ? clamp(dot(uv - a, ab) / ab2, 0.0, 1.0) : 1.0;
-      vec2 closest = a + t * ab;
-      vec2 r = uv - closest;
-      float d2 = dot(r, r);
-
-      if (d2 < R2 * 9.0) {
-        vec2 tineVel = ab * invFrameDt * uToolDrag;
-        float speed = length(tineVel);
-        if (speed > 3.2) tineVel *= 3.2 / speed;
-
-        float core = exp(-d2 / (R2 * 1.15));
-        w = mix(w, tineVel * 0.68, clamp(core * 0.85, 0.0, 0.92));
-
-        float E = exp(-d2 / (R2 * 1.6));
-        float crossProd = tineVel.x * r.y - tineVel.y * r.x;
-        vec2 dipole = E * vec2(
-          tineVel.x - 1.5 * r.y * crossProd / R2,
-          tineVel.y + 1.5 * r.x * crossProd / R2
-        );
-        w += dipole * uDt * 3.5;
-      }
+      vec2 tineVel = (uCenter - uPrevCenter) * uDomain * invFrameDt * uToolDrag;
+      w = applyTine(w, uv, uPrevCenter, uCenter, tineVel, uStickRadius);
     }
 
-    float edgeX = min(uv.x, 1.0 - uv.x);
-    float edgeY = min(uv.y, 1.0 - uv.y);
-    w.x *= smoothstep(0.0, uTexelSize * 2.5, edgeX);
-    w.y *= smoothstep(0.0, uTexelSize * 2.5, edgeY);
+    for (int i = 0; i < MAX_PINS; i++) {
+      if (i >= uPinCount) break;
+      vec4 seg = uPinSeg[i];
+      w = applyTine(w, uv, seg.xy, seg.zw, uPinVel[i], uStickRadius);
+    }
+
+    float edgeX = min(uv.x, 1.0 - uv.x) * uDomain.x;
+    float edgeY = min(uv.y, 1.0 - uv.y) * uDomain.y;
+    w.x *= smoothstep(0.0, h.x * 2.5, edgeX);
+    w.y *= smoothstep(0.0, h.y * 2.5, edgeY);
 
     float sp = length(w);
     if (sp > 1.35) w *= 1.35 / sp;
@@ -1808,48 +2512,51 @@ void main() {
   }
   else if (uPass == 17) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
     float wL = coord.x == 0 ? 0.0 : texelFetch(uInertVel, coord - ivec2(1, 0), 0).x;
-    float wR = coord.x == last ? 0.0 : texelFetch(uInertVel, coord + ivec2(1, 0), 0).x;
+    float wR = coord.x == last.x ? 0.0 : texelFetch(uInertVel, coord + ivec2(1, 0), 0).x;
     float wB = coord.y == 0 ? 0.0 : texelFetch(uInertVel, coord - ivec2(0, 1), 0).y;
-    float wT = coord.y == last ? 0.0 : texelFetch(uInertVel, coord + ivec2(0, 1), 0).y;
-    float div = (wR - wL + wT - wB) / (2.0 * uTexelSize);
+    float wT = coord.y == last.y ? 0.0 : texelFetch(uInertVel, coord + ivec2(0, 1), 0).y;
+    float div = (wR - wL) / (2.0 * h.x) + (wT - wB) / (2.0 * h.y);
     fragColor = vec4(div, 0.0, 0.0, 1.0);
   }
   else if (uPass == 18) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
     vec2 w = texelFetch(uInertVel, coord, 0).rg;
 
     float pC = texelFetch(uPress, coord, 0).r;
     float pL = coord.x == 0 ? pC : texelFetch(uPress, coord - ivec2(1, 0), 0).r;
-    float pR = coord.x == last ? pC : texelFetch(uPress, coord + ivec2(1, 0), 0).r;
+    float pR = coord.x == last.x ? pC : texelFetch(uPress, coord + ivec2(1, 0), 0).r;
     float pB = coord.y == 0 ? pC : texelFetch(uPress, coord - ivec2(0, 1), 0).r;
-    float pT = coord.y == last ? pC : texelFetch(uPress, coord + ivec2(0, 1), 0).r;
+    float pT = coord.y == last.y ? pC : texelFetch(uPress, coord + ivec2(0, 1), 0).r;
 
-    vec2 gradP = vec2(pR - pL, pT - pB) / (2.0 * uTexelSize);
+    vec2 gradP = vec2((pR - pL) / (2.0 * h.x), (pT - pB) / (2.0 * h.y));
     vec2 wProj = w - gradP;
 
-    if (coord.x == 0 || coord.x == last) wProj.x = 0.0;
-    if (coord.y == 0 || coord.y == last) wProj.y = 0.0;
+    if (coord.x == 0 || coord.x == last.x) wProj.x = 0.0;
+    if (coord.y == 0 || coord.y == last.y) wProj.y = 0.0;
 
     fragColor = vec4(wProj, 0.0, 1.0);
   }
   else if (uPass == 19) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
 
     float pL = 0.0, pR = 0.0, pB = 0.0, pT = 0.0;
     for (int i = -1; i <= 1; i++) {
-      pL += texelFetch(uPhi, clamp(coord + ivec2(-1, i), ivec2(0), ivec2(last)), 0).r;
-      pR += texelFetch(uPhi, clamp(coord + ivec2( 1, i), ivec2(0), ivec2(last)), 0).r;
-      pB += texelFetch(uPhi, clamp(coord + ivec2(i, -1), ivec2(0), ivec2(last)), 0).r;
-      pT += texelFetch(uPhi, clamp(coord + ivec2(i,  1), ivec2(0), ivec2(last)), 0).r;
+      pL += texelFetch(uPhi, clamp(coord + ivec2(-1, i), ivec2(0), last), 0).r;
+      pR += texelFetch(uPhi, clamp(coord + ivec2( 1, i), ivec2(0), last), 0).r;
+      pB += texelFetch(uPhi, clamp(coord + ivec2(i, -1), ivec2(0), last), 0).r;
+      pT += texelFetch(uPhi, clamp(coord + ivec2(i,  1), ivec2(0), last), 0).r;
     }
 
     vec2 vMarangoni = vec2(0.0);
-    if (coord.x > 0 && coord.x < last) vMarangoni.x = ((pR - pL) / 3.0) / (2.0 * uTexelSize);
-    if (coord.y > 0 && coord.y < last) vMarangoni.y = ((pT - pB) / 3.0) / (2.0 * uTexelSize);
+    if (coord.x > 0 && coord.x < last.x) vMarangoni.x = ((pR - pL) / 3.0) / (2.0 * h.x);
+    if (coord.y > 0 && coord.y < last.y) vMarangoni.y = ((pT - pB) / 3.0) / (2.0 * h.y);
 
     float spM = length(vMarangoni);
     if (spM > 0.45) vMarangoni *= 0.45 / spM;
@@ -1861,37 +2568,39 @@ void main() {
   }
   else if (uPass == 20) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    int last = int(uTargetSize) - 1;
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
     vec4 center = texelFetch(uInk, coord, 0);
     float dC = center.a;
-    float h = 1.0 / uTargetSize;
+    vec2 h = uDomain / uTargetSize;
+    float hMin = min(h.x, h.y);
 
-    if (abs(dC) < h * 1.6) {
+    if (abs(dC) < hMin * 1.6) {
       fragColor = center;
       return;
     }
 
-    float dL = texelFetch(uInk, clamp(coord - ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
-    float dR = texelFetch(uInk, clamp(coord + ivec2(1, 0), ivec2(0), ivec2(last)), 0).a;
-    float dB = texelFetch(uInk, clamp(coord - ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
-    float dT = texelFetch(uInk, clamp(coord + ivec2(0, 1), ivec2(0), ivec2(last)), 0).a;
+    float dL = texelFetch(uInk, clamp(coord - ivec2(1, 0), ivec2(0), last), 0).a;
+    float dR = texelFetch(uInk, clamp(coord + ivec2(1, 0), ivec2(0), last), 0).a;
+    float dB = texelFetch(uInk, clamp(coord - ivec2(0, 1), ivec2(0), last), 0).a;
+    float dT = texelFetch(uInk, clamp(coord + ivec2(0, 1), ivec2(0), last), 0).a;
 
     float sgn = dC >= 0.0 ? 1.0 : -1.0;
-    float gradMag = length(vec2(dR - dL, dT - dB)) / (2.0 * h);
-    float dNew = dC - 0.30 * h * sgn * (gradMag - 1.0);
+    float gradMag = length(vec2((dR - dL) / (2.0 * h.x), (dT - dB) / (2.0 * h.y)));
+    float dNew = dC - 0.30 * hMin * sgn * (gradMag - 1.0);
     if (dNew * dC <= 0.0) dNew = dC;
     fragColor = vec4(center.rgb, dNew);
   }
   else if (uPass == 21) {
     ivec2 block = ivec2(gl_FragCoord.xy);
-    int stride = int(uN) / int(uTargetSize);
+    ivec2 stride = max(ivec2(1), ivec2(uSimSize) / ivec2(uTargetSize));
+    ivec2 lastSim = ivec2(uSimSize) - ivec2(1);
     ivec2 base = block * stride;
     float maxAct = 0.0;
-    for (int y = 0; y < 64; y += 4) {
-      if (y >= stride) break;
-      for (int x = 0; x < 64; x += 4) {
-        if (x >= stride) break;
-        ivec2 c = base + ivec2(x, y);
+    for (int y = 0; y < 160; y += 4) {
+      if (y >= stride.y) break;
+      for (int x = 0; x < 160; x += 4) {
+        if (x >= stride.x) break;
+        ivec2 c = clamp(base + ivec2(x, y), ivec2(0), lastSim);
         vec2 v = texelFetch(uVel, c, 0).rg;
         float s = texelFetch(uSurf, c, 0).r;
         float act = length(v) + max(0.0, s - uSeq) * 0.5;
@@ -1904,6 +2613,26 @@ void main() {
     vec2 uv = gl_FragCoord.xy / uTargetSize;
     vec3 imgCol = texture(uAuxA, uv).rgb;
     fragColor = vec4(imgCol, 1.0);
+  }
+  else if (uPass == 23) {
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+    vec2 rawOldUv = vec2(0.5) + (uv - vec2(0.5)) * uResizeScale;
+    vec2 clampedUv = clamp(rawOldUv, vec2(0.001), vec2(0.999));
+    float d = distBicubicClampedSize(uAuxA, clampedUv, uOldInkSize);
+    vec3 col = pureColorAtSize(uAuxA, clampedUv, d, uOldInkSize);
+    vec2 oldDom = uDomain / max(uResizeScale, vec2(1e-4));
+    vec2 outVec = (rawOldUv - clamp(rawOldUv, vec2(0.0), vec2(1.0))) * oldDom;
+    float outDist = length(outVec);
+    if (outDist > 1e-6) {
+      float edgeSign = d >= 0.0 ? 1.0 : -1.0;
+      if (distance(col, uWater) < 0.01) {
+        fragColor = vec4(uWater, edgeSign * (abs(d) + outDist));
+      } else {
+        fragColor = vec4(uWater, (-edgeSign) * outDist);
+      }
+    } else {
+      fragColor = vec4(col, d);
+    }
   }
 }`;
 
@@ -1963,11 +2692,27 @@ void main() {
   const uVortConfLoc = gl.getUniformLocation(program, "uVortConf");
   const uFrameDtLoc = gl.getUniformLocation(program, "uFrameDt");
   const uIsExportLoc = gl.getUniformLocation(program, "uIsExport");
+  const uIsFullScreenLoc = gl.getUniformLocation(program, "uIsFullScreen");
+  const uSimSizeLoc = gl.getUniformLocation(program, "uSimSize");
+  const uMapSizeLoc = gl.getUniformLocation(program, "uMapSize");
+  const uInkSizeLoc = gl.getUniformLocation(program, "uInkSize");
+  const uDomainLoc = gl.getUniformLocation(program, "uDomain");
+  const uOldInkSizeLoc = gl.getUniformLocation(program, "uOldInkSize");
+  const uResizeScaleLoc = gl.getUniformLocation(program, "uResizeScale");
 
-  gl.uniform1f(gl.getUniformLocation(program, "uN"), SIM);
-  gl.uniform1f(gl.getUniformLocation(program, "uMapSize"), MAP);
-  gl.uniform1f(gl.getUniformLocation(program, "uInkSize"), INK);
-  gl.uniform1f(gl.getUniformLocation(program, "uTexelSize"), 1.0 / SIM);
+  const uPinCountLoc = gl.getUniformLocation(program, "uPinCount");
+  const uPinSegLoc = gl.getUniformLocation(program, "uPinSeg");
+  const uPinVelLoc = gl.getUniformLocation(program, "uPinVel");
+
+  function syncDomainUniforms() {
+    gl.useProgram(program);
+    gl.uniform2f(uSimSizeLoc, simW, simH);
+    gl.uniform2f(uMapSizeLoc, mapW, mapH);
+    gl.uniform2f(uInkSizeLoc, inkW, inkH);
+    gl.uniform2f(uDomainLoc, domainX, domainY);
+    gl.uniform1i(uIsFullScreenLoc, isFullScreenMode ? 1 : 0);
+  }
+  syncDomainUniforms();
 
   gl.uniform1i(gl.getUniformLocation(program, "uInk"), 0);
   gl.uniform1i(gl.getUniformLocation(program, "uMap"), 1);
@@ -1989,7 +2734,7 @@ void main() {
   const PASS_MG_RESTRICT = 12, PASS_MG_PROLONG = 13, PASS_WARM_START = 14;
   const PASS_VORTICITY = 15, PASS_ADVECT_INERTIAL = 16, PASS_NS_DIV = 17;
   const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
-  const PASS_LOAD_IMAGE = 22;
+  const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23;
 
   function makeTarget(w, h, internal, format, type) {
     const tex = gl.createTexture();
@@ -2006,19 +2751,25 @@ void main() {
     return { tex, fbo, w, h };
   }
 
-  const inkTex = [
-    makeTarget(INK, INK, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT),
-    makeTarget(INK, INK, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT)
-  ];
-  const back = [makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT)];
-  const fwd = [makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(MAP, MAP, gl.RG32F, gl.RG, gl.FLOAT)];
+  function destroyTarget(t) {
+    if (!t) return;
+    if (t.fbo) gl.deleteFramebuffer(t.fbo);
+    if (t.tex) gl.deleteTexture(t.tex);
+  }
 
-  const surfTex = [makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT)];
-  const inertVelTex = [makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT)];
-  const velTex = makeTarget(SIM, SIM, gl.RG32F, gl.RG, gl.FLOAT);
-  const curlTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
-  let phiTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
-  let pressTex = makeTarget(SIM, SIM, gl.R32F, gl.RED, gl.FLOAT);
+  let inkTex = [
+    makeTarget(inkW, inkH, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT),
+    makeTarget(inkW, inkH, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT)
+  ];
+  let back = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
+  let fwd = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
+
+  let surfTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
+  let inertVelTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
+  let velTex = makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT);
+  let curlTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+  let phiTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+  let pressTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
 
   // Texture used for transferring cropped 2D canvas images into inkTex
   const uploadTex = gl.createTexture();
@@ -2029,16 +2780,22 @@ void main() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.bindTexture(gl.TEXTURE_2D, null);
 
-  const mgSol = [];
-  const mgRhs = [];
-  for (let l = 0; l < MG_LEVELS; l++) {
-    const sz = SIM >> l;
-    mgSol.push([
-      makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT),
-      makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT)
-    ]);
-    mgRhs.push(makeTarget(sz, sz, gl.R32F, gl.RED, gl.FLOAT));
+  let mgSol = [];
+  let mgRhs = [];
+  function allocateMultigrid() {
+    mgSol = [];
+    mgRhs = [];
+    for (let l = 0; l < MG_LEVELS; l++) {
+      const lw = Math.max(2, simW >> l);
+      const lh = Math.max(2, simH >> l);
+      mgSol.push([
+        makeTarget(lw, lh, gl.R32F, gl.RED, gl.FLOAT),
+        makeTarget(lw, lh, gl.R32F, gl.RED, gl.FLOAT)
+      ]);
+      mgRhs.push(makeTarget(lw, lh, gl.R32F, gl.RED, gl.FLOAT));
+    }
   }
+  allocateMultigrid();
 
   const energyTarget = makeTarget(ENERGY_RES, ENERGY_RES, gl.R32F, gl.RED, gl.FLOAT);
   const energyPbo = gl.createBuffer();
@@ -2072,19 +2829,159 @@ void main() {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
     gl.uniform1i(uIsExportLoc, 0);
+    gl.uniform1i(uIsFullScreenLoc, isFullScreenMode ? 1 : 0);
 
     if (!target) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, view.width, view.height);
+      gl.uniform2f(uTargetSize, view.width, view.height);
     } else {
       gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
       gl.viewport(0, 0, target.w, target.h);
-      gl.uniform1f(uTargetSize, target.w);
+      gl.uniform2f(uTargetSize, target.w, target.h);
     }
 
     gl.uniform1i(uPass, pass);
     bindInputs(target ? target.tex : null, auxATex, auxBTex);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  const MAX_GPU_TEX = Math.min(isIOSDevice ? 3072 : 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+
+  function resizeSimulationIfNeeded(stageW, stageH, dpr) {
+    let nextDomX = 1.0;
+    let nextDomY = 1.0;
+    let nextSimW = BASE_SIM;
+    let nextSimH = BASE_SIM;
+    let nextInkW = BASE_INK;
+    let nextInkH = BASE_INK;
+
+    if (isFullScreenMode && stageW >= 32 && stageH >= 32) {
+      const minSide = Math.max(1, Math.min(stageW, stageH));
+      nextDomX = stageW / minSide;
+      nextDomY = stageH / minSide;
+
+      const mgAlign = 1 << (MG_LEVELS - 1); // 32: guarantees exact halving across all 6 MG levels
+      nextSimW = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomX) / mgAlign) * mgAlign));
+      nextSimH = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomY) / mgAlign) * mgAlign));
+
+      const rawPxW = Math.max(Math.round(stageW * dpr), Math.round(BASE_INK * nextDomX));
+      const rawPxH = Math.max(Math.round(stageH * dpr), Math.round(BASE_INK * nextDomY));
+      const rawMax = Math.max(rawPxW, rawPxH);
+      const clampScale = rawMax > MAX_GPU_TEX ? (MAX_GPU_TEX / rawMax) : 1.0;
+      nextInkW = Math.max(512, Math.round((rawPxW * clampScale) / 4) * 4);
+      nextInkH = Math.max(512, Math.round((rawPxH * clampScale) / 4) * 4);
+    }
+
+    const nextMapW = nextSimW * 2;
+    const nextMapH = nextSimH * 2;
+
+    if (
+      nextSimW === simW &&
+      nextSimH === simH &&
+      nextInkW === inkW &&
+      nextInkH === inkH &&
+      Math.abs(nextDomX - domainX) <= 0.002 &&
+      Math.abs(nextDomY - domainY) <= 0.002
+    ) {
+      return false;
+    }
+
+    if (pendingSync) {
+      gl.deleteSync(pendingSync);
+      pendingSync = null;
+    }
+
+    // Bake current advected swirls into inkTex[inkI] using current grid uniforms before resizing
+    gpuBake();
+
+    const prevInk = inkTex[inkI];
+    destroyTarget(inkTex[1 - inkI]);
+    destroyTarget(back[0]); destroyTarget(back[1]);
+    destroyTarget(fwd[0]); destroyTarget(fwd[1]);
+    destroyTarget(surfTex[0]); destroyTarget(surfTex[1]);
+    destroyTarget(inertVelTex[0]); destroyTarget(inertVelTex[1]);
+    destroyTarget(velTex);
+    destroyTarget(curlTex);
+    destroyTarget(phiTex);
+    destroyTarget(pressTex);
+    for (let l = 0; l < mgSol.length; l++) {
+      destroyTarget(mgSol[l][0]);
+      destroyTarget(mgSol[l][1]);
+      destroyTarget(mgRhs[l]);
+    }
+
+    const oldDomX = domainX;
+    const oldDomY = domainY;
+
+    simW = nextSimW;
+    simH = nextSimH;
+    mapW = nextMapW;
+    mapH = nextMapH;
+    inkW = nextInkW;
+    inkH = nextInkH;
+    domainX = nextDomX;
+    domainY = nextDomY;
+    syncDomainUniforms();
+
+    inkTex = [
+      makeTarget(inkW, inkH, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT),
+      makeTarget(inkW, inkH, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT)
+    ];
+    back = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
+    fwd = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
+    surfTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
+    inertVelTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
+    velTex = makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT);
+    curlTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+    phiTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+    pressTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+    allocateMultigrid();
+
+    inkI = 0; backI = 0; fwdI = 0; surfI = 0; inertI = 0;
+
+    // Resample existing ink level-set isotropically around the bath center
+    gl.useProgram(program);
+    gl.uniform2f(uOldInkSizeLoc, prevInk.w, prevInk.h);
+    gl.uniform2f(uResizeScaleLoc, domainX / oldDomX, domainY / oldDomY);
+    drawTo(inkTex[0], PASS_RESIZE_INK, prevInk.tex);
+    inkI = 0;
+    destroyTarget(prevInk);
+
+    for (let r = 0; r < 2; r++) {
+      drawTo(inkTex[1 - inkI], PASS_REDISTANCE);
+      inkI = 1 - inkI;
+    }
+
+    drawTo(back[0], PASS_IDENTITY);
+    drawTo(back[1], PASS_IDENTITY);
+    drawTo(fwd[0], PASS_IDENTITY);
+    drawTo(fwd[1], PASS_IDENTITY);
+    drawTo(surfTex[0], PASS_ZERO);
+    drawTo(surfTex[1], PASS_ZERO);
+    drawTo(inertVelTex[0], PASS_ZERO);
+    drawTo(inertVelTex[1], PASS_ZERO);
+    drawTo(phiTex, PASS_ZERO);
+    drawTo(pressTex, PASS_ZERO);
+    drawTo(velTex, PASS_ZERO);
+    drawTo(curlTex, PASS_ZERO);
+
+    isSpreading = false;
+    hasAdvectedSinceBake = false;
+
+    const remapX = oldDomX / domainX;
+    const remapY = oldDomY / domainY;
+    for (const p of pins) {
+      p.x = clampUv(0.5 + (p.x - 0.5) * remapX);
+      p.y = clampUv(0.5 + (p.y - 0.5) * remapY);
+      p.lastStampX = p.x;
+      p.lastStampY = p.y;
+      if (p.launch) {
+        p.launch = [p.launch[0] * remapX, p.launch[1] * remapY];
+      }
+    }
+
+    return true;
   }
 
   function solveMultigridVCycle(alpha, numVCycles) {
@@ -2173,17 +3070,18 @@ void main() {
     }
   }
 
-  function exportHighRes(mimeType, isSvg = false) {
-    const exportSize = isSvg ? 4096 : INK;
+  function exportHighRes(mimeType) {
+    const exportW = inkW;
+    const exportH = inkH;
 
     const exportFbo = gl.createFramebuffer();
     const exportTex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, exportTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, exportSize, exportSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, exportW, exportH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
 
-    gl.viewport(0, 0, exportSize, exportSize);
+    gl.viewport(0, 0, exportW, exportH);
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     gl.enableVertexAttribArray(0);
@@ -2191,30 +3089,31 @@ void main() {
 
     gl.uniform1i(uIsExportLoc, 1);
     gl.uniform1i(uPass, PASS_DISPLAY);
-    gl.uniform1f(uTargetSize, exportSize);
+    gl.uniform2f(uTargetSize, exportW, exportH);
 
     bindInputs(null);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     gl.uniform1i(uIsExportLoc, 0);
 
-    const pixels = new Uint8Array(exportSize * exportSize * 4);
-    gl.readPixels(0, 0, exportSize, exportSize, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    const pixels = new Uint8Array(exportW * exportH * 4);
+    gl.readPixels(0, 0, exportW, exportH, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
     gl.deleteTexture(exportTex);
     gl.deleteFramebuffer(exportFbo);
 
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = exportSize;
-    tempCanvas.height = exportSize;
+    tempCanvas.width = exportW;
+    tempCanvas.height = exportH;
     const ctx = tempCanvas.getContext("2d");
-    const imgData = ctx.createImageData(exportSize, exportSize);
+    const imgData = ctx.createImageData(exportW, exportH);
+    const rowBytes = exportW * 4;
 
-    for (let y = 0; y < exportSize; y++) {
-      const topY = exportSize - 1 - y;
-      const srcOffset = y * exportSize * 4;
-      const dstOffset = topY * exportSize * 4;
-      imgData.data.set(pixels.subarray(srcOffset, srcOffset + exportSize * 4), dstOffset);
+    for (let y = 0; y < exportH; y++) {
+      const topY = exportH - 1 - y;
+      const srcOffset = y * rowBytes;
+      const dstOffset = topY * rowBytes;
+      imgData.data.set(pixels.subarray(srcOffset, srcOffset + rowBytes), dstOffset);
     }
 
     ctx.putImageData(imgData, 0, 0);
@@ -2339,6 +3238,731 @@ void main() {
     drawTo(null, PASS_DISPLAY);
   }
 
+  // =========================================================
+  // Pin / Slingshot System (for both Sumi Inks & Bamboo Stick)
+  //   - Tap empty water        -> place a pin (ink bead or stylus point)
+  //   - Drag back from a pin   -> elastic slingshot vector
+  //   - Tap a pin              -> clear slingshot, or remove pin
+  //   - Drag on empty water    -> master stroke: sweeps unassigned pins while firing slingshots
+  //   - Release button / F key -> release all ink pins (ink mode) or fire slingshots (stick mode)
+  //   - Grid dropdown          -> spawn symmetric grids (2x2, 3x3, 4x4, Ring 6, Ring 8, Cross)
+  // =========================================================
+  const MAX_PINS = 32;            // must match MAX_PINS in the fragment shader
+  const SLING_POWER = 1.75;       // launch distance = pull distance * power
+  const SLING_MAX_PULL = 0.25;    // max elastic stretch in bath UV
+  const PIN_TAP_PX = 6;           // screen px before a press counts as a drag
+
+  let pushInkActive = false;      // false = Drop only; true = Drop + Push (latte pin push)
+  let stickMode = "stir";         // "stir" | "pins"
+  let keepInkPins = false;
+  let keepStickPins = false;
+  const pins = [];                // { kind, x, y, color, colorHex, launch: [dx, dy] | null, state, flight, hoverTime, lastStampX, lastStampY }
+  let pinGesture = null;
+  let masterStroke = null;
+  const pinSegBuf = new Float32Array(MAX_PINS * 4);
+  const pinVelBuf = new Float32Array(MAX_PINS * 2);
+  let pinSegCount = 0;
+  let stepsSincePourBake = 0;
+
+  function activePinKind() {
+    if (activeTool === 0 && pushInkActive) return "ink";
+    if (activeTool === 1 && stickMode === "pins") return "stick";
+    return null;
+  }
+  function pinsModeActive() { return activePinKind() !== null; }
+  function isLatteMode() { return activeTool === 0 && pushInkActive; }
+
+  function ensureLattePins() {
+    const inkPins = pins.filter(p => p.kind === "ink");
+    if (inkPins.length === 0) {
+      const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+      pins.push({
+        kind: "ink",
+        x: 0.5,
+        y: 0.5,
+        color: ink,
+        colorHex: activeHex,
+        launch: null,
+        state: "idle",
+        flight: null,
+        hoverTime: 0,
+        lastStampX: 0.5,
+        lastStampY: 0.5
+      });
+      updatePinUI();
+      drawRing();
+    }
+  }
+  function clampUv(v) { return Math.max(0.003, Math.min(0.997, v)); }
+  function pinHitRadius() {
+    const k = activePinKind();
+    return (k === "ink")
+      ? Math.max(0.026, INK_RADIUS * dropSizeMult * 0.75)
+      : Math.max(0.022, STICK_BASE_RADIUS * stylusRadiusMult * 1.4);
+  }
+
+  function findPinAt(x, y) {
+    const r = pinHitRadius();
+    let best = null, bestD = r * r;
+    const currentKind = activePinKind();
+    // Prefer pins matching the active tool mode
+    for (const pin of pins) {
+      if (pin.state !== "idle" || pin.kind !== currentKind) continue;
+      const dx = (pin.x - x) * domainX;
+      const dy = (pin.y - y) * domainY;
+      const d = dx * dx + dy * dy;
+      if (d <= bestD) { bestD = d; best = pin; }
+    }
+    if (best) return best;
+    // Otherwise allow interacting with any idle pin
+    for (const pin of pins) {
+      if (pin.state !== "idle") continue;
+      const dx = (pin.x - x) * domainX;
+      const dy = (pin.y - y) * domainY;
+      const d = dx * dx + dy * dy;
+      if (d <= bestD) { bestD = d; best = pin; }
+    }
+    return best;
+  }
+
+  function addPin(x, y) {
+    if (pins.length >= MAX_PINS) return null;
+    const kind = activePinKind() || "stick";
+    let col = ink;
+    let hex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+    const pin = {
+      kind,
+      x: clampUv(x),
+      y: clampUv(y),
+      color: col,
+      colorHex: hex,
+      launch: null,
+      state: "idle",
+      flight: null,
+      hoverTime: 0,
+      lastStampX: clampUv(x),
+      lastStampY: clampUv(y)
+    };
+    pins.push(pin);
+    if (kind === "ink" && sumiMode) {
+      cycleColor();
+    }
+    return pin;
+  }
+
+  function generatePinGrid(kind, type) {
+    // Clear pins of this kind first
+    for (let i = pins.length - 1; i >= 0; i--) {
+      if (pins[i].kind === kind) pins.splice(i, 1);
+    }
+
+    if (kind === "ink") {
+      keepInkPins = true;
+      const keepEl = document.getElementById("ink-pin-keep");
+      if (keepEl) keepEl.checked = true;
+    }
+
+    const baseCoords = [];
+    if (type === "1pin") {
+      baseCoords.push([0.5, 0.5]);
+    } else if (type === "2x2") {
+      const xs = [0.36, 0.64], ys = [0.36, 0.64];
+      for (const y of ys) for (const x of xs) baseCoords.push([x, y]);
+    } else if (type === "3x3") {
+      const xs = [0.26, 0.50, 0.74], ys = [0.26, 0.50, 0.74];
+      for (const y of ys) for (const x of xs) baseCoords.push([x, y]);
+    } else if (type === "4x4") {
+      const xs = [0.20, 0.40, 0.60, 0.80], ys = [0.20, 0.40, 0.60, 0.80];
+      for (const y of ys) for (const x of xs) baseCoords.push([x, y]);
+    } else if (type === "ring6") {
+      const R = 0.24, cx = 0.5, cy = 0.5;
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        baseCoords.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R]);
+      }
+    } else if (type === "ring8") {
+      const R = 0.26, cx = 0.5, cy = 0.5;
+      for (let i = 0; i < 8; i++) {
+        const a = (i * Math.PI) / 4;
+        baseCoords.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R]);
+      }
+    } else if (type === "cross") {
+      baseCoords.push([0.5, 0.5], [0.5, 0.25], [0.5, 0.75], [0.25, 0.5], [0.75, 0.5]);
+    }
+
+    // Keep symmetric grids physically square/circular across widescreen & portrait full-screen baths
+    const coords = baseCoords.map(([x, y]) => [
+      0.5 + (x - 0.5) / domainX,
+      0.5 + (y - 0.5) / domainY
+    ]);
+
+    const available = MAX_PINS - pins.length;
+    const toAdd = coords.slice(0, available);
+
+    const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+    const activeColor = ink;
+
+    toAdd.forEach(([x, y]) => {
+      pins.push({
+        kind,
+        x: clampUv(x),
+        y: clampUv(y),
+        color: activeColor,
+        colorHex: activeHex,
+        launch: null,
+        state: "idle",
+        flight: null,
+        hoverTime: 0,
+        lastStampX: clampUv(x),
+        lastStampY: clampUv(y)
+      });
+    });
+
+    updatePinUI();
+    drawRing();
+  }
+
+  function removePin(pin) {
+    const i = pins.indexOf(pin);
+    if (i >= 0) pins.splice(i, 1);
+  }
+
+  function clearPinsByKind(kind) {
+    for (let i = pins.length - 1; i >= 0; i--) {
+      if (!kind || pins[i].kind === kind) {
+        pins.splice(i, 1);
+      }
+    }
+    pinGesture = null;
+    masterStroke = null;
+    updatePinUI();
+    drawRing();
+  }
+
+  function clearPins() {
+    clearPinsByKind(null);
+  }
+
+  // Clamped elastic pull vector (anchor -> pouch) in isotropic physical units, returned as UV offset
+  function clampedPull(pin, px, py) {
+    let dxP = (px - pin.x) * domainX;
+    let dyP = (py - pin.y) * domainY;
+    const len = Math.hypot(dxP, dyP);
+    if (len > SLING_MAX_PULL) {
+      dxP *= SLING_MAX_PULL / len;
+      dyP *= SLING_MAX_PULL / len;
+    }
+    return [dxP / domainX, dyP / domainY, Math.min(len, SLING_MAX_PULL)];
+  }
+
+  function computeLaunch(pin, px, py) {
+    const [dx, dy, len] = clampedPull(pin, px, py);
+    if (len < 0.006) return null;
+    return [-dx * SLING_POWER, -dy * SLING_POWER];
+  }
+
+  function launchPin(pin) {
+    const tx = clampUv(pin.x + pin.launch[0]);
+    const ty = clampUv(pin.y + pin.launch[1]);
+    const dist = Math.hypot((tx - pin.x) * domainX, (ty - pin.y) * domainY);
+    pin.flight = { fx: pin.x, fy: pin.y, tx, ty, t: 0, dur: 0.3 + 0.9 * dist };
+    pin.state = "flying";
+  }
+
+  // Release all idle ink pins simultaneously onto the bath
+  function releaseInkPins() {
+    const inkPins = pins.filter(p => p.kind === "ink" && p.state === "idle");
+    if (inkPins.length === 0) return 0;
+
+    if (hasAdvectedSinceBake) {
+      gpuBake();
+    }
+
+    const radius = INK_RADIUS * dropSizeMult;
+    const mass = (2.8 + 1.2 * flowRateMult);
+    gl.uniform1f(uMassLoc, mass);
+    gl.uniform1f(uRadius, radius);
+
+    // 1. Splat surface tension mass for all ink pins simultaneously
+    for (const pin of inkPins) {
+      gl.uniform2f(uCenter, pin.x, pin.y);
+      drawTo(surfTex[1 - surfI], PASS_SPLAT);
+      surfI = 1 - surfI;
+    }
+
+    // 2. Stamp ink droplets into inkTex simultaneously
+    gl.uniform1i(uIsNewDropLoc, 1);
+    gl.uniform1f(uRadius, radius);
+    for (const pin of inkPins) {
+      const col = pin.color !== undefined ? pin.color : ink;
+      gl.uniform3f(
+        uInkColor,
+        (col & 255) / 255,
+        ((col >> 8) & 255) / 255,
+        ((col >> 16) & 255) / 255
+      );
+      gl.uniform2f(uCenter, pin.x, pin.y);
+      drawTo(inkTex[1 - inkI], PASS_STAMP);
+      inkI = 1 - inkI;
+    }
+
+    isSpreading = true;
+
+    // 3. Launch slingshot ink pins, or retire stationary pins if keep is off
+    for (const pin of inkPins) {
+      if (pin.launch) {
+        launchPin(pin);
+      } else if (!keepInkPins) {
+        pin.state = "done";
+      }
+    }
+
+    pouredDrop = false;
+
+    // 4. Advance color palette if auto-cycle is enabled
+    if (sumiMode) {
+      cycleColor();
+    } else {
+      // If auto-cycle is off, keep existing colors or ensure sync
+      const curHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+      for (const pin of inkPins) {
+        if (pin.state === "idle") {
+          pin.color = ink;
+          pin.colorHex = curHex;
+        }
+      }
+    }
+
+    if (!masterStroke) {
+      finalizePinRun();
+    }
+
+    drawTo(null, PASS_DISPLAY);
+    updatePinUI();
+    return inkPins.length;
+  }
+
+  function handleLattePointerDown(px, py) {
+    let inkPins = pins.filter(p => p.kind === "ink");
+    if (inkPins.length === 0) {
+      ensureLattePins();
+      inkPins = pins.filter(p => p.kind === "ink");
+    }
+
+    // Color sync: ensure pin colors match active swatch
+    const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+    for (const p of inkPins) {
+      p.color = ink;
+      p.colorHex = activeHex;
+    }
+
+    // Relocate pins so they center at the contact point (px, py)
+    const hitPin = findPinAt(px, py);
+    if (hitPin && inkPins.length > 1) {
+      const dx = px - hitPin.x;
+      const dy = py - hitPin.y;
+      for (const p of inkPins) {
+        p.x = clampUv(p.x + dx);
+        p.y = clampUv(p.y + dy);
+        p.lastStampX = p.x;
+        p.lastStampY = p.y;
+        p.hoverTime = 0;
+      }
+    } else if (inkPins.length === 1) {
+      const p = inkPins[0];
+      p.x = clampUv(px);
+      p.y = clampUv(py);
+      p.lastStampX = p.x;
+      p.lastStampY = p.y;
+      p.hoverTime = 0;
+    } else {
+      let cx = 0, cy = 0;
+      for (const p of inkPins) { cx += p.x; cy += p.y; }
+      cx /= inkPins.length; cy /= inkPins.length;
+      const dx = px - cx;
+      const dy = py - cy;
+      for (const p of inkPins) {
+        p.x = clampUv(p.x + dx);
+        p.y = clampUv(p.y + dy);
+        p.lastStampX = p.x;
+        p.lastStampY = p.y;
+        p.hoverTime = 0;
+      }
+    }
+
+    if (hasAdvectedSinceBake) {
+      gpuBake();
+    }
+    stepsSincePourBake = 0;
+
+    // Initial surface contact pour
+    const radius = INK_RADIUS * dropSizeMult;
+    const addedMass = (2.8 + 1.2 * flowRateMult);
+    gl.uniform1f(uMassLoc, addedMass);
+    gl.uniform1f(uRadius, radius);
+    for (const pin of inkPins) {
+      gl.uniform2f(uCenter, pin.x, pin.y);
+      drawTo(surfTex[1 - surfI], PASS_SPLAT);
+      surfI = 1 - surfI;
+    }
+
+    gl.uniform1i(uIsNewDropLoc, 1);
+    gl.uniform1f(uRadius, radius);
+    for (const pin of inkPins) {
+      const col = pin.color !== undefined ? pin.color : ink;
+      gl.uniform3f(
+        uInkColor,
+        (col & 255) / 255,
+        ((col >> 8) & 255) / 255,
+        ((col >> 16) & 255) / 255
+      );
+      gl.uniform2f(uCenter, pin.x, pin.y);
+      drawTo(inkTex[1 - inkI], PASS_STAMP);
+      inkI = 1 - inkI;
+    }
+
+    isSpreading = true;
+    pouredDrop = true;
+    drawTo(null, PASS_DISPLAY);
+  }
+
+  function fireSlingshots() {
+    let fired = 0;
+    const targetKind = activePinKind();
+    for (const pin of pins) {
+      if (pin.state === "idle" && pin.launch && (!targetKind || pin.kind === targetKind)) {
+        if (pin.kind === "ink") {
+          // Ink slingshot drops ink before flying
+          releaseInkPins();
+          fired++;
+          break;
+        } else {
+          launchPin(pin);
+          fired++;
+        }
+      }
+    }
+    updatePinUI();
+    return fired;
+  }
+
+  function beginMasterStroke(x0, y0) {
+    const currentKind = activePinKind();
+    if (currentKind === "ink") {
+      releaseInkPins();
+    } else {
+      fireSlingshots();
+    }
+    for (const pin of pins) {
+      if (pin.state === "idle" && !pin.launch && (!currentKind || pin.kind === currentKind)) {
+        pin.state = "following";
+      }
+    }
+    masterStroke = { lastX: x0, lastY: y0 };
+  }
+
+  function endMasterStroke() {
+    masterStroke = null;
+    for (const pin of pins) {
+      if (pin.state === "following") pin.state = "done";
+    }
+  }
+
+  function finalizePinRun() {
+    let changed = false;
+    for (let i = pins.length - 1; i >= 0; i--) {
+      const pin = pins[i];
+      if (pin.state !== "done") continue;
+      changed = true;
+      const keep = (pin.kind === "ink") ? keepInkPins : keepStickPins;
+      if (keep) {
+        pin.state = "idle";
+      } else {
+        pins.splice(i, 1);
+      }
+    }
+    if (changed) updatePinUI();
+  }
+
+  function pushPinSeg(ax, ay, bx, by, vx, vy) {
+    if (pinSegCount >= MAX_PINS) return;
+    const i = pinSegCount++;
+    pinSegBuf[i * 4] = ax; pinSegBuf[i * 4 + 1] = ay;
+    pinSegBuf[i * 4 + 2] = bx; pinSegBuf[i * 4 + 3] = by;
+    pinVelBuf[i * 2] = vx * domainX * stylusDragMult;
+    pinVelBuf[i * 2 + 1] = vy * domainY * stylusDragMult;
+  }
+
+  // Advances pin positions for one sim step and fills the moving-segment uniforms.
+  // Returns true while any pin run (master stroke or slingshot flight) is in progress.
+  function advancePins(dt, frameDelta) {
+    pinSegCount = 0;
+    let busy = false;
+
+    if (masterStroke) {
+      busy = true;
+      const dx = input.x - masterStroke.lastX;
+      const dy = input.y - masterStroke.lastY;
+      masterStroke.lastX = input.x;
+      masterStroke.lastY = input.y;
+      if (dx * dx + dy * dy > 1e-12) {
+        const inv = 1 / Math.max(frameDelta, 0.004);
+        for (const pin of pins) {
+          if (pin.state !== "following") continue;
+          const ox = pin.x, oy = pin.y;
+          pin.x = clampUv(pin.x + dx);
+          pin.y = clampUv(pin.y + dy);
+          pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * inv, (pin.y - oy) * inv);
+        }
+      }
+    }
+
+    for (const pin of pins) {
+      if (pin.state !== "flying") continue;
+      busy = true;
+      const f = pin.flight;
+      f.t = Math.min(f.dur, f.t + dt);
+      const s = 1 - Math.pow(1 - f.t / f.dur, 3); // ease-out: snaps forward, then glides to rest
+      const ox = pin.x, oy = pin.y;
+      pin.x = f.fx + (f.tx - f.fx) * s;
+      pin.y = f.fy + (f.ty - f.fy) * s;
+      pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) / dt, (pin.y - oy) / dt);
+      if (f.t >= f.dur) { pin.state = "done"; pin.flight = null; }
+    }
+
+    if (!masterStroke) finalizePinRun();
+    return busy;
+  }
+
+  function finishPinGesture(cancelled) {
+    const g = pinGesture;
+    pinGesture = null;
+    if (!g) return;
+    if (g.type === "pending") {
+      if (!cancelled) addPin(g.sx, g.sy);
+    } else if (g.type === "pull") {
+      if (!cancelled) {
+        if (g.moved) {
+          g.pin.launch = computeLaunch(g.pin, g.px, g.py);
+        } else if (g.pin.launch) {
+          g.pin.launch = null;
+        } else {
+          removePin(g.pin);
+        }
+      }
+    } else if (g.type === "stroke") {
+      endMasterStroke();
+    }
+    updatePinUI();
+  }
+
+  function updatePinUI() {
+    // 1. Bamboo Stick Pin UI
+    const stickCountEl = document.getElementById("pin-count");
+    const stickFireBtn = document.getElementById("pin-fire");
+    if (stickCountEl && stickFireBtn) {
+      const stickPins = pins.filter(p => p.kind === "stick");
+      const slings = stickPins.filter(p => p.state === "idle" && p.launch).length;
+      const total = stickPins.length;
+      stickCountEl.textContent = total === 0
+        ? "No pins"
+        : `${total} pin${total === 1 ? "" : "s"}` + (slings ? ` · ${slings} sling` : "");
+      stickFireBtn.disabled = slings === 0;
+    }
+
+    // 2. Sumi Inks Push Pin UI
+    const inkCountEl = document.getElementById("ink-pin-count");
+    if (inkCountEl) {
+      const inkPins = pins.filter(p => p.kind === "ink");
+      const total = inkPins.length;
+      inkCountEl.textContent = total === 0
+        ? "No pins"
+        : `${total} push pin${total === 1 ? "" : "s"}`;
+    }
+  }
+
+  function drawPinArrow(ctx, x0, y0, x1, y1, unit, color) {
+    const dx = x1 - x0, dy = y1 - y0;
+    const L = Math.hypot(dx, dy);
+    if (L < 2) return;
+    const ux = dx / L, uy = dy / L;
+    const head = Math.min(L * 0.45, 11 * unit);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2 * unit;
+    ctx.setLineDash([5 * unit, 5 * unit]);
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1 - ux * head * 0.8, y1 - uy * head * 0.8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - ux * head - uy * head * 0.55, y1 - uy * head + ux * head * 0.55);
+    ctx.lineTo(x1 - ux * head + uy * head * 0.55, y1 - uy * head - ux * head * 0.55);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawPins() {
+    if (pins.length === 0 && !pinGesture) return;
+    const w = ring.width, h = ring.height;
+    const minDim = Math.min(w, h);
+    const ctx = ringCtx;
+    const unit = minDim / 800;
+    const currentKind = activePinKind();
+
+    ctx.save();
+
+    // Master stroke trail
+    if (pinGesture && pinGesture.type === "stroke" && pinGesture.trail.length > 1) {
+      ctx.setLineDash([6 * unit, 6 * unit]);
+      ctx.strokeStyle = "rgba(245, 235, 215, 0.55)";
+      ctx.lineWidth = 2 * unit;
+      ctx.beginPath();
+      pinGesture.trail.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p[0] * w, p[1] * h);
+        else ctx.lineTo(p[0] * w, p[1] * h);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    for (const pin of pins) {
+      if (pin.kind === "ink" && !pushInkActive) continue;
+      const isCurrentKind = (pin.kind === currentKind);
+      ctx.globalAlpha = isCurrentKind ? 1.0 : 0.45;
+
+      const x = pin.x * w, y = pin.y * h;
+      const pulling = pinGesture && pinGesture.type === "pull" && pinGesture.pin === pin && pinGesture.moved;
+      const launch = pulling ? computeLaunch(pin, pinGesture.px, pinGesture.py) : pin.launch;
+      const isSling = !!launch;
+
+      // Trajectory arrow
+      if (pin.state === "idle" && launch) {
+        const tx = clampUv(pin.x + launch[0]) * w;
+        const ty = clampUv(pin.y + launch[1]) * h;
+        const arrowCol = pin.kind === "ink"
+          ? (pin.colorHex || "rgba(222, 92, 62, 0.95)")
+          : "rgba(222, 92, 62, 0.92)";
+        drawPinArrow(ctx, x, y, tx, ty, unit, arrowCol);
+      }
+
+      // Slingshot pull rubber band
+      if (pulling) {
+        const [pdx, pdy, plen] = clampedPull(pin, pinGesture.px, pinGesture.py);
+        const px = x + pdx * w, py = y + pdy * h;
+        const L = Math.hypot(pdx * w, pdy * h) || 1;
+        const nx = -(pdy * h) / L, ny = (pdx * w) / L;
+        const R = (pin.kind === "ink")
+          ? INK_RADIUS * dropSizeMult * minDim * 0.45
+          : STICK_BASE_RADIUS * stylusRadiusMult * minDim;
+        const fork = R * 1.1 + 4 * unit;
+        const stretch = plen / SLING_MAX_PULL;
+        ctx.strokeStyle = `rgba(${Math.round(110 + 110 * stretch)}, 52, 34, 0.92)`;
+        ctx.lineWidth = Math.max(1, (3.2 - 1.8 * stretch) * unit);
+        ctx.beginPath();
+        ctx.moveTo(x + nx * fork, y + ny * fork);
+        ctx.lineTo(px, py);
+        ctx.moveTo(x - nx * fork, y - ny * fork);
+        ctx.lineTo(px, py);
+        ctx.stroke();
+
+        ctx.fillStyle = pin.kind === "ink" ? (pin.colorHex || "#161514") : "rgba(58, 38, 24, 0.92)";
+        ctx.beginPath();
+        ctx.arc(px, py, 6 * unit, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.lineWidth = 1 * unit;
+        ctx.stroke();
+      }
+
+      if (pin.kind === "ink") {
+        // --- INK PIN VISUALS ---
+        const dropR = INK_RADIUS * dropSizeMult * minDim;
+        const beadR = Math.max(5 * unit, Math.min(dropR * 0.5, 12 * unit));
+
+        // When in active latte pouring, draw glowing pouring pulse rings
+        if (isLatteMode() && input.down) {
+          ctx.save();
+          ctx.strokeStyle = "rgba(255, 230, 180, 0.75)";
+          ctx.lineWidth = 2.0 * unit;
+          const pulse = 1.0 + 0.22 * Math.sin(Date.now() * 0.016);
+          ctx.beginPath();
+          ctx.arc(x, y, dropR * 1.25 * pulse, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Droplet boundary ring
+        ctx.setLineDash([3 * unit, 3 * unit]);
+        ctx.strokeStyle = (isLatteMode() && input.down) ? "rgba(255, 240, 200, 0.95)" : "rgba(240, 230, 215, 0.5)";
+        ctx.lineWidth = 1.2 * unit;
+        ctx.beginPath();
+        ctx.arc(x, y, dropR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Rich ink bead
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+        ctx.shadowBlur = 4 * unit;
+        ctx.shadowOffsetY = 1.5 * unit;
+
+        const hex = pin.colorHex || "#161514";
+        const grad = ctx.createRadialGradient(x - beadR * 0.35, y - beadR * 0.4, beadR * 0.1, x, y, beadR);
+        grad.addColorStop(0, "#ffffff");
+        grad.addColorStop(0.35, hex);
+        grad.addColorStop(1, "#0a0806");
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, beadR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Droplet rim
+        ctx.strokeStyle = isSling ? "rgba(222, 92, 62, 0.95)" : "rgba(255, 250, 240, 0.75)";
+        ctx.lineWidth = 1.4 * unit;
+        ctx.beginPath();
+        ctx.arc(x, y, beadR, 0, Math.PI * 2);
+        ctx.stroke();
+
+      } else {
+        // --- STICK PIN VISUALS ---
+        const R = STICK_BASE_RADIUS * stylusRadiusMult * minDim;
+        const dotR = Math.max(4 * unit, Math.min(R * 0.45, 9 * unit));
+
+        // Stylus influence ring
+        ctx.strokeStyle = pin.state === "idle" ? "rgba(235, 225, 210, 0.55)" : "rgba(255, 240, 200, 0.9)";
+        ctx.lineWidth = 1.2 * unit;
+        ctx.beginPath();
+        ctx.arc(x, y, R, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Pin head: brass for default, vermilion for slingshot
+        const grad = ctx.createRadialGradient(x - dotR * 0.35, y - dotR * 0.4, dotR * 0.1, x, y, dotR);
+        if (isSling) {
+          grad.addColorStop(0, "#ffd2b8");
+          grad.addColorStop(0.55, "#c4442a");
+          grad.addColorStop(1, "#5a160b");
+        } else {
+          grad.addColorStop(0, "#fff2c2");
+          grad.addColorStop(0.6, "#d49b35");
+          grad.addColorStop(1, "#6e4411");
+        }
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, dotR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(30, 20, 12, 0.85)";
+        ctx.lineWidth = 1.4 * unit;
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function reset() {
     input.tap = false;
     gpuClear();
@@ -2346,13 +3970,87 @@ void main() {
   }
 
   function step(dt, frameDelta) {
-    const isActivelyWorking = input.down || input.tap;
+    const pointerWorking = input.down || input.tap;
+    const pinMotion = advancePins(dt, frameDelta);
+    const isActivelyWorking = pointerWorking || pinMotion;
 
     if (isActivelyWorking) {
       if (!isSpreading) {
         isSpreading = true;
       }
-      if (activeTool === 0) {
+      if (input.down && isLatteMode()) {
+        const inkPins = pins.filter(p => p.kind === "ink");
+        if (inkPins.length > 0) {
+          stepsSincePourBake++;
+          if (stepsSincePourBake >= 40 && hasAdvectedSinceBake) {
+            gpuBake();
+            stepsSincePourBake = 0;
+          }
+
+          const dx = input.x - input.xPrev;
+          const dy = input.y - input.yPrev;
+          const invDt = 1 / Math.max(frameDelta, 0.004);
+          const radius = INK_RADIUS * dropSizeMult;
+          const addedMass = (4.4 * dt) * flowRateMult;
+
+          gl.uniform1f(uMassLoc, addedMass);
+          gl.uniform1f(uRadius, radius);
+
+          for (const pin of inkPins) {
+            const ox = pin.x, oy = pin.y;
+            pin.x = clampUv(pin.x + dx);
+            pin.y = clampUv(pin.y + dy);
+
+            // Forward viscous push and dipole wake in the bath
+            if (dx * dx + dy * dy > 1e-12) {
+              pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * invDt, (pin.y - oy) * invDt);
+            }
+
+            // Continuous surfactant mass splat
+            gl.uniform2f(uCenter, pin.x, pin.y);
+            drawTo(surfTex[1 - surfI], PASS_SPLAT);
+            surfI = 1 - surfI;
+
+            // Continuous stamp: if moved beyond threshold or hovered for ~0.075s
+            if (pin.lastStampX === undefined) {
+              pin.lastStampX = pin.x;
+              pin.lastStampY = pin.y;
+              pin.hoverTime = 0;
+            }
+            const movedDist = Math.hypot((pin.x - pin.lastStampX) * domainX, (pin.y - pin.lastStampY) * domainY);
+            pin.hoverTime = (pin.hoverTime || 0) + dt;
+
+            if (movedDist > radius * 0.28 || pin.hoverTime > 0.075) {
+              gl.uniform1i(uIsNewDropLoc, 0);
+              gl.uniform1f(uRadius, radius);
+              const col = pin.color !== undefined ? pin.color : ink;
+              gl.uniform3f(
+                uInkColor,
+                (col & 255) / 255,
+                ((col >> 8) & 255) / 255,
+                ((col >> 16) & 255) / 255
+              );
+              gl.uniform2f(uCenter, pin.x, pin.y);
+              drawTo(inkTex[1 - inkI], PASS_STAMP);
+              inkI = 1 - inkI;
+
+              pin.lastStampX = pin.x;
+              pin.lastStampY = pin.y;
+              pin.hoverTime = 0;
+            }
+          }
+        }
+      } else if (pointerWorking && activeTool === 0 && !pinsModeActive()) {
+        if (!input.tap) {
+          stepsSincePourBake++;
+          if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
+            gpuBake();
+            stepsSincePourBake = 0;
+          }
+        } else {
+          stepsSincePourBake = 0;
+        }
+
         const radius = INK_RADIUS * dropSizeMult;
         const addedMass = (4.4 * dt + (input.tap ? 1.35 : 0)) * flowRateMult;
         gl.uniform1f(uMassLoc, addedMass);
@@ -2364,7 +4062,7 @@ void main() {
         if (input.tap) {
           gpuStamp(true);
         } else {
-          const movedDist = Math.hypot(input.x - input.stampX, input.y - input.stampY);
+          const movedDist = Math.hypot((input.x - input.stampX) * domainX, (input.y - input.stampY) * domainY);
           if (movedDist > radius * 0.30) {
             gpuStamp(false);
           }
@@ -2398,21 +4096,27 @@ void main() {
     gl.uniform1f(uViscDiffLoc, 0.15 + 0.35 * (1.0 - diffValue));
     gl.uniform1f(uVortConfLoc, vortValue * 8.5);
 
-    gl.uniform1i(uTool, isActivelyWorking ? activeTool : 0);
+    gl.uniform1i(uTool, (pointerWorking && !pinsModeActive()) ? activeTool : 0);
     gl.uniform1f(uToolDragLoc, stylusDragMult);
     gl.uniform2f(uCenter, input.x, input.y);
     gl.uniform2f(uPrevCenter, input.xPrev, input.yPrev);
     gl.uniform2f(uRakeDir, input.dirX, input.dirY);
     gl.uniform2f(uPrevRakeDir, input.prevDirX, input.prevDirY);
     gl.uniform1f(uStickRadius, STICK_BASE_RADIUS * stylusRadiusMult);
+    gl.uniform1i(uPinCountLoc, pinSegCount);
+    if (pinSegCount > 0) {
+      gl.uniform4fv(uPinSegLoc, pinSegBuf);
+      gl.uniform2fv(uPinVelLoc, pinVelBuf);
+    }
 
     drawTo(inertVelTex[1 - inertI], PASS_ADVECT_INERTIAL);
     inertI = 1 - inertI;
+    gl.uniform1i(uPinCountLoc, 0);
 
     drawTo(mgRhs[0], PASS_NS_DIV);
-    gl.uniform1f(uScaleLoc, 0.80);
+    gl.uniform1f(uScaleLoc, 0.90);
     drawTo(mgSol[0][0], PASS_WARM_START, pressTex.tex);
-    const pressFinalIdx = solveMultigridVCycle(0.0005, 1);
+    const pressFinalIdx = solveMultigridVCycle(0.0002, 2);
     const tmpPress = pressTex;
     pressTex = mgSol[0][pressFinalIdx];
     mgSol[0][pressFinalIdx] = tmpPress;
@@ -2433,7 +4137,7 @@ void main() {
 
     hasAdvectedSinceBake = true;
     stepCount++;
-    if (stepCount % 750 === 0) gpuBake();
+    if (!input.down && stepCount % 2400 === 0) gpuBake();
 
     pollAsyncGpuActivity(isActivelyWorking);
 
@@ -2443,7 +4147,10 @@ void main() {
   function drawRing() {
     const w = ring.width;
     const h = ring.height;
+    const minDim = Math.min(w, h);
     ringCtx.clearRect(0, 0, w, h);
+
+    drawPins();
 
     if (!(input.inside || input.down)) {
       toolCursor.classList.remove("visible", "pressing");
@@ -2451,11 +4158,11 @@ void main() {
     }
 
     ringCtx.strokeStyle = "rgba(235, 225, 210, 0.65)";
-    ringCtx.lineWidth = Math.max(1.2, w / 480);
+    ringCtx.lineWidth = Math.max(1.2, minDim / 480);
 
     const radius = (activeTool === 0)
-      ? 0.034 * Math.sqrt(0.72) * w * dropSizeMult
-      : STICK_BASE_RADIUS * w * stylusRadiusMult;
+      ? 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult
+      : STICK_BASE_RADIUS * minDim * stylusRadiusMult;
 
     ringCtx.beginPath();
     ringCtx.arc(input.x * w, input.y * h, radius, 0, Math.PI * 2);
@@ -2472,14 +4179,32 @@ void main() {
 
   function layout() {
     updateBathHomography();
+    const rect = stage.getBoundingClientRect();
+    const W = Math.max(64, rect.width);
+    const H = Math.max(64, rect.height);
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const px = Math.round(RENDER_BATH_SIZE * dpr);
-    if (view.width !== px || view.height !== px) {
-      view.width = px;
-      view.height = px;
-      ring.width = px;
-      ring.height = px;
+
+    if (isFullScreenMode) {
+      const targetW = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(W * dpr)));
+      const targetH = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(H * dpr)));
+      if (view.width !== targetW || view.height !== targetH) {
+        view.width = targetW;
+        view.height = targetH;
+        ring.width = targetW;
+        ring.height = targetH;
+      }
+      resizeSimulationIfNeeded(W, H, dpr);
+    } else {
+      const px = Math.round(RENDER_BATH_SIZE * dpr);
+      if (view.width !== px || view.height !== px) {
+        view.width = px;
+        view.height = px;
+        ring.width = px;
+        ring.height = px;
+      }
+      resizeSimulationIfNeeded(RENDER_BATH_SIZE, RENDER_BATH_SIZE, dpr);
     }
+
     drawTo(null, PASS_DISPLAY);
     drawRing();
   }
@@ -2512,11 +4237,11 @@ void main() {
 
   function clampCropOffsets() {
     if (!cropState.img) return;
-    const iw = cropState.img.naturalWidth || cropState.img.width;
-    const ih = cropState.img.naturalHeight || cropState.img.height;
-    const minDim = Math.max(1, Math.min(iw, ih));
-    const normW = (iw / minDim) * cropState.zoom;
-    const normH = (ih / minDim) * cropState.zoom;
+    const iw = Math.max(1, cropState.img.naturalWidth || cropState.img.width);
+    const ih = Math.max(1, cropState.img.naturalHeight || cropState.img.height);
+    const coverBase = Math.max(domainX / iw, domainY / ih);
+    const normW = ((iw * coverBase) / domainX) * cropState.zoom;
+    const normH = ((ih * coverBase) / domainY) * cropState.zoom;
     const maxNormX = Math.max(0, (normW - 1.0) * 0.5);
     const maxNormY = Math.max(0, (normH - 1.0) * 0.5);
     cropState.normX = Math.max(-maxNormX, Math.min(maxNormX, cropState.normX));
@@ -2525,21 +4250,22 @@ void main() {
 
   function renderCroppedSquare(targetCanvas) {
     if (!cropState.img) return;
-    const size = targetCanvas.width;
+    const tw = targetCanvas.width;
+    const th = targetCanvas.height;
     const ctx = targetCanvas.getContext("2d");
-    const iw = cropState.img.naturalWidth || cropState.img.width;
-    const ih = cropState.img.naturalHeight || cropState.img.height;
-    const baseScale = size / Math.max(1, Math.min(iw, ih));
+    const iw = Math.max(1, cropState.img.naturalWidth || cropState.img.width);
+    const ih = Math.max(1, cropState.img.naturalHeight || cropState.img.height);
+    const baseScale = Math.max(tw / iw, th / ih);
     const scale = baseScale * cropState.zoom;
     const dw = iw * scale;
     const dh = ih * scale;
 
     clampCropOffsets();
 
-    const dx = (size - dw) * 0.5 + cropState.normX * size;
-    const dy = (size - dh) * 0.5 + cropState.normY * size;
+    const dx = (tw - dw) * 0.5 + cropState.normX * tw;
+    const dy = (th - dh) * 0.5 + cropState.normY * th;
 
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, tw, th);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(cropState.img, dx, dy, dw, dh);
@@ -2557,6 +4283,14 @@ void main() {
       cropState.normY = 0.0;
       cropZoomSlider.value = "1.0";
       cropZoomRead.textContent = "1.00x";
+      const maxDom = Math.max(domainX, domainY);
+      cropCanvas.width = Math.max(256, Math.round(680 * (domainX / maxDom)));
+      cropCanvas.height = Math.max(256, Math.round(680 * (domainY / maxDom)));
+      cropViewport.style.aspectRatio = `${domainX} / ${domainY}`;
+      const cropTitle = document.getElementById("crop-modal-title");
+      if (cropTitle) {
+        cropTitle.textContent = isFullScreenMode ? "Full Bath Crop" : "Square Bath Crop";
+      }
       renderCroppedSquare(cropCanvas);
       cropModal.classList.add("open");
     };
@@ -2639,8 +4373,8 @@ void main() {
   cropConfirmBtn.addEventListener("click", () => {
     if (!cropState.img) return;
     const finalCanvas = document.createElement("canvas");
-    finalCanvas.width = INK;
-    finalCanvas.height = INK;
+    finalCanvas.width = inkW;
+    finalCanvas.height = inkH;
     renderCroppedSquare(finalCanvas);
     placeImageInBath(finalCanvas);
     closeCropModal();
@@ -2697,8 +4431,127 @@ void main() {
     }
   }, true);
 
+  // =========================================================
+  // Full-Screen Mode & Docked Hoverable/Touchable Windows
+  // =========================================================
+  const fullscreenBtn = document.getElementById("fullscreen-btn");
+  const fsCornerExitBtn = document.getElementById("fs-corner-exit");
+  const topDockCard = document.getElementById("top-dock-card");
+  const bathDockCard = document.getElementById("bath-dock-card");
+  const topDockTab = document.getElementById("top-dock-tab");
+  const bathDockTab = document.getElementById("bath-dock-tab");
+  const topDockTabText = document.getElementById("top-dock-tab-text");
+  let hadNativeFullscreen = false;
+
+  if (fullscreenBtn) {
+    fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
+    fullscreenBtn.title = isFullScreenMode ? "Exit full screen bath" : "Full screen bath";
+  }
+
+  function getNativeFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function closeDockedDrawers() {
+    if (topDockCard) topDockCard.classList.remove("dock-open");
+    if (bathDockCard) bathDockCard.classList.remove("dock-open");
+  }
+
+  function setFullScreenMode(enable) {
+    const next = !!enable;
+    if (next === isFullScreenMode) return;
+    isFullScreenMode = next;
+
+    stage.classList.toggle("fullscreen-mode", isFullScreenMode);
+    closeDockedDrawers();
+
+    if (fullscreenBtn) {
+      fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
+      fullscreenBtn.title = isFullScreenMode ? "Exit full screen bath" : "Full screen bath";
+    }
+
+    if (isFullScreenMode) {
+      document.querySelectorAll(".corner-pin").forEach(pin => pin.classList.remove("visible"));
+      try {
+        const docEl = document.documentElement;
+        const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+        if (req && !getNativeFullscreenElement()) {
+          const res = req.call(docEl);
+          if (res && typeof res.catch === "function") res.catch(() => {});
+        }
+      } catch (_) {}
+    } else {
+      try {
+        if (getNativeFullscreenElement()) {
+          const exit = document.exitFullscreen || document.webkitExitFullscreen;
+          if (exit) {
+            const res = exit.call(document);
+            if (res && typeof res.catch === "function") res.catch(() => {});
+          }
+        }
+      } catch (_) {}
+    }
+
+    layout();
+    setTimeout(layout, 120);
+    setTimeout(layout, 360);
+  }
+
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setFullScreenMode(!isFullScreenMode);
+    });
+  }
+
+  if (fsCornerExitBtn) {
+    fsCornerExitBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setFullScreenMode(false);
+    });
+  }
+
+  function handleNativeFullscreenChange() {
+    const fsEl = getNativeFullscreenElement();
+    if (fsEl) {
+      hadNativeFullscreen = true;
+      layout();
+      setTimeout(layout, 120);
+    } else if (hadNativeFullscreen) {
+      hadNativeFullscreen = false;
+      if (isFullScreenMode) {
+        setFullScreenMode(false);
+      }
+    }
+  }
+
+  document.addEventListener("fullscreenchange", handleNativeFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", handleNativeFullscreenChange);
+
+  if (topDockTab && topDockCard) {
+    topDockTab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const opening = !topDockCard.classList.contains("dock-open");
+      topDockCard.classList.toggle("dock-open", opening);
+      if (opening && bathDockCard) bathDockCard.classList.remove("dock-open");
+    });
+  }
+
+  if (bathDockTab && bathDockCard) {
+    bathDockTab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const opening = !bathDockCard.classList.contains("dock-open");
+      bathDockCard.classList.toggle("dock-open", opening);
+      if (opening && topDockCard) topDockCard.classList.remove("dock-open");
+    });
+  }
+
   view.addEventListener("pointerdown", (e) => {
     flushPendingColorIfAny();
+    if (isFullScreenMode) {
+      closeDockedDrawers();
+    }
+    if (pinsModeActive() && pinGesture) { e.preventDefault(); return; } // single-pointer gestures only
     view.setPointerCapture(e.pointerId);
     const p = worldFromEvent(e);
     input.x = p[0]; input.y = p[1];
@@ -2707,7 +4560,22 @@ void main() {
     input.prevDirX = input.dirX;
     input.prevDirY = input.dirY;
     input.down = true; input.tap = true; input.inside = true;
-    pouredDrop = true;
+    pouredDrop = !pinsModeActive() || isLatteMode();
+    if (isLatteMode()) {
+      handleLattePointerDown(p[0], p[1]);
+    } else if (pinsModeActive()) {
+      const hit = findPinAt(p[0], p[1]);
+      pinGesture = {
+        pointerId: e.pointerId,
+        type: hit ? "pull" : "pending",
+        pin: hit,
+        sx: p[0], sy: p[1],
+        px: p[0], py: p[1],
+        cx: e.clientX, cy: e.clientY,
+        moved: false,
+        trail: []
+      };
+    }
     drawRing();
     e.preventDefault();
   });
@@ -2716,6 +4584,22 @@ void main() {
     const p = worldFromEvent(e);
     input.x = p[0]; input.y = p[1];
     input.inside = true;
+    const g = pinGesture;
+    if (g && e.pointerId === g.pointerId) {
+      g.px = p[0]; g.py = p[1];
+      if (!g.moved && Math.hypot(e.clientX - g.cx, e.clientY - g.cy) > PIN_TAP_PX) {
+        g.moved = true;
+        if (g.type === "pending") {
+          g.type = "stroke";
+          g.trail.push([g.sx, g.sy]);
+          beginMasterStroke(g.sx, g.sy);
+        }
+      }
+      if (g.type === "stroke") {
+        g.trail.push([p[0], p[1]]);
+        if (g.trail.length > 600) g.trail.splice(0, g.trail.length - 600);
+      }
+    }
   });
 
   function cycleColor() {
@@ -2726,10 +4610,22 @@ void main() {
   }
 
   function endPointer(e) {
+    if (pinGesture && (!e || e.pointerId === undefined || e.pointerId === pinGesture.pointerId)) {
+      finishPinGesture(!!(e && e.type === "pointercancel"));
+    }
     input.down = false;
     if (pouredDrop) {
-      if (sumiMode && activeTool === 0) cycleColor();
+      if (sumiMode && (activeTool === 0 || isLatteMode())) cycleColor();
       pouredDrop = false;
+    }
+    if (isLatteMode()) {
+      for (const pin of pins) {
+        if (pin.kind === "ink") {
+          pin.hoverTime = 0;
+          pin.lastStampX = pin.x;
+          pin.lastStampY = pin.y;
+        }
+      }
     }
     if (e && e.pointerId !== undefined && view.hasPointerCapture(e.pointerId)) {
       view.releasePointerCapture(e.pointerId);
@@ -2754,8 +4650,22 @@ void main() {
       if (e.key === "Escape") closeCropModal();
       return;
     }
-    if (e.key === "p" || e.key === "P") {
+    if (e.key === "Escape" && isFullScreenMode) {
+      setFullScreenMode(false);
+      return;
+    }
+    if ((e.key === "p" || e.key === "P") && !isFullScreenMode) {
       document.querySelectorAll(".corner-pin").forEach(pin => pin.classList.toggle("visible"));
+    } else if ((e.key === "f" || e.key === "F" || e.key === " ") && pinsModeActive() && !isLatteMode()) {
+      if (activePinKind() === "ink") {
+        releaseInkPins();
+      } else {
+        fireSlingshots();
+      }
+      e.preventDefault();
+    } else if ((e.key === "Delete" || e.key === "Backspace") && pinsModeActive()) {
+      clearPinsByKind(activePinKind());
+      e.preventDefault();
     } else if ((e.key === "r" || e.key === "R") && document.querySelector(".corner-pin.visible")) {
       bathQuad = DEFAULT_BATH_QUAD.map(pt => [pt[0], pt[1]]);
       localStorage.removeItem("suminagashi_bath_quad_v2");
@@ -2793,18 +4703,145 @@ void main() {
   // Tool Hotspot Selection (Brushes vs Bamboo Stick)
   document.querySelectorAll(".tool-hotspot").forEach(btn => {
     btn.addEventListener("click", () => {
+      const clickedTool = parseInt(btn.getAttribute("data-tool"), 10);
+      const wasAlreadyActive = (activeTool === clickedTool);
+
       document.querySelectorAll(".tool-hotspot").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".top-view").forEach(p => p.classList.remove("active"));
 
       btn.classList.add("active");
-      activeTool = parseInt(btn.getAttribute("data-tool"), 10);
+      activeTool = clickedTool;
+      if (topDockTabText) {
+        topDockTabText.textContent = activeTool === 0 ? "Inks" : "Stick";
+      }
+      if (isFullScreenMode && topDockCard && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        if (wasAlreadyActive) {
+          topDockCard.classList.toggle("dock-open");
+        } else {
+          topDockCard.classList.add("dock-open");
+        }
+        if (bathDockCard) bathDockCard.classList.remove("dock-open");
+      }
+
+      if (!pinsModeActive() && pinGesture) finishPinGesture(true);
+      if (activeTool === 0 && pushInkActive) ensureLattePins();
       const panel = document.getElementById(`panel-${activeTool}`);
       if (panel) panel.classList.add("active");
 
       syncToolCursorImage();
+      updatePinUI();
       if (input.inside) drawRing();
     });
   });
+
+  // Sumi Inks dual-clickable sub-mode: Drop (always base active) + Push (optional pin-push pour)
+  const inkPinControls = document.getElementById("ink-pin-controls");
+  const dropModeBtn = document.querySelector('[data-ink-mode="drop"]');
+  const pushModeBtn = document.querySelector('[data-ink-mode="push"]');
+
+  function syncInkModeUI() {
+    if (dropModeBtn) {
+      dropModeBtn.classList.add("active");
+      dropModeBtn.setAttribute("aria-pressed", "true");
+    }
+    if (pushModeBtn) {
+      pushModeBtn.classList.toggle("active", pushInkActive);
+      pushModeBtn.setAttribute("aria-pressed", pushInkActive ? "true" : "false");
+    }
+    if (inkPinControls) {
+      inkPinControls.classList.toggle("active", pushInkActive);
+    }
+    if (pushInkActive) {
+      ensureLattePins();
+    }
+    view.setAttribute("aria-label", pushInkActive
+      ? "Suminagashi water bath. Drop + Push mode: drag to pour fluid while pushing pin; touch anywhere to relocate."
+      : "Suminagashi water bath. Hold to drop and pour ink.");
+    updatePinUI();
+    drawRing();
+  }
+
+  document.querySelectorAll("[data-ink-mode]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.getAttribute("data-ink-mode");
+      if (mode === "push") {
+        pushInkActive = !pushInkActive;
+      } else {
+        pushInkActive = false;
+      }
+      if (pinGesture) finishPinGesture(true);
+      syncInkModeUI();
+    });
+  });
+
+  // Bamboo Stick sub-mode (Stir vs Pins) + pin controls
+  const pinControls = document.getElementById("pin-controls");
+  document.querySelectorAll("[data-stick-mode]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      stickMode = btn.getAttribute("data-stick-mode");
+      document.querySelectorAll("[data-stick-mode]").forEach(b => {
+        const on = b === btn;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (pinGesture) finishPinGesture(true);
+      pinControls.classList.toggle("active", stickMode === "pins");
+      view.setAttribute("aria-label", stickMode === "pins"
+        ? "Suminagashi water bath. Tap to place pins, drag a pin back to aim it, drag the water to sweep."
+        : "Suminagashi water bath. Hold to pour ink.");
+      updatePinUI();
+      drawRing();
+    });
+  });
+
+  // Grid Dropdown Toggles and Action
+  const inkGridBtn = document.getElementById("ink-grid-btn");
+  const inkGridMenu = document.getElementById("ink-grid-menu");
+  const stickGridBtn = document.getElementById("stick-grid-btn");
+  const stickGridMenu = document.getElementById("stick-grid-menu");
+
+  if (inkGridBtn && inkGridMenu) {
+    inkGridBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      inkGridMenu.classList.toggle("open");
+      if (stickGridMenu) stickGridMenu.classList.remove("open");
+    });
+  }
+  if (stickGridBtn && stickGridMenu) {
+    stickGridBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      stickGridMenu.classList.toggle("open");
+      if (inkGridMenu) inkGridMenu.classList.remove("open");
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (inkGridMenu && !inkGridMenu.contains(e.target) && e.target !== inkGridBtn) {
+      inkGridMenu.classList.remove("open");
+    }
+    if (stickGridMenu && !stickGridMenu.contains(e.target) && e.target !== stickGridBtn) {
+      stickGridMenu.classList.remove("open");
+    }
+  });
+
+  document.querySelectorAll("[data-grid]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const tool = btn.getAttribute("data-grid-tool") || (activePinKind() || "ink");
+      const gridType = btn.getAttribute("data-grid");
+      generatePinGrid(tool, gridType);
+      if (inkGridMenu) inkGridMenu.classList.remove("open");
+      if (stickGridMenu) stickGridMenu.classList.remove("open");
+    });
+  });
+
+  // Ink Push Pin actions
+  document.getElementById("ink-pin-clear").addEventListener("click", () => { clearPinsByKind("ink"); });
+
+  // Stick Pin actions
+  document.getElementById("pin-fire").addEventListener("click", () => { fireSlingshots(); });
+  document.getElementById("pin-clear").addEventListener("click", () => { clearPinsByKind("stick"); });
+  document.getElementById("pin-keep").addEventListener("change", (e) => { keepStickPins = e.target.checked; });
+  updatePinUI();
 
   // Washi Paper Stack Export Menu Toggle
   const washiTrigger = document.getElementById("washi-trigger");
@@ -2870,6 +4907,14 @@ void main() {
     document.querySelectorAll(".swatch").forEach((node) => {
       node.setAttribute("aria-pressed", node === el ? "true" : "false");
     });
+    const hex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+    for (const pin of pins) {
+      if (pin.kind === "ink" && pin.state === "idle") {
+        pin.color = packed;
+        pin.colorHex = hex;
+      }
+    }
+    drawRing();
   }
 
   document.getElementById("sumi-mode").addEventListener("change", (e) => { sumiMode = e.target.checked; });
@@ -2923,298 +4968,303 @@ void main() {
 
   document.getElementById("export-jpg").addEventListener("click", () => {
     const a = document.createElement("a");
-    a.href = exportHighRes("image/jpeg", false);
+    a.href = exportHighRes("image/jpeg");
     a.download = "suminagashi.jpg";
     a.click();
     washiMenu.classList.remove("open");
   });
 
-function exportTrueVectorSVG(gridSize = 2048, viewBoxSize = 2048) {
-    // 1. Render unshadowed flat-color bath at full 2048x2048 INK resolution
-    const exportFbo = gl.createFramebuffer();
-    const exportTex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, exportTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gridSize, gridSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
+  function exportTrueVectorSVG(maxLongSide = 2048) {
+      const maxInk = Math.max(inkW, inkH);
+      const gridScale = maxLongSide / maxInk;
+      const W = Math.max(64, Math.round(inkW * gridScale));
+      const H = Math.max(64, Math.round(inkH * gridScale));
 
-    gl.viewport(0, 0, gridSize, gridSize);
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      // 1. Render unshadowed flat-color bath matching active bath aspect ratio
+      const exportFbo = gl.createFramebuffer();
+      const exportTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, exportTex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
 
-    gl.uniform1i(uIsExportLoc, 1);
-    gl.uniform1i(uPass, PASS_DISPLAY);
-    gl.uniform1f(uTargetSize, gridSize);
-    bindInputs(null);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    gl.uniform1i(uIsExportLoc, 0);
+      gl.viewport(0, 0, W, H);
+      gl.useProgram(program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-    const pixels = new Uint8Array(gridSize * gridSize * 4);
-    gl.readPixels(0, 0, gridSize, gridSize, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      gl.uniform1i(uIsExportLoc, 1);
+      gl.uniform1i(uPass, PASS_DISPLAY);
+      gl.uniform2f(uTargetSize, W, H);
+      bindInputs(null);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      gl.uniform1i(uIsExportLoc, 0);
 
-    gl.deleteTexture(exportTex);
-    gl.deleteFramebuffer(exportFbo);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, view.width, view.height);
+      const pixels = new Uint8Array(W * H * 4);
+      gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-    // 2. Build Palette (0 = Water Bath, 1..K = Sumi Inks)
-    const waterHex = (document.getElementById("bath-color").value || "#b8b0a2").toLowerCase();
-    const hexToRgb = (hex) => {
-      const n = parseInt(hex.slice(1), 16);
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-    };
+      gl.deleteTexture(exportTex);
+      gl.deleteFramebuffer(exportFbo);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, view.width, view.height);
 
-    const layers = [{ name: "Water_Bath", hex: waterHex, rgb: hexToRgb(waterHex) }];
-    const seenHex = new Set([waterHex]);
-
-    dynamicPalette.forEach(([name, hex]) => {
-      const lower = hex.toLowerCase();
-      if (!seenHex.has(lower)) {
-        seenHex.add(lower);
-        layers.push({ name, hex: lower, rgb: hexToRgb(lower) });
-      }
-    });
-
-    const N = gridSize;
-    const labelGrid = new Uint8Array(N * N);
-
-    // Flip Y from WebGL bottom-left to SVG top-left
-    for (let y = 0; y < N; y++) {
-      const srcRow = (N - 1 - y) * N * 4;
-      const dstRow = y * N;
-      for (let x = 0; x < N; x++) {
-        const i = srcRow + x * 4;
-        const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-        let bestK = 0;
-        let bestDist = 1e9;
-        for (let k = 0; k < layers.length; k++) {
-          const dr = layers[k].rgb[0] - r;
-          const dg = layers[k].rgb[1] - g;
-          const db = layers[k].rgb[2] - b;
-          const d2 = dr * dr + dg * dg + db * db;
-          if (d2 < bestDist) {
-            bestDist = d2;
-            bestK = k;
-          }
-        }
-        labelGrid[dstRow + x] = bestK;
-      }
-    }
-
-    // Taubin zero-shrinkage smoothing on unit-step vertex loops
-    function smoothClosedLoop(pts, iterations = 5) {
-      const len = pts.length;
-      if (len < 6) return pts;
-      let curr = pts.map(p => [p[0], p[1]]);
-      let next = pts.map(p => [p[0], p[1]]);
-      const isBorder = (p) => (p[0] <= 0 || p[0] >= N || p[1] <= 0 || p[1] >= N);
-
-      const step = (src, dst, w) => {
-        for (let i = 0; i < len; i++) {
-          const p = src[i];
-          if (isBorder(p)) {
-            dst[i][0] = p[0];
-            dst[i][1] = p[1];
-            continue;
-          }
-          const prev = src[(i - 1 + len) % len];
-          const nxt = src[(i + 1) % len];
-          dst[i][0] = p[0] + w * (0.5 * (prev[0] + nxt[0]) - p[0]);
-          dst[i][1] = p[1] + w * (0.5 * (prev[1] + nxt[1]) - p[1]);
-        }
+      // 2. Dynamic Color Quantization (Preserves floated photo colors alongside inks)
+      const waterHex = (document.getElementById("bath-color").value || "#b8b0a2").toLowerCase();
+      const hexToRgb = (hex) => {
+        const n = parseInt(hex.slice(1), 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      };
+      const rgbToHex = (r, g, b) => {
+        const toByte = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+        return `#${toByte(r)}${toByte(g)}${toByte(b)}`;
       };
 
-      for (let it = 0; it < iterations; it++) {
-        step(curr, next, 0.50);
-        step(next, curr, -0.52);
-      }
-      return curr;
-    }
+      const layers = [{ name: "Water_Bath", hex: waterHex, rgb: hexToRgb(waterHex) }];
+      const seenHex = new Set([waterHex]);
 
-    // Ramer-Douglas-Peucker simplification to collapse collinear runs
-    function simplifyClosedLoop(pts, epsilon = 0.45) {
-      if (pts.length <= 6) return pts;
-      function sqSegDist(p, p1, p2) {
-        let x = p1[0], y = p1[1], dx = p2[0] - x, dy = p2[1] - y;
-        if (dx !== 0 || dy !== 0) {
-          const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
-          if (t > 1) { x = p2[0]; y = p2[1]; }
-          else if (t > 0) { x += dx * t; y += dy * t; }
+      dynamicPalette.forEach(([name, hex]) => {
+        const lower = hex.toLowerCase();
+        if (!seenHex.has(lower)) {
+          seenHex.add(lower);
+          layers.push({ name, hex: lower, rgb: hexToRgb(lower) });
         }
-        dx = p[0] - x; dy = p[1] - y;
-        return dx * dx + dy * dy;
-      }
-      function rdp(start, end, arr, out) {
-        let maxD = 0, index = start;
-        for (let i = start + 1; i < end; i++) {
-          const d = sqSegDist(arr[i], arr[start], arr[end]);
-          if (d > maxD) { maxD = d; index = i; }
-        }
-        if (maxD > epsilon * epsilon) {
-          rdp(start, index, arr, out);
-          out.push(arr[index]);
-          rdp(index, end, arr, out);
-        }
-      }
-      let splitIdx = Math.floor(pts.length / 2);
-      const half1 = [pts[0]];
-      rdp(0, splitIdx, pts, half1);
-      half1.push(pts[splitIdx]);
+      });
 
-      const half2 = [pts[splitIdx]];
-      const closedPts = pts.concat([pts[0]]);
-      rdp(splitIdx, closedPts.length - 1, closedPts, half2);
+      const rawLabels = new Uint8Array(W * H);
 
-      return half1.concat(half2.slice(1));
-    }
+      // First pass: map pixels to existing palette or auto-cluster photo colors into max 24 bands
+      for (let y = 0; y < H; y++) {
+        const srcRow = (H - 1 - y) * W * 4;
+        const dstRow = y * W;
+        for (let x = 0; x < W; x++) {
+          const i = srcRow + x * 4;
+          const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+          const a = pixels[i + 3];
 
-    // Convex-hull-bounded Midpoint B-Spline (elevated to Cubic Bezier 'C' commands)
-    const scale = viewBoxSize / N;
-    function loopToBSplinePath(pts) {
-      const len = pts.length;
-      if (len < 3) return "";
-
-      const mid = (a, b) => [0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])];
-      const m0 = mid(pts[len - 1], pts[0]);
-      let d = `M ${(m0[0] * scale).toFixed(2)} ${(m0[1] * scale).toFixed(2)}`;
-      let prevMid = m0;
-
-      for (let i = 0; i < len; i++) {
-        const p = pts[i];
-        const nextP = pts[(i + 1) % len];
-        const currMid = mid(p, nextP);
-
-        // Degree-elevated quadratic midpoint spline -> exact cubic Bezier inside triangle(prevMid, p, currMid)
-        const cp1x = ((prevMid[0] + 2.0 * p[0]) / 3.0) * scale;
-        const cp1y = ((prevMid[1] + 2.0 * p[1]) / 3.0) * scale;
-        const cp2x = ((currMid[0] + 2.0 * p[0]) / 3.0) * scale;
-        const cp2y = ((currMid[1] + 2.0 * p[1]) / 3.0) * scale;
-        const x = currMid[0] * scale;
-        const y = currMid[1] * scale;
-
-        d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${x.toFixed(2)} ${y.toFixed(2)}`;
-        prevMid = currMid;
-      }
-      return d + " Z";
-    }
-
-    // 3. Eulerian Grid-Boundary Tracer (4 cardinal directions: 0=E, 1=S, 2=W, 3=N)
-    const VW = N + 1;
-    const outMask = new Uint8Array(VW * VW);
-    const DX = [1, 0, -1, 0];
-    const DY = [0, 1, 0, -1];
-    const svgGroups = [];
-
-    for (let k = 1; k < layers.length; k++) {
-      outMask.fill(0);
-
-      // Emit directed boundary edges around every pixel of layer k
-      for (let y = 0; y < N; y++) {
-        const row = y * N;
-        const vRow0 = y * VW;
-        const vRow1 = (y + 1) * VW;
-        for (let x = 0; x < N; x++) {
-          if (labelGrid[row + x] !== k) continue;
-
-          // Top edge (East: vTL -> vTR)
-          if (y === 0 || labelGrid[row - N + x] !== k) {
-            outMask[vRow0 + x] |= 1;
+          if (a < 10) {
+            rawLabels[dstRow + x] = 0;
+            continue;
           }
-          // Right edge (South: vTR -> vBR)
-          if (x === N - 1 || labelGrid[row + x + 1] !== k) {
-            outMask[vRow0 + x + 1] |= 2;
+
+          let bestK = 0;
+          let bestDist = 1e9;
+          for (let k = 0; k < layers.length; k++) {
+            const dr = layers[k].rgb[0] - r;
+            const dg = layers[k].rgb[1] - g;
+            const db = layers[k].rgb[2] - b;
+            const d2 = dr * dr + dg * dg + db * db;
+            if (d2 < bestDist) {
+              bestDist = d2;
+              bestK = k;
+            }
           }
-          // Bottom edge (West: vBR -> vBL)
-          if (y === N - 1 || labelGrid[row + N + x] !== k) {
-            outMask[vRow1 + x + 1] |= 4;
-          }
-          // Left edge (North: vBL -> vTL)
-          if (x === 0 || labelGrid[row + x - 1] !== k) {
-            outMask[vRow1 + x] |= 8;
-          }
-        }
-      }
 
-      const pathStrings = [];
-      for (let sy = 0; sy <= N; sy++) {
-        const vRow = sy * VW;
-        for (let sx = 0; sx <= N; sx++) {
-          let mask = outMask[vRow + sx];
-          if (mask === 0) continue;
+          // If pixel color is distant from current palette (e.g. floated image), quantize into new shade bucket
+          if (bestDist > 650.0 && layers.length < 24) {
+            const qr = Math.round(r / 32) * 32;
+            const qg = Math.round(g / 32) * 32;
+            const qb = Math.round(b / 32) * 32;
+            const qHex = rgbToHex(qr, qg, qb);
 
-          for (let initDir = 0; initDir < 4; initDir++) {
-            if (!(outMask[vRow + sx] & (1 << initDir))) continue;
-
-            const loop = [];
-            let vx = sx, vy = sy, dir = initDir;
-
-            while (true) {
-              loop.push([vx, vy]);
-              const vIdx = vy * VW + vx;
-              outMask[vIdx] &= ~(1 << dir);
-
-              vx += DX[dir];
-              vy += DY[dir];
-              if (vx === sx && vy === sy) break;
-
-              const nextMask = outMask[vy * VW + vx];
-              if (nextMask === 0) break;
-
-              // Right-hand rule turn priority keeps saddle points from crossing
-              const rDir = (dir + 1) & 3;
-              const sDir = dir;
-              const lDir = (dir + 3) & 3;
-              const bDir = (dir + 2) & 3;
-
-              if (nextMask & (1 << rDir)) dir = rDir;
-              else if (nextMask & (1 << sDir)) dir = sDir;
-              else if (nextMask & (1 << lDir)) dir = lDir;
-              else dir = bDir;
+            let foundBin = -1;
+            for (let k = 1; k < layers.length; k++) {
+              if (layers[k].hex === qHex) {
+                foundBin = k;
+                break;
+              }
             }
 
-            if (loop.length >= 4) {
-              const smoothed = smoothClosedLoop(loop, 5);
-              const simplified = simplifyClosedLoop(smoothed, 0.45);
-              if (simplified.length >= 3) {
-                pathStrings.push(loopToBSplinePath(simplified));
+            if (foundBin !== -1) {
+              bestK = foundBin;
+            } else {
+              bestK = layers.length;
+              seenHex.add(qHex);
+              layers.push({ name: `Photo_${bestK}`, hex: qHex, rgb: [qr, qg, qb] });
+            }
+          }
+
+          rawLabels[dstRow + x] = bestK;
+        }
+      }
+
+      function smoothClosedLoop(pts, iterations = 5) {
+        const len = pts.length;
+        if (len < 6) return pts;
+        let curr = pts.map(p => [p[0], p[1]]);
+        let next = pts.map(p => [p[0], p[1]]);
+        const isBorder = (p) => (p[0] <= 0 || p[0] >= W || p[1] <= 0 || p[1] >= H);
+
+        const step = (src, dst, w) => {
+          for (let i = 0; i < len; i++) {
+            const p = src[i];
+            if (isBorder(p)) {
+              dst[i][0] = p[0];
+              dst[i][1] = p[1];
+              continue;
+            }
+            const prev = src[(i - 1 + len) % len];
+            const nxt = src[(i + 1) % len];
+            dst[i][0] = p[0] + w * (0.5 * (prev[0] + nxt[0]) - p[0]);
+            dst[i][1] = p[1] + w * (0.5 * (prev[1] + nxt[1]) - p[1]);
+          }
+        };
+
+        for (let it = 0; it < iterations; it++) {
+          step(curr, next, 0.50);
+          step(next, curr, -0.52);
+        }
+        return curr;
+      }
+
+      function simplifyClosedLoop(pts, epsilon = 0.45) {
+        if (pts.length <= 6) return pts;
+        function sqSegDist(p, p1, p2) {
+          let x = p1[0], y = p1[1], dx = p2[0] - x, dy = p2[1] - y;
+          if (dx !== 0 || dy !== 0) {
+            const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
+            if (t > 1) { x = p2[0]; y = p2[1]; }
+            else if (t > 0) { x += dx * t; y += dy * t; }
+          }
+          dx = p[0] - x; dy = p[1] - y;
+          return dx * dx + dy * dy;
+        }
+        function rdp(start, end, arr, out) {
+          let maxD = 0, index = start;
+          for (let i = start + 1; i < end; i++) {
+            const d = sqSegDist(arr[i], arr[start], arr[end]);
+            if (d > maxD) { maxD = d; index = i; }
+          }
+          if (maxD > epsilon * epsilon) {
+            rdp(start, index, arr, out);
+            out.push(arr[index]);
+            rdp(index, end, arr, out);
+          }
+        }
+        let splitIdx = Math.floor(pts.length / 2);
+        const half1 = [pts[0]];
+        rdp(0, splitIdx, pts, half1);
+        half1.push(pts[splitIdx]);
+
+        const half2 = [pts[splitIdx]];
+        const closedPts = pts.concat([pts[0]]);
+        rdp(splitIdx, closedPts.length - 1, closedPts, half2);
+
+        return half1.concat(half2.slice(1));
+      }
+
+      function loopToBSplinePath(pts) {
+        const len = pts.length;
+        if (len < 3) return "";
+        const mid = (a, b) => [0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])];
+        const m0 = mid(pts[len - 1], pts[0]);
+        let d = `M ${m0[0].toFixed(2)} ${m0[1].toFixed(2)}`;
+        let prevMid = m0;
+
+        for (let i = 0; i < len; i++) {
+          const p = pts[i];
+          const nextP = pts[(i + 1) % len];
+          const currMid = mid(p, nextP);
+          const cp1x = (prevMid[0] + 2.0 * p[0]) / 3.0;
+          const cp1y = (prevMid[1] + 2.0 * p[1]) / 3.0;
+          const cp2x = (currMid[0] + 2.0 * p[0]) / 3.0;
+          const cp2y = (currMid[1] + 2.0 * p[1]) / 3.0;
+          d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${currMid[0].toFixed(2)} ${currMid[1].toFixed(2)}`;
+          prevMid = currMid;
+        }
+        return d + " Z";
+      }
+
+      const VW = W + 1;
+      const VH = H + 1;
+      const outMask = new Uint8Array(VW * VH);
+      const DX = [1, 0, -1, 0];
+      const DY = [0, 1, 0, -1];
+      const svgGroups = [];
+
+      for (let k = 1; k < layers.length; k++) {
+        outMask.fill(0);
+        for (let y = 0; y < H; y++) {
+          const row = y * W;
+          const vRow0 = y * VW;
+          const vRow1 = (y + 1) * VW;
+          for (let x = 0; x < W; x++) {
+            if (rawLabels[row + x] !== k) continue;
+            if (y === 0 || rawLabels[row - W + x] !== k) outMask[vRow0 + x] |= 1;
+            if (x === W - 1 || rawLabels[row + x + 1] !== k) outMask[vRow0 + x + 1] |= 2;
+            if (y === H - 1 || rawLabels[row + W + x] !== k) outMask[vRow1 + x + 1] |= 4;
+            if (x === 0 || rawLabels[row + x - 1] !== k) outMask[vRow1 + x] |= 8;
+          }
+        }
+
+        const pathStrings = [];
+        for (let sy = 0; sy <= H; sy++) {
+          const vRow = sy * VW;
+          for (let sx = 0; sx <= W; sx++) {
+            if (outMask[vRow + sx] === 0) continue;
+            for (let initDir = 0; initDir < 4; initDir++) {
+              if (!(outMask[vRow + sx] & (1 << initDir))) continue;
+
+              const loop = [];
+              let vx = sx, vy = sy, dir = initDir;
+              while (true) {
+                loop.push([vx, vy]);
+                const vIdx = vy * VW + vx;
+                outMask[vIdx] &= ~(1 << dir);
+                vx += DX[dir];
+                vy += DY[dir];
+                if (vx === sx && vy === sy) break;
+                const nextMask = outMask[vy * VW + vx];
+                if (nextMask === 0) break;
+
+                const rDir = (dir + 1) & 3, sDir = dir, lDir = (dir + 3) & 3, bDir = (dir + 2) & 3;
+                if (nextMask & (1 << rDir)) dir = rDir;
+                else if (nextMask & (1 << sDir)) dir = sDir;
+                else if (nextMask & (1 << lDir)) dir = lDir;
+                else dir = bDir;
+              }
+
+              if (loop.length >= 4) {
+                const smoothed = smoothClosedLoop(loop, 5);
+                const simplified = simplifyClosedLoop(smoothed, 0.45);
+                if (simplified.length >= 3) {
+                  pathStrings.push(loopToBSplinePath(simplified));
+                }
               }
             }
           }
         }
+
+        if (pathStrings.length > 0) {
+          const safeId = layers[k].name.replace(/[^a-zA-Z0-9_-]/g, "_");
+          svgGroups.push(
+            `  <g id="${safeId}_layer_${k}">\n` +
+            `    <path fill="${layers[k].hex}" fill-rule="evenodd" d="${pathStrings.join(" ")}" />\n` +
+            `  </g>`
+          );
+        }
       }
 
-      if (pathStrings.length > 0) {
-        const safeId = layers[k].name.replace(/[^a-zA-Z0-9_-]/g, "_");
-        svgGroups.push(
-          `  <g id="${safeId}_layer_${k}">\n` +
-          `    <path fill="${layers[k].hex}" fill-rule="evenodd" d="${pathStrings.join(" ")}" />\n` +
-          `  </g>`
-        );
-      }
+      return [
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`,
+        `  <rect id="water_bath" width="${W}" height="${H}" fill="${waterHex}" />`,
+        ...svgGroups,
+        `</svg>`
+      ].join("\n");
     }
 
-    return [
-      `<?xml version="1.0" encoding="UTF-8"?>`,
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" width="${viewBoxSize}" height="${viewBoxSize}">`,
-      `  <rect id="water_bath" width="${viewBoxSize}" height="${viewBoxSize}" fill="${waterHex}" />`,
-      ...svgGroups,
-      `</svg>`
-    ].join("\n");
-  }
-
-  document.getElementById("export-svg").addEventListener("click", () => {
-    const svgString = exportTrueVectorSVG(2048, 2048);
-    const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "suminagashi.svg";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-    washiMenu.classList.remove("open");
-  });
+    document.getElementById("export-svg").addEventListener("click", () => {
+      const svgString = exportTrueVectorSVG(2048);
+      const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "suminagashi.svg";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      washiMenu.classList.remove("open");
+    });
 
   // Keep bath homography aligned across portrait load, iPad rotation, and visualViewport changes
   window.addEventListener("resize", layout);
@@ -3266,21 +5316,34 @@ function exportTrueVectorSVG(gridSize = 2048, viewBoxSize = 2048) {
     }
 
     acc += delta;
+    const totalSteps = Math.min(2, Math.floor(acc / DT));
     let steps = 0;
     let painted = false;
-    while (acc >= DT && steps < 2) {
-      if (step(DT, Math.max(delta, DT))) painted = true;
-      input.xPrev = input.x;
-      input.yPrev = input.y;
-      input.prevDirX = input.dirX;
-      input.prevDirY = input.dirY;
-      acc -= DT;
-      steps++;
+    if (totalSteps > 0) {
+      const startX = input.xPrev;
+      const startY = input.yPrev;
+      const endX = input.x;
+      const endY = input.y;
+      const stepDt = Math.max(delta / totalSteps, DT);
+      for (let s = 0; s < totalSteps; s++) {
+        const t1 = (s + 1) / totalSteps;
+        input.x = startX + (endX - startX) * t1;
+        input.y = startY + (endY - startY) * t1;
+        if (step(DT, stepDt)) painted = true;
+        input.xPrev = input.x;
+        input.yPrev = input.y;
+        input.prevDirX = input.dirX;
+        input.prevDirY = input.dirY;
+        acc -= DT;
+        steps++;
+      }
+      input.x = endX;
+      input.y = endY;
     }
     if (steps === 2) acc = 0;
 
     if (painted) drawTo(null, PASS_DISPLAY);
-    if (steps > 0 || input.inside || input.down) drawRing();
+    if (steps > 0 || input.inside || input.down || pins.length > 0) drawRing();
     requestAnimationFrame(frame);
   }
 
