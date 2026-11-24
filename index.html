@@ -726,19 +726,20 @@
     z-index: 25;
     opacity: 0;
     transform-origin: 7.5% 91%;
-    transform: translate(-7.5%, -91%);
+    transform: translate3d(0, 0, 0) translate(-7.5%, -91%);
     filter: drop-shadow(0.35cqw 0.55cqw 0.45cqw rgba(0, 0, 0, 0.55));
-    transition: opacity 0.12s ease, transform 0.08s ease;
-    will-change: left, top, transform;
+    transition: opacity 0.12s ease;
+    will-change: transform, opacity;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .tool-cursor {
+      filter: none;
+    }
   }
 
   .tool-cursor.visible {
     opacity: 1;
-  }
-
-  .tool-cursor.pressing {
-    transform: translate(-7.5%, -91%) scale(0.95) rotate(-3deg);
-    filter: drop-shadow(0.18cqw 0.28cqw 0.25cqw rgba(0, 0, 0, 0.65));
   }
 
   /* =========================================================
@@ -1784,17 +1785,19 @@
   const ringCtx = ring.getContext("2d");
   const toolCursor = document.getElementById("tool-cursor");
 
-  // alpha: true + premultipliedAlpha: false allows PASS_DISPLAY to feather edges/corners smoothly
+  // preserveDrawingBuffer: false enables Apple Silicon / iPad TBDR zero-copy tile rendering
   const gl = view.getContext("webgl2", {
     alpha: true,
     premultipliedAlpha: false,
     antialias: false,
     depth: false,
     stencil: false,
-    preserveDrawingBuffer: true
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: false
   });
   if (!gl) throw new Error("WebGL2 is required to draw the bath.");
 
+  gl.getExtension("EXT_color_buffer_half_float");
   if (!gl.getExtension("EXT_color_buffer_float")) {
     throw new Error("This browser cannot keep floating-point fluid textures on the GPU.");
   }
@@ -2018,20 +2021,21 @@ vec2 mapBicubicClamped(sampler2D tex, vec2 uv) {
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
   vec2 sum = vec2(0.0);
+  vec2 lo = vec2(1e9);
+  vec2 hi = vec2(-1e9);
   for (int j = 0; j < 4; j++) {
     float wy = catmull(j, f.y);
     vec2 row = vec2(0.0);
     for (int k = 0; k < 4; k++) {
-      row += mapFetch(tex, i.x - 1 + k, i.y - 1 + j) * catmull(k, f.x);
+      vec2 s = mapFetch(tex, i.x - 1 + k, i.y - 1 + j);
+      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
+        lo = min(lo, s);
+        hi = max(hi, s);
+      }
+      row += s * catmull(k, f.x);
     }
     sum += row * wy;
   }
-  vec2 a = mapFetch(tex, i.x, i.y);
-  vec2 b = mapFetch(tex, i.x + 1, i.y);
-  vec2 c = mapFetch(tex, i.x, i.y + 1);
-  vec2 d = mapFetch(tex, i.x + 1, i.y + 1);
-  vec2 lo = min(min(a, b), min(c, d));
-  vec2 hi = max(max(a, b), max(c, d));
   return clamp(sum, lo, hi);
 }
 
@@ -2069,21 +2073,22 @@ float distBicubicClampedSize(sampler2D tex, vec2 origin, vec2 texSize) {
   vec2 f = p - vec2(i);
   ivec2 last = ivec2(texSize) - ivec2(1);
   float sum = 0.0;
+  float minD = 1e9;
+  float maxD = -1e9;
   for (int j = 0; j < 4; j++) {
     float wy = catmull(j, f.y);
     float row = 0.0;
     for (int k = 0; k < 4; k++) {
       ivec2 c = clamp(i + ivec2(k - 1, j - 1), ivec2(0), last);
-      row += texelFetch(tex, c, 0).a * catmull(k, f.x);
+      float s = texelFetch(tex, c, 0).a;
+      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
+        minD = min(minD, s);
+        maxD = max(maxD, s);
+      }
+      row += s * catmull(k, f.x);
     }
     sum += row * wy;
   }
-  float a = texelFetch(tex, clamp(i, ivec2(0), last), 0).a;
-  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).a;
-  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).a;
-  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).a;
-  float minD = min(min(a, b), min(c, d));
-  float maxD = max(max(a, b), max(c, d));
   return clamp(sum, minD, maxD);
 }
 
@@ -2127,16 +2132,9 @@ vec3 pureColorAt(vec2 origin, float targetSign) {
   return pureColorAtSize(uInk, origin, targetSign, uInkSize);
 }
 
+// Hardware bilinear sample on RG16F gl.LINEAR textures (uVel, uSurf, uInertVel)
 vec2 simBilinearRG(sampler2D tex, vec2 world) {
-  vec2 p = clamp(world * uSimSize - 0.5, vec2(0.0), uSimSize - 1.0);
-  ivec2 i = ivec2(floor(p));
-  vec2 f = p - vec2(i);
-  ivec2 last = ivec2(uSimSize) - ivec2(1);
-  vec2 a = texelFetch(tex, clamp(i, ivec2(0), last), 0).rg;
-  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).rg;
-  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).rg;
-  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).rg;
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+  return texture(tex, clamp(world, vec2(0.0), vec2(1.0))).rg;
 }
 
 float coarseBilinearR(sampler2D tex, vec2 uv, vec2 coarseSize) {
@@ -2212,11 +2210,14 @@ void main() {
     float pixels = abs(d) / fw;
     vec2 pixelStep = g * (-d / max(dot(g, g), 1e-8));
     vec2 worldStep = pixelStep.x * dFdx(world) + pixelStep.y * dFdy(world);
-    vec2 otherOrigin = bicubic(uMap, world + 2.0 * worldStep);
-    vec3 other = pureColorAt(otherOrigin, -d);
 
-    float keep = (uIsExport == 1) ? 1.0 : (pixels >= 1.0 ? 1.0 : 0.5 + 0.5 * pixels);
-    vec3 baseCol = mix(other, c, keep);
+    // Only sample opposite contour color on the ~1.5% of pixels straddling an ink boundary
+    vec3 baseCol = c;
+    if (uIsExport == 0 && pixels < 1.0) {
+      vec2 otherOrigin = bicubic(uMap, world + 2.0 * worldStep);
+      vec3 other = pureColorAt(otherOrigin, -d);
+      baseCol = mix(other, c, 0.5 + 0.5 * pixels);
+    }
 
     // Full-bleed unshadowed output when pulling JPG/SVG prints
     if (uIsExport == 1) {
@@ -2292,12 +2293,18 @@ void main() {
     fragColor = vec4(c, d);
   }
   else if (uPass == 5) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    vec4 old = texelFetch(uInk, coord, 0);
+
     vec2 origin = gl_FragCoord.xy / uTargetSize;
     vec2 placed = mapBilinear(uForward, origin);
     float radial = length((placed - uCenter) * uDomain) - uRadius;
 
-    ivec2 coord = ivec2(gl_FragCoord.xy);
-    vec4 old = texelFetch(uInk, coord, 0);
+    // Exact fast-exit: outside the drop where radial >= abs(old.a), all branches preserve old
+    if (radial >= abs(old.a) && radial > 0.0) {
+      fragColor = old;
+      return;
+    }
 
     vec2 centerOrigin = bicubic(uMap, uCenter);
     float centerD = distAt(centerOrigin);
@@ -2646,15 +2653,202 @@ void main() {
     return shader;
   }
 
-  const program = gl.createProgram();
-  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
-  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error(gl.getProgramInfoLog(program) || "program link failed");
+  // Register-minimal specialized shader for the 140+ multigrid stencil passes per step
+  const MG_FRAG = `#version 300 es
+precision highp float;
+precision highp int;
+
+uniform sampler2D uAuxA;
+uniform sampler2D uAuxB;
+uniform vec2 uTargetSize;
+uniform vec2 uDomain;
+uniform float uAlpha;
+uniform int uPass;
+out vec4 fragColor;
+
+float coarseBilinearR(sampler2D tex, vec2 uv, vec2 coarseSize) {
+  vec2 p = clamp(uv * coarseSize - 0.5, vec2(0.0), coarseSize - 1.0);
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  ivec2 last = ivec2(coarseSize) - ivec2(1);
+  float a = texelFetch(tex, clamp(i, ivec2(0), last), 0).r;
+  float b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).r;
+  float c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).r;
+  float d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).r;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+void main() {
+  if (uPass == 10) {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    ivec2 last = ivec2(uTargetSize) - ivec2(1);
+    vec2 h = uDomain / uTargetSize;
+    float invHx2 = 1.0 / (h.x * h.x);
+    float invHy2 = 1.0 / (h.y * h.y);
+
+    float uC = texelFetch(uAuxA, coord, 0).r;
+    float uL = coord.x == 0 ? uC : texelFetch(uAuxA, coord - ivec2(1, 0), 0).r;
+    float uR = coord.x == last.x ? uC : texelFetch(uAuxA, coord + ivec2(1, 0), 0).r;
+    float uB = coord.y == 0 ? uC : texelFetch(uAuxA, coord - ivec2(0, 1), 0).r;
+    float uT = coord.y == last.y ? uC : texelFetch(uAuxA, coord + ivec2(0, 1), 0).r;
+    float fC = texelFetch(uAuxB, coord, 0).r;
+
+    float uStar = ((uL + uR) * invHx2 + (uB + uT) * invHy2 - fC) / (2.0 * (invHx2 + invHy2) + uAlpha);
+    fragColor = vec4(mix(uC, uStar, 0.8), 0.0, 0.0, 1.0);
   }
+  else if (uPass == 11) {
+    fragColor = vec4(0.0);
+  }
+  else if (uPass == 12) {
+    ivec2 coordC = ivec2(gl_FragCoord.xy);
+    ivec2 fineSize = ivec2(uTargetSize) * 2;
+    ivec2 lastF = fineSize - ivec2(1);
+    vec2 hf = uDomain / vec2(fineSize);
+    float invHx2 = 1.0 / (hf.x * hf.x);
+    float invHy2 = 1.0 / (hf.y * hf.y);
+    float diag = 2.0 * (invHx2 + invHy2) + uAlpha;
+
+    float resSum = 0.0;
+    for (int dy = 0; dy < 2; dy++) {
+      for (int dx = 0; dx < 2; dx++) {
+        ivec2 cF = coordC * 2 + ivec2(dx, dy);
+        float uC = texelFetch(uAuxA, cF, 0).r;
+        float uL = cF.x == 0 ? uC : texelFetch(uAuxA, cF - ivec2(1, 0), 0).r;
+        float uR = cF.x == lastF.x ? uC : texelFetch(uAuxA, cF + ivec2(1, 0), 0).r;
+        float uB = cF.y == 0 ? uC : texelFetch(uAuxA, cF - ivec2(0, 1), 0).r;
+        float uT = cF.y == lastF.y ? uC : texelFetch(uAuxA, cF + ivec2(0, 1), 0).r;
+        float fF = texelFetch(uAuxB, cF, 0).r;
+
+        float lap = (uL + uR) * invHx2 + (uB + uT) * invHy2 - diag * uC;
+        resSum += (fF - lap);
+      }
+    }
+    fragColor = vec4(resSum * 0.25, 0.0, 0.0, 1.0);
+  }
+  else {
+    ivec2 coordF = ivec2(gl_FragCoord.xy);
+    vec2 uv = gl_FragCoord.xy / uTargetSize;
+    float uFine = texelFetch(uAuxA, coordF, 0).r;
+    float eCoarse = coarseBilinearR(uAuxB, uv, uTargetSize * 0.5);
+    fragColor = vec4(uFine + eCoarse, 0.0, 0.0, 1.0);
+  }
+}`;
+
+  // Register-minimal specialized shader for high-res RK4 flow-map advection (PASS_BACK & PASS_FWD)
+  const FLOW_FRAG = `#version 300 es
+precision highp float;
+precision highp int;
+
+uniform sampler2D uMap;
+uniform sampler2D uForward;
+uniform sampler2D uVel;
+uniform vec2 uMapSize;
+uniform vec2 uTargetSize;
+uniform vec2 uDomain;
+uniform float uDt;
+uniform int uPass;
+out vec4 fragColor;
+
+float catmull(int k, float t) {
+  if (k == 0) return t * (-0.5 + t * (1.0 - 0.5 * t));
+  if (k == 1) return 1.0 + t * t * (-2.5 + 1.5 * t);
+  if (k == 2) return t * (0.5 + t * (2.0 - 1.5 * t));
+  return t * t * (-0.5 + 0.5 * t);
+}
+
+vec2 mapFetch(sampler2D tex, int x, int y) {
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  return texelFetch(tex, clamp(ivec2(x, y), ivec2(0), last), 0).rg;
+}
+
+vec2 mapBicubicClamped(sampler2D tex, vec2 uv) {
+  vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  vec2 sum = vec2(0.0);
+  vec2 lo = vec2(1e9);
+  vec2 hi = vec2(-1e9);
+  for (int j = 0; j < 4; j++) {
+    float wy = catmull(j, f.y);
+    vec2 row = vec2(0.0);
+    for (int k = 0; k < 4; k++) {
+      vec2 s = mapFetch(tex, i.x - 1 + k, i.y - 1 + j);
+      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
+        lo = min(lo, s);
+        hi = max(hi, s);
+      }
+      row += s * catmull(k, f.x);
+    }
+    sum += row * wy;
+  }
+  return clamp(sum, lo, hi);
+}
+
+vec2 mapBilinear(sampler2D tex, vec2 uv) {
+  vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+  ivec2 i = ivec2(floor(p));
+  vec2 f = p - vec2(i);
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  vec2 a = texelFetch(tex, clamp(i, ivec2(0), last), 0).rg;
+  vec2 b = texelFetch(tex, clamp(i + ivec2(1, 0), ivec2(0), last), 0).rg;
+  vec2 c = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0).rg;
+  vec2 d = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0).rg;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+vec2 velAt(vec2 uv) {
+  return texture(uVel, clamp(uv, vec2(0.0), vec2(1.0))).rg;
+}
+
+vec2 rk4Back(vec2 uv, float dt) {
+  vec2 invDom = 1.0 / uDomain;
+  vec2 k1 = velAt(uv) * invDom;
+  vec2 k2 = velAt(uv - 0.5 * dt * k1) * invDom;
+  vec2 k3 = velAt(uv - 0.5 * dt * k2) * invDom;
+  vec2 k4 = velAt(uv - dt * k3) * invDom;
+  return clamp(uv - (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+}
+
+vec2 rk4Fwd(vec2 uv, float dt) {
+  vec2 invDom = 1.0 / uDomain;
+  vec2 k1 = velAt(uv) * invDom;
+  vec2 k2 = velAt(uv + 0.5 * dt * k1) * invDom;
+  vec2 k3 = velAt(uv + 0.5 * dt * k2) * invDom;
+  vec2 k4 = velAt(uv + dt * k3) * invDom;
+  return clamp(uv + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+}
+
+void main() {
+  if (uPass == 1) {
+    vec2 world = gl_FragCoord.xy / uTargetSize;
+    vec2 prev = rk4Back(world, uDt);
+    fragColor = vec4(mapBicubicClamped(uMap, prev), 0.0, 1.0);
+  } else {
+    vec2 origin = gl_FragCoord.xy / uTargetSize;
+    vec2 world = mapBilinear(uForward, origin);
+    fragColor = vec4(rk4Fwd(world, uDt), 0.0, 1.0);
+  }
+}`;
+
+  const sharedVertShader = compile(gl.VERTEX_SHADER, VERT);
+  function buildProgram(fragSrc) {
+    const p = gl.createProgram();
+    gl.attachShader(p, sharedVertShader);
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fragSrc));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(p) || "program link failed");
+    }
+    return p;
+  }
+
+  const program = buildProgram(FRAG);
+  const mgProgram = buildProgram(MG_FRAG);
+  const flowProgram = buildProgram(FLOW_FRAG);
   gl.useProgram(program);
 
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
   const quad = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
@@ -2664,6 +2858,26 @@ void main() {
   gl.disable(gl.BLEND);
   gl.disable(gl.DITHER);
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+
+  const mgUPass = gl.getUniformLocation(mgProgram, "uPass");
+  const mgUTargetSize = gl.getUniformLocation(mgProgram, "uTargetSize");
+  const mgUDomain = gl.getUniformLocation(mgProgram, "uDomain");
+  const mgUAlpha = gl.getUniformLocation(mgProgram, "uAlpha");
+  gl.useProgram(mgProgram);
+  gl.uniform1i(gl.getUniformLocation(mgProgram, "uAuxA"), 9);
+  gl.uniform1i(gl.getUniformLocation(mgProgram, "uAuxB"), 10);
+
+  const flowUPass = gl.getUniformLocation(flowProgram, "uPass");
+  const flowUTargetSize = gl.getUniformLocation(flowProgram, "uTargetSize");
+  const flowUMapSize = gl.getUniformLocation(flowProgram, "uMapSize");
+  const flowUDomain = gl.getUniformLocation(flowProgram, "uDomain");
+  const flowUDt = gl.getUniformLocation(flowProgram, "uDt");
+  gl.useProgram(flowProgram);
+  gl.uniform1i(gl.getUniformLocation(flowProgram, "uMap"), 1);
+  gl.uniform1i(gl.getUniformLocation(flowProgram, "uForward"), 2);
+  gl.uniform1i(gl.getUniformLocation(flowProgram, "uVel"), 3);
+
+  gl.useProgram(program);
 
   const uPass = gl.getUniformLocation(program, "uPass");
   const uIsNewDropLoc = gl.getUniformLocation(program, "uIsNewDrop");
@@ -2704,13 +2918,30 @@ void main() {
   const uPinSegLoc = gl.getUniformLocation(program, "uPinSeg");
   const uPinVelLoc = gl.getUniformLocation(program, "uPinVel");
 
+  let cachedPass = -1;
+  let cachedTargetW = -1;
+  let cachedTargetH = -1;
+  let cachedIsExport = -1;
+  let cachedIsFullScreen = -1;
+
   function syncDomainUniforms() {
+    gl.useProgram(mgProgram);
+    gl.uniform2f(mgUDomain, domainX, domainY);
+
+    gl.useProgram(flowProgram);
+    gl.uniform2f(flowUMapSize, mapW, mapH);
+    gl.uniform2f(flowUDomain, domainX, domainY);
+
     gl.useProgram(program);
     gl.uniform2f(uSimSizeLoc, simW, simH);
     gl.uniform2f(uMapSizeLoc, mapW, mapH);
     gl.uniform2f(uInkSizeLoc, inkW, inkH);
     gl.uniform2f(uDomainLoc, domainX, domainY);
-    gl.uniform1i(uIsFullScreenLoc, isFullScreenMode ? 1 : 0);
+    const fsVal = isFullScreenMode ? 1 : 0;
+    gl.uniform1i(uIsFullScreenLoc, fsVal);
+    cachedIsFullScreen = fsVal;
+    cachedTargetW = -1;
+    cachedTargetH = -1;
   }
   syncDomainUniforms();
 
@@ -2736,14 +2967,26 @@ void main() {
   const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
   const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23;
 
-  function makeTarget(w, h, internal, format, type) {
+  const boundTex = new Array(11).fill(null);
+
+  function setUnit(unit, tex) {
+    if (boundTex[unit] !== tex) {
+      gl.activeTexture(gl.TEXTURE0 + unit);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      boundTex[unit] = tex;
+    }
+  }
+
+  function makeTarget(w, h, internal, format, type, filter = gl.NEAREST) {
     const tex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     const fbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
@@ -2753,8 +2996,17 @@ void main() {
 
   function destroyTarget(t) {
     if (!t) return;
+    if (t.tex) {
+      for (let u = 0; u < 11; u++) {
+        if (boundTex[u] === t.tex) {
+          gl.activeTexture(gl.TEXTURE0 + u);
+          gl.bindTexture(gl.TEXTURE_2D, null);
+          boundTex[u] = null;
+        }
+      }
+      gl.deleteTexture(t.tex);
+    }
     if (t.fbo) gl.deleteFramebuffer(t.fbo);
-    if (t.tex) gl.deleteTexture(t.tex);
   }
 
   let inkTex = [
@@ -2764,15 +3016,22 @@ void main() {
   let back = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
   let fwd = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
 
-  let surfTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
-  let inertVelTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
-  let velTex = makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT);
-  let curlTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+  let surfTex = [
+    makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR),
+    makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR)
+  ];
+  let inertVelTex = [
+    makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR),
+    makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR)
+  ];
+  let velTex = makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR);
+  let curlTex = makeTarget(simW, simH, gl.R16F, gl.RED, gl.HALF_FLOAT);
   let phiTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
   let pressTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
 
   // Texture used for transferring cropped 2D canvas images into inkTex
   const uploadTex = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE11);
   gl.bindTexture(gl.TEXTURE_2D, uploadTex);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -2808,45 +3067,75 @@ void main() {
   let inkI = 0, backI = 0, fwdI = 0, surfI = 0, inertI = 0;
 
   function bindInputs(targetTex, auxATex = null, auxBTex = null) {
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, targetTex === inkTex[inkI].tex ? null : inkTex[inkI].tex);
-    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, targetTex === back[backI].tex ? null : back[backI].tex);
-    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, targetTex === fwd[fwdI].tex ? null : fwd[fwdI].tex);
-    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, targetTex === velTex.tex ? null : velTex.tex);
-    gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, targetTex === surfTex[surfI].tex ? null : surfTex[surfI].tex);
-    gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, targetTex === phiTex.tex ? null : phiTex.tex);
-    gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, targetTex === inertVelTex[inertI].tex ? null : inertVelTex[inertI].tex);
-    gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D, targetTex === pressTex.tex ? null : pressTex.tex);
-    gl.activeTexture(gl.TEXTURE8); gl.bindTexture(gl.TEXTURE_2D, targetTex === curlTex.tex ? null : curlTex.tex);
-    gl.activeTexture(gl.TEXTURE9); gl.bindTexture(gl.TEXTURE_2D, (auxATex && targetTex !== auxATex) ? auxATex : null);
-    gl.activeTexture(gl.TEXTURE10); gl.bindTexture(gl.TEXTURE_2D, (auxBTex && targetTex !== auxBTex) ? auxBTex : null);
-    gl.activeTexture(gl.TEXTURE0);
+    setUnit(0, targetTex === inkTex[inkI].tex ? null : inkTex[inkI].tex);
+    setUnit(1, targetTex === back[backI].tex ? null : back[backI].tex);
+    setUnit(2, targetTex === fwd[fwdI].tex ? null : fwd[fwdI].tex);
+    setUnit(3, targetTex === velTex.tex ? null : velTex.tex);
+    setUnit(4, targetTex === surfTex[surfI].tex ? null : surfTex[surfI].tex);
+    setUnit(5, targetTex === phiTex.tex ? null : phiTex.tex);
+    setUnit(6, targetTex === inertVelTex[inertI].tex ? null : inertVelTex[inertI].tex);
+    setUnit(7, targetTex === pressTex.tex ? null : pressTex.tex);
+    setUnit(8, targetTex === curlTex.tex ? null : curlTex.tex);
+    setUnit(9, (auxATex && targetTex !== auxATex) ? auxATex : null);
+    setUnit(10, (auxBTex && targetTex !== auxBTex) ? auxBTex : null);
   }
 
   function drawTo(target, pass, auxATex = null, auxBTex = null) {
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-    gl.uniform1i(uIsExportLoc, 0);
-    gl.uniform1i(uIsFullScreenLoc, isFullScreenMode ? 1 : 0);
-
-    if (!target) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, view.width, view.height);
-      gl.uniform2f(uTargetSize, view.width, view.height);
-    } else {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
-      gl.viewport(0, 0, target.w, target.h);
-      gl.uniform2f(uTargetSize, target.w, target.h);
+    if (cachedIsExport !== 0) {
+      gl.uniform1i(uIsExportLoc, 0);
+      cachedIsExport = 0;
+    }
+    const fsVal = isFullScreenMode ? 1 : 0;
+    if (cachedIsFullScreen !== fsVal) {
+      gl.uniform1i(uIsFullScreenLoc, fsVal);
+      cachedIsFullScreen = fsVal;
     }
 
-    gl.uniform1i(uPass, pass);
+    const tw = target ? target.w : view.width;
+    const th = target ? target.h : view.height;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.fbo : null);
+    gl.viewport(0, 0, tw, th);
+    if (cachedTargetW !== tw || cachedTargetH !== th) {
+      gl.uniform2f(uTargetSize, tw, th);
+      cachedTargetW = tw;
+      cachedTargetH = th;
+    }
+
+    if (cachedPass !== pass) {
+      gl.uniform1i(uPass, pass);
+      cachedPass = pass;
+    }
     bindInputs(target ? target.tex : null, auxATex, auxBTex);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  const MAX_GPU_TEX = Math.min(isIOSDevice ? 3072 : 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+  function drawFlowStep(sdt, subSteps) {
+    gl.useProgram(flowProgram);
+    gl.uniform1f(flowUDt, sdt);
+    gl.uniform2f(flowUTargetSize, mapW, mapH);
+    gl.viewport(0, 0, mapW, mapH);
+    setUnit(3, velTex.tex);
+
+    for (let s = 0; s < subSteps; s++) {
+      const dstBack = back[1 - backI];
+      setUnit(1, back[backI].tex);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, dstBack.fbo);
+      gl.uniform1i(flowUPass, PASS_BACK);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      backI = 1 - backI;
+
+      const dstFwd = fwd[1 - fwdI];
+      setUnit(2, fwd[fwdI].tex);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, dstFwd.fbo);
+      gl.uniform1i(flowUPass, PASS_FWD);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      fwdI = 1 - fwdI;
+    }
+
+    gl.useProgram(program);
+  }
+
+  const MAX_GPU_TEX = Math.min(isIOSDevice ? 2048 : 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
 
   function resizeSimulationIfNeeded(stageW, stageH, dpr) {
     let nextDomX = 1.0;
@@ -2862,8 +3151,15 @@ void main() {
       nextDomY = stageH / minSide;
 
       const mgAlign = 1 << (MG_LEVELS - 1); // 32: guarantees exact halving across all 6 MG levels
-      nextSimW = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomX) / mgAlign) * mgAlign));
-      nextSimH = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomY) / mgAlign) * mgAlign));
+      if (isIOSDevice) {
+        // Keep total cell count matched to 512x512 (~256k cells) so iPad maintains 60fps across full screen
+        const isoBase = BASE_SIM / Math.sqrt(nextDomX * nextDomY);
+        nextSimW = Math.min(768, Math.max(384, Math.round((isoBase * nextDomX) / mgAlign) * mgAlign));
+        nextSimH = Math.min(768, Math.max(384, Math.round((isoBase * nextDomY) / mgAlign) * mgAlign));
+      } else {
+        nextSimW = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomX) / mgAlign) * mgAlign));
+        nextSimH = Math.min(1024, Math.max(BASE_SIM, Math.round((BASE_SIM * nextDomY) / mgAlign) * mgAlign));
+      }
 
       const rawPxW = Math.max(Math.round(stageW * dpr), Math.round(BASE_INK * nextDomX));
       const rawPxH = Math.max(Math.round(stageH * dpr), Math.round(BASE_INK * nextDomY));
@@ -2930,10 +3226,16 @@ void main() {
     ];
     back = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
     fwd = [makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(mapW, mapH, gl.RG32F, gl.RG, gl.FLOAT)];
-    surfTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
-    inertVelTex = [makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT), makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT)];
-    velTex = makeTarget(simW, simH, gl.RG32F, gl.RG, gl.FLOAT);
-    curlTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
+    surfTex = [
+      makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR),
+      makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR)
+    ];
+    inertVelTex = [
+      makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR),
+      makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR)
+    ];
+    velTex = makeTarget(simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR);
+    curlTex = makeTarget(simW, simH, gl.R16F, gl.RED, gl.HALF_FLOAT);
     phiTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
     pressTex = makeTarget(simW, simH, gl.R32F, gl.RED, gl.FLOAT);
     allocateMultigrid();
@@ -2984,48 +3286,78 @@ void main() {
     return true;
   }
 
+  const mgCurIdx = new Int32Array(MG_LEVELS);
   function solveMultigridVCycle(alpha, numVCycles) {
-    gl.uniform1f(uAlphaLoc, alpha);
-    const curIdx = new Int32Array(MG_LEVELS);
+    setUnit(5, null);
+    setUnit(7, null);
+    gl.useProgram(mgProgram);
+    gl.uniform1f(mgUAlpha, alpha);
+    mgCurIdx.fill(0);
+
+    let mgLastPass = -1;
+    let mgLastW = -1;
+    let mgLastH = -1;
+
+    function drawMg(target, pass, auxATex = null, auxBTex = null) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+      if (mgLastW !== target.w || mgLastH !== target.h) {
+        gl.viewport(0, 0, target.w, target.h);
+        gl.uniform2f(mgUTargetSize, target.w, target.h);
+        mgLastW = target.w;
+        mgLastH = target.h;
+      }
+      if (mgLastPass !== pass) {
+        gl.uniform1i(mgUPass, pass);
+        mgLastPass = pass;
+      }
+      setUnit(9, auxATex);
+      setUnit(10, auxBTex);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
 
     for (let cycle = 0; cycle < numVCycles; cycle++) {
       for (let l = 0; l < MG_LEVELS - 1; l++) {
         const preSmoothSteps = (l === 0) ? 2 : 3;
+        const rhsTex = mgRhs[l].tex;
         for (let s = 0; s < preSmoothSteps; s++) {
-          const src = curIdx[l];
+          const src = mgCurIdx[l];
           const dst = 1 - src;
-          drawTo(mgSol[l][dst], PASS_MG_SMOOTH, mgSol[l][src].tex, mgRhs[l].tex);
-          curIdx[l] = dst;
+          drawMg(mgSol[l][dst], PASS_MG_SMOOTH, mgSol[l][src].tex, rhsTex);
+          mgCurIdx[l] = dst;
         }
-        drawTo(mgRhs[l + 1], PASS_MG_RESTRICT, mgSol[l][curIdx[l]].tex, mgRhs[l].tex);
-        drawTo(mgSol[l + 1][0], PASS_ZERO);
-        curIdx[l + 1] = 0;
+        drawMg(mgRhs[l + 1], PASS_MG_RESTRICT, mgSol[l][mgCurIdx[l]].tex, rhsTex);
+        drawMg(mgSol[l + 1][0], PASS_ZERO, null, null);
+        mgCurIdx[l + 1] = 0;
       }
 
       const coarsest = MG_LEVELS - 1;
-      for (let s = 0; s < 10; s++) {
-        const src = curIdx[coarsest];
+      const coarseRhsTex = mgRhs[coarsest].tex;
+      for (let s = 0; s < 6; s++) {
+        const src = mgCurIdx[coarsest];
         const dst = 1 - src;
-        drawTo(mgSol[coarsest][dst], PASS_MG_SMOOTH, mgSol[coarsest][src].tex, mgRhs[coarsest].tex);
-        curIdx[coarsest] = dst;
+        drawMg(mgSol[coarsest][dst], PASS_MG_SMOOTH, mgSol[coarsest][src].tex, coarseRhsTex);
+        mgCurIdx[coarsest] = dst;
       }
 
       for (let l = MG_LEVELS - 2; l >= 0; l--) {
-        const src = curIdx[l];
+        const src = mgCurIdx[l];
         const dst = 1 - src;
-        drawTo(mgSol[l][dst], PASS_MG_PROLONG, mgSol[l][src].tex, mgSol[l + 1][curIdx[l + 1]].tex);
-        curIdx[l] = dst;
+        drawMg(mgSol[l][dst], PASS_MG_PROLONG, mgSol[l][src].tex, mgSol[l + 1][mgCurIdx[l + 1]].tex);
+        mgCurIdx[l] = dst;
 
         const postSmoothSteps = (l === 0) ? 2 : 3;
+        const rhsTex = mgRhs[l].tex;
         for (let s = 0; s < postSmoothSteps; s++) {
-          const sSrc = curIdx[l];
+          const sSrc = mgCurIdx[l];
           const sDst = 1 - sSrc;
-          drawTo(mgSol[l][sDst], PASS_MG_SMOOTH, mgSol[l][sSrc].tex, mgRhs[l].tex);
-          curIdx[l] = sDst;
+          drawMg(mgSol[l][sDst], PASS_MG_SMOOTH, mgSol[l][sSrc].tex, rhsTex);
+          mgCurIdx[l] = sDst;
         }
       }
     }
-    return curIdx[0];
+
+    gl.useProgram(program);
+    return mgCurIdx[0];
   }
 
   function pollAsyncGpuActivity(isActivelyWorking) {
@@ -3076,25 +3408,29 @@ void main() {
 
     const exportFbo = gl.createFramebuffer();
     const exportTex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, exportTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, exportW, exportH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
 
     gl.viewport(0, 0, exportW, exportH);
     gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
     gl.uniform1i(uIsExportLoc, 1);
     gl.uniform1i(uPass, PASS_DISPLAY);
     gl.uniform2f(uTargetSize, exportW, exportH);
+    cachedIsExport = 1;
+    cachedPass = PASS_DISPLAY;
+    cachedTargetW = exportW;
+    cachedTargetH = exportH;
 
     bindInputs(null);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     gl.uniform1i(uIsExportLoc, 0);
+    cachedIsExport = 0;
 
     const pixels = new Uint8Array(exportW * exportH * 4);
     gl.readPixels(0, 0, exportW, exportH, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
@@ -3147,6 +3483,7 @@ void main() {
     input.down = false;
     gpuClear();
 
+    gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, uploadTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, squareCanvas);
     gl.bindTexture(gl.TEXTURE_2D, null);
@@ -4126,13 +4463,17 @@ void main() {
 
     drawTo(velTex, PASS_COMBINE_VEL);
 
-    const sub = 3;
+    const sub = 2;
     const sdt = dt / sub;
     gl.uniform1f(uDt, sdt);
     for (let s = 0; s < sub; s++) {
-      drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF); surfI = 1 - surfI;
-      drawTo(back[1 - backI], PASS_BACK); backI = 1 - backI;
-      drawTo(fwd[1 - fwdI], PASS_FWD); fwdI = 1 - fwdI;
+      drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF);
+      surfI = 1 - surfI;
+    }
+    drawFlowStep(sdt, sub);
+
+    if (pinMotion || (input.down && isLatteMode())) {
+      ringDirty = true;
     }
 
     hasAdvectedSinceBake = true;
@@ -4144,16 +4485,43 @@ void main() {
     return true;
   }
 
+  let ringHasContent = true;
+  let ringDirty = true;
+
+  function hasVisiblePins() {
+    if (pinGesture) return true;
+    for (let i = 0; i < pins.length; i++) {
+      if (pins[i].kind !== "ink" || pushInkActive) return true;
+    }
+    return false;
+  }
+
   function drawRing() {
+    ringDirty = false;
+    const showCursor = input.inside || input.down;
+    const showPins = hasVisiblePins();
+
+    if (!showCursor && !showPins) {
+      if (ringHasContent) {
+        ringCtx.clearRect(0, 0, ring.width, ring.height);
+        ringHasContent = false;
+      }
+      toolCursor.classList.remove("visible");
+      return;
+    }
+
     const w = ring.width;
     const h = ring.height;
     const minDim = Math.min(w, h);
     ringCtx.clearRect(0, 0, w, h);
+    ringHasContent = true;
 
-    drawPins();
+    if (showPins) {
+      drawPins();
+    }
 
-    if (!(input.inside || input.down)) {
-      toolCursor.classList.remove("visible", "pressing");
+    if (!showCursor) {
+      toolCursor.classList.remove("visible");
       return;
     }
 
@@ -4168,13 +4536,12 @@ void main() {
     ringCtx.arc(input.x * w, input.y * h, radius, 0, Math.PI * 2);
     ringCtx.stroke();
 
-    // Position the skeuomorphic tool sprite so its tip hovers directly over the area circle center
+    // GPU-composited transform avoids layout invalidation on high-rate touch/Pencil move
     syncToolCursorImage();
     const [stageX, stageY] = stageFromWorld(input.x, input.y);
-    toolCursor.style.left = `${stageX}px`;
-    toolCursor.style.top = `${stageY}px`;
+    const pressSuffix = input.down ? " scale(0.95) rotate(-3deg)" : "";
+    toolCursor.style.transform = `translate3d(${stageX.toFixed(1)}px, ${stageY.toFixed(1)}px, 0) translate(-7.5%, -91%)${pressSuffix}`;
     toolCursor.classList.add("visible");
-    toolCursor.classList.toggle("pressing", input.down);
   }
 
   function layout() {
@@ -4182,27 +4549,38 @@ void main() {
     const rect = stage.getBoundingClientRect();
     const W = Math.max(64, rect.width);
     const H = Math.max(64, rect.height);
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const rawDpr = window.devicePixelRatio || 1;
+    const viewDpr = isIOSDevice ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
+    const ringDpr = isIOSDevice ? 1 : Math.min(1.5, rawDpr);
 
     if (isFullScreenMode) {
-      const targetW = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(W * dpr)));
-      const targetH = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(H * dpr)));
+      const targetW = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(W * viewDpr)));
+      const targetH = Math.min(MAX_GPU_TEX, Math.max(64, Math.round(H * viewDpr)));
+      const rW = Math.max(64, Math.round(W * ringDpr));
+      const rH = Math.max(64, Math.round(H * ringDpr));
       if (view.width !== targetW || view.height !== targetH) {
         view.width = targetW;
         view.height = targetH;
-        ring.width = targetW;
-        ring.height = targetH;
       }
-      resizeSimulationIfNeeded(W, H, dpr);
+      if (ring.width !== rW || ring.height !== rH) {
+        ring.width = rW;
+        ring.height = rH;
+        ringHasContent = true;
+      }
+      resizeSimulationIfNeeded(W, H, viewDpr);
     } else {
-      const px = Math.round(RENDER_BATH_SIZE * dpr);
+      const px = Math.round(RENDER_BATH_SIZE * viewDpr);
+      const rPx = Math.round(RENDER_BATH_SIZE * ringDpr);
       if (view.width !== px || view.height !== px) {
         view.width = px;
         view.height = px;
-        ring.width = px;
-        ring.height = px;
       }
-      resizeSimulationIfNeeded(RENDER_BATH_SIZE, RENDER_BATH_SIZE, dpr);
+      if (ring.width !== rPx || ring.height !== rPx) {
+        ring.width = rPx;
+        ring.height = rPx;
+        ringHasContent = true;
+      }
+      resizeSimulationIfNeeded(RENDER_BATH_SIZE, RENDER_BATH_SIZE, viewDpr);
     }
 
     drawTo(null, PASS_DISPLAY);
@@ -4584,6 +4962,7 @@ void main() {
     const p = worldFromEvent(e);
     input.x = p[0]; input.y = p[1];
     input.inside = true;
+    ringDirty = true;
     const g = pinGesture;
     if (g && e.pointerId === g.pointerId) {
       g.px = p[0]; g.py = p[1];
@@ -4614,6 +4993,9 @@ void main() {
       finishPinGesture(!!(e && e.type === "pointercancel"));
     }
     input.down = false;
+    if (e && e.pointerType && e.pointerType !== "mouse") {
+      input.inside = false;
+    }
     if (pouredDrop) {
       if (sumiMode && (activeTool === 0 || isLatteMode())) cycleColor();
       pouredDrop = false;
@@ -4983,23 +5365,27 @@ void main() {
       // 1. Render unshadowed flat-color bath matching active bath aspect ratio
       const exportFbo = gl.createFramebuffer();
       const exportTex = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE11);
       gl.bindTexture(gl.TEXTURE_2D, exportTex);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.bindTexture(gl.TEXTURE_2D, null);
       gl.bindFramebuffer(gl.FRAMEBUFFER, exportFbo);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, exportTex, 0);
 
       gl.viewport(0, 0, W, H);
       gl.useProgram(program);
-      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-      gl.enableVertexAttribArray(0);
-      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
       gl.uniform1i(uIsExportLoc, 1);
       gl.uniform1i(uPass, PASS_DISPLAY);
       gl.uniform2f(uTargetSize, W, H);
+      cachedIsExport = 1;
+      cachedPass = PASS_DISPLAY;
+      cachedTargetW = W;
+      cachedTargetH = H;
       bindInputs(null);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       gl.uniform1i(uIsExportLoc, 0);
+      cachedIsExport = 0;
 
       const pixels = new Uint8Array(W * H * 4);
       gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
@@ -5316,7 +5702,8 @@ void main() {
     }
 
     acc += delta;
-    const totalSteps = Math.min(2, Math.floor(acc / DT));
+    const maxSteps = isIOSDevice ? 1 : 2;
+    const totalSteps = Math.min(maxSteps, Math.floor(acc / DT));
     let steps = 0;
     let painted = false;
     if (totalSteps > 0) {
@@ -5340,10 +5727,10 @@ void main() {
       input.x = endX;
       input.y = endY;
     }
-    if (steps === 2) acc = 0;
+    if (steps === maxSteps) acc = 0;
 
     if (painted) drawTo(null, PASS_DISPLAY);
-    if (steps > 0 || input.inside || input.down || pins.length > 0) drawRing();
+    if (ringDirty) drawRing();
     requestAnimationFrame(frame);
   }
 
