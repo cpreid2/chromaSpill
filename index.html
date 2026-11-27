@@ -1396,10 +1396,10 @@
   <div class="parchment-card top-slot" id="top-dock-card">
     <button class="dock-tab" id="top-dock-tab" type="button" title="Hover or tap for Tool Parameters">
       <span class="dock-tab-kanji">墨</span>
-      <span class="dock-tab-text" id="top-dock-tab-text">Stick</span>
+      <span class="dock-tab-text" id="top-dock-tab-text">Inks</span>
     </button>
     <!-- View 0: Sumi Ink Palette + Brush Sliders -->
-    <div class="top-view" id="panel-0">
+    <div class="top-view active" id="panel-0">
       <div>
         <div class="section-header">
           <div class="header-title-group">
@@ -1408,7 +1408,7 @@
           <div class="header-right-group">
             <div class="mode-toggle" role="group" aria-label="Ink mode">
               <button type="button" class="active" data-ink-mode="drop" aria-pressed="true" title="Drop and pour ink directly onto the bath">Drop</button>
-              <button type="button" data-ink-mode="push" aria-pressed="false" title="Toggle Push with Drop: hold & drag to pour fluid while pushing pin, touch anywhere to relocate">Push</button>
+              <button type="button" class="active" data-ink-mode="push" aria-pressed="true" title="Toggle Push with Drop: hold & drag to pour fluid while pushing pin, touch anywhere to relocate">Push</button>
             </div>
             <label class="cycle-toggle" title="Automatically alternate ink dishes on each drop">
               <input type="checkbox" id="sumi-mode" checked> Auto
@@ -1430,20 +1430,20 @@
         <label class="craft-slider">
           <div class="craft-slider-header">
             <span>Drop Size</span>
-            <strong id="size-read">1.0x</strong>
+            <strong id="size-read">0.3x</strong>
           </div>
-          <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+          <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="0.3">
         </label>
         <label class="craft-slider" id="pour-slider-wrap">
           <div class="craft-slider-header">
             <span>Pour Rate</span>
-            <strong id="flow-read">1.0x</strong>
+            <strong id="flow-read">1.4x</strong>
           </div>
-          <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
+          <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.4">
         </label>
       </div>
 
-      <div class="pin-controls" id="ink-pin-controls">
+      <div class="pin-controls active" id="ink-pin-controls">
         <div class="pin-row">
           <span class="pin-count" id="ink-pin-count">1 push pin</span>
           <div class="pin-row-actions">
@@ -1466,7 +1466,7 @@
     </div>
 
     <!-- View 1: Bamboo Stick Parameters -->
-    <div class="top-view active" id="panel-1">
+    <div class="top-view" id="panel-1">
       <div class="section-header">
         <h2>Bamboo Stick</h2>
         <div class="header-right-group">
@@ -1524,11 +1524,11 @@
   </div>
 
   <!-- 2. MIDDLE TOOL RACK HOTSPOTS -->
-  <button class="tool-hotspot" data-tool="0" type="button" title="Suminagashi Twin Brushes (Dropper)">
+  <button class="tool-hotspot active" data-tool="0" type="button" title="Suminagashi Twin Brushes (Dropper)">
     <span class="plaque-label">Brushes</span>
   </button>
 
-  <button class="tool-hotspot active" data-tool="1" type="button" title="Bamboo Stylus Stick">
+  <button class="tool-hotspot" data-tool="1" type="button" title="Bamboo Stylus Stick">
     <span class="plaque-label">Stick</span>
   </button>
 
@@ -1586,9 +1586,9 @@
       <label class="craft-slider">
         <div class="craft-slider-header">
           <span>Swirl Drama</span>
-          <strong id="vorticity-read">100%</strong>
+          <strong id="vorticity-read">0%</strong>
         </div>
-        <input id="vorticity" type="range" min="0.0" max="1.0" step="0.01" value="1.00">
+        <input id="vorticity" type="range" min="0.0" max="1.0" step="0.01" value="0.00">
       </label>
     </div>
   </div>
@@ -1600,7 +1600,7 @@
   </div>
 
   <!-- Skeuomorphic Tool Cursor Hovering Over the Bath Circle -->
-  <img id="tool-cursor" class="tool-cursor" src="stick.png" alt="" aria-hidden="true">
+  <img id="tool-cursor" class="tool-cursor" src="brush.png" alt="" aria-hidden="true">
 
   <!-- Optional Corner Calibration Pins (Press 'P' to show/drag) -->
   <div class="corner-pin" data-corner="0" data-label="TL"></div>
@@ -1765,16 +1765,16 @@
   const INK_RADIUS = 0.034 * 0.72;
   const STICK_BASE_RADIUS = 0.015;
 
-  let activeTool = 1;
+  let activeTool = 0;
   let sumiMode = true;
   let currentSwatchIndex = 0;
 
   let diffValue = 0.68;
   let glideValue = 0.34;
-  let vortValue = 1.0;
+  let vortValue = 0.0;
 
-  let dropSizeMult = 1.0;
-  let flowRateMult = 1.0;
+  let dropSizeMult = 0.3;
+  let flowRateMult = 1.4;
 
   let stylusRadiusMult = 1.0;
   let stylusDragMult = 1.0;
@@ -3531,7 +3531,12 @@ void main() {
       [0.52, 0.48, 0.95]
     ];
     const savedTool = activeTool;
+    const savedPush = pushInkActive;
+    const savedDropSize = dropSizeMult;
+    const savedFlowRate = flowRateMult;
+    pushInkActive = false;
     activeTool = 0;
+    flowRateMult = 1.0;
     drops.forEach(([x, y, sz], idx) => {
       ink = hexToPack(dynamicPalette[idx % dynamicPalette.length][1]);
       input.x = x;
@@ -3542,7 +3547,8 @@ void main() {
         step(DT, DT);
       }
     });
-    dropSizeMult = 1.0;
+    dropSizeMult = savedDropSize;
+    flowRateMult = savedFlowRate;
     ink = hexToPack(dynamicPalette[currentSwatchIndex][1]);
 
     activeTool = 1;
@@ -3564,6 +3570,7 @@ void main() {
       }
     }
     input.down = false;
+    pushInkActive = savedPush;
     activeTool = savedTool;
     drawTo(null, PASS_DISPLAY);
   }
@@ -3582,7 +3589,7 @@ void main() {
   const SLING_MAX_PULL = 0.25;    // max elastic stretch in bath UV
   const PIN_TAP_PX = 6;           // screen px before a press counts as a drag
 
-  let pushInkActive = false;      // false = Drop only; true = Drop + Push (latte pin push)
+  let pushInkActive = true;       // false = Drop only; true = Drop + Push (latte pin push)
   let stickMode = "stir";         // "stir" | "pins"
   let keepInkPins = false;
   let keepStickPins = false;
@@ -5729,6 +5736,7 @@ void main() {
 
   layout();
   seedInitialBath();
+  syncInkModeUI();
   requestAnimationFrame(frame);
 })();
 </script>
