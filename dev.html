@@ -2977,7 +2977,16 @@ void main() {
     vec4 old = texelFetch(uInk, coord, 0);
 
     vec2 origin = gl_FragCoord.xy / uTargetSize;
-    vec2 placed = mapBilinear(uForward, origin);
+    vec2 pf = clamp(origin, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
+    ivec2 fi = ivec2(floor(pf));
+    vec2 ff = pf - vec2(fi);
+    ivec2 flast = ivec2(uMapSize) - ivec2(1);
+    vec2 f00 = texelFetch(uForward, clamp(fi, ivec2(0), flast), 0).rg;
+    vec2 f10 = texelFetch(uForward, clamp(fi + ivec2(1, 0), ivec2(0), flast), 0).rg;
+    vec2 f01 = texelFetch(uForward, clamp(fi + ivec2(0, 1), ivec2(0), flast), 0).rg;
+    vec2 f11 = texelFetch(uForward, clamp(fi + ivec2(1, 1), ivec2(0), flast), 0).rg;
+    vec2 placed = mix(mix(f00, f10, ff.x), mix(f01, f11, ff.x), ff.y);
+
     vec2 pa = (placed - uPrevCenter) * uDomain;
     vec2 ba = (uCenter - uPrevCenter) * uDomain;
     float ba2 = dot(ba, ba);
@@ -2986,6 +2995,21 @@ void main() {
 
     // Exact fast-exit: outside the capsule where radial >= abs(old.a), all branches preserve old
     if (radial >= abs(old.a) && radial > 0.0) {
+      fragColor = old;
+      return;
+    }
+
+    // Reject torn/folded forward-map wake sheets behind a moving Push+Drop brush where opposite
+    // sides of the parted wake interpolate across uCenter without matching the backward map uMap
+    vec2 spanX = (f10 - f00) * uDomain;
+    vec2 spanY = (f01 - f00) * uDomain;
+    vec2 spanD = (f11 - f00) * uDomain;
+    float maxCellSpan2 = max(dot(spanX, spanX), max(dot(spanY, spanY), dot(spanD, spanD)));
+    float maxAllowedSpan = max(uRadius * 1.4, 0.02);
+    vec2 backOrigin = mapBilinear(uMap, placed);
+    vec2 invDiff = (backOrigin - origin) * uDomain;
+    float maxInvErr = max(uRadius * 1.3, 0.018);
+    if (maxCellSpan2 > maxAllowedSpan * maxAllowedSpan || dot(invDiff, invDiff) > maxInvErr * maxInvErr) {
       fragColor = old;
       return;
     }
@@ -4349,6 +4373,7 @@ void main() {
   const pinVelBuf = new Float32Array(MAX_PINS * 2);
   let pinSegCount = 0;
   let stepsSincePourBake = 0;
+  let pourAdvectDist = 0;
 
   function isLatteMode() { return brushOn && stickOn; }
   function activePinKind() {
@@ -4671,6 +4696,7 @@ void main() {
       gpuBake();
     }
     stepsSincePourBake = 0;
+    pourAdvectDist = 0;
 
     // Initial surface contact pour (balanced mass so touch-down blends seamlessly into continuous drag)
     const radius = INK_RADIUS * dropSizeMult;
@@ -5053,16 +5079,18 @@ void main() {
       if (input.down && isLatteMode()) {
         const inkPins = pins.filter(p => p.kind === "ink");
         if (inkPins.length > 0) {
+          const dx = input.x - input.xPrev;
+          const dy = input.y - input.yPrev;
           if (!frozen) {
             stepsSincePourBake++;
-            if (stepsSincePourBake >= 140 && hasAdvectedSinceBake) {
-              gpuBake(2);
+            pourAdvectDist += Math.hypot(dx * domainX, dy * domainY);
+            if ((stepsSincePourBake >= 24 || pourAdvectDist >= 0.12) && hasAdvectedSinceBake) {
+              gpuBake(1);
               stepsSincePourBake = 0;
+              pourAdvectDist = 0;
             }
           }
 
-          const dx = input.x - input.xPrev;
-          const dy = input.y - input.yPrev;
           const invDt = 1 / Math.max(frameDelta, 0.004);
           const radius = INK_RADIUS * dropSizeMult;
           const addedMass = (4.4 * dt) * flowRateMult * mobility;
