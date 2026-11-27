@@ -209,10 +209,10 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.55cqw;
-    max-height: 4.8cqw;
+    gap: 0.6cqw;
+    max-height: 5.4cqw;
     overflow-y: auto;
-    padding: 0.2cqw 0.15cqw;
+    padding: 0.45cqw 0.45cqw 0.35cqw 0.25cqw;
   }
 
   .swatches-list {
@@ -254,24 +254,34 @@
 
   .swatch-del {
     position: absolute;
-    top: -0.25cqw;
-    right: -0.25cqw;
-    width: 0.95cqw;
-    height: 0.95cqw;
-    background: #f5efe6;
-    color: #5c4b3c;
-    border: 1px solid rgba(0,0,0,0.3);
+    top: -0.32cqw;
+    right: -0.32cqw;
+    width: 1.05cqw;
+    height: 1.05cqw;
+    background: #f7f1e6;
+    color: #5a2216;
+    border: 1px solid rgba(55, 40, 26, 0.48);
     border-radius: 50%;
-    font-size: 0.65cqw;
-    line-height: 0.85cqw;
-    text-align: center;
+    font-size: 0.72cqw;
+    font-weight: 700;
+    line-height: 1;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     display: none;
-    font-family: sans-serif;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+    font-family: system-ui, -apple-system, sans-serif;
   }
 
   .swatch-wrap:hover .swatch-del {
-    display: block;
+    display: flex;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .swatch-del {
+      display: flex;
+    }
   }
 
   .btn-add-color,
@@ -1163,9 +1173,9 @@
     left: max(10px, env(safe-area-inset-left, 10px));
     top: 50%;
     transform: translateY(-50%);
-    width: 124px;
-    padding: 8px;
-    border-radius: 9px;
+    width: 146px;
+    padding: 10px;
+    border-radius: 10px;
     background-color: #d6cbb8;
     background-image:
       radial-gradient(circle at 25% 20%, rgba(248, 242, 230, 0.78), transparent 60%),
@@ -1178,7 +1188,7 @@
       0 8px 26px rgba(0, 0, 0, 0.68);
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
     z-index: 37;
   }
 
@@ -1186,29 +1196,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3px 6px;
-    border-radius: 4px;
-    background: rgba(62, 46, 32, 0.11);
-    border: 1px solid rgba(75, 58, 40, 0.25);
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: rgba(62, 46, 32, 0.12);
+    border: 1px solid rgba(75, 58, 40, 0.26);
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 9.5px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #4a3726;
+    color: #423020;
     text-align: center;
   }
 
+  .rail-ink-header,
   .rail-drawer-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .rail-ink-dish {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: 2.5px solid var(--ceramic);
     background: #161514;
@@ -1228,19 +1239,21 @@
 
   .rail-ink-auto {
     position: absolute;
-    right: -4px;
-    bottom: -4px;
-    width: 13px;
-    height: 13px;
+    right: -3px;
+    bottom: -3px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
-    background: #efe7d8;
-    border: 1px solid rgba(60, 45, 30, 0.55);
+    background: #f5ede0;
+    border: 1px solid rgba(60, 45, 30, 0.6);
     color: #7d2616;
     font-family: system-ui, sans-serif;
-    font-size: 8.5px;
+    font-size: 10px;
     font-weight: 800;
-    line-height: 11px;
-    text-align: center;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
   }
 
@@ -1250,20 +1263,21 @@
 
   .rail-flyout-btn {
     flex: 1;
-    height: 30px;
-    padding: 0 7px;
-    border-radius: 5px;
+    height: 34px;
+    padding: 0 9px;
+    border-radius: 6px;
     border: 1px solid rgba(75, 58, 40, 0.5);
     background: rgba(242, 235, 222, 0.85);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.55);
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12.5px;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 5px;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
@@ -1281,7 +1295,7 @@
   .rail-flyout-kanji {
     color: #9e2a1b;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 13.5px;
   }
 
   .rail-flyout-btn.open .rail-flyout-kanji {
@@ -1289,8 +1303,8 @@
   }
 
   .rail-water-dot {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     border: 1.5px solid #e5dac8;
     box-shadow: 0 0 0 1px rgba(45, 32, 20, 0.55), inset 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -1307,14 +1321,14 @@
   .rail-tool-block {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
 
   /* Tactile Urushi Lacquer ON/OFF Tool Switch */
   .rail-switch-btn {
     width: 100%;
-    height: 31px;
-    padding: 0 8px;
+    height: 34px;
+    padding: 0 9px;
     border-radius: 6px;
     border: 1px solid rgba(55, 42, 28, 0.55);
     background: linear-gradient(180deg, #cbbda8, #b5a791);
@@ -1323,7 +1337,7 @@
       0 1px 0 rgba(255, 250, 240, 0.45);
     color: #4a3c2f;
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -1341,8 +1355,8 @@
   }
 
   .rail-switch-dot {
-    width: 8px;
-    height: 8px;
+    width: 8.5px;
+    height: 8.5px;
     border-radius: 50%;
     border: 1.5px solid rgba(74, 60, 47, 0.65);
     background: transparent;
@@ -1351,10 +1365,10 @@
 
   .rail-switch-pill {
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.06em;
-    padding: 1.5px 5px;
+    padding: 2px 6px;
     border-radius: 999px;
     background: rgba(55, 42, 28, 0.14);
     color: #574738;
@@ -1386,7 +1400,7 @@
   .rail-scrub-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     transition: opacity 0.18s ease;
   }
 
@@ -1398,8 +1412,8 @@
 
   .rail-scrub {
     position: relative;
-    height: 25px;
-    border-radius: 5px;
+    height: 30px;
+    border-radius: 6px;
     background: rgba(58, 44, 30, 0.16);
     border: 1px solid rgba(60, 45, 30, 0.48);
     box-shadow:
@@ -1409,7 +1423,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 7px;
+    padding: 0 9px;
     cursor: ew-resize;
     touch-action: none;
   }
@@ -1451,7 +1465,7 @@
   }
 
   .rail-scrub-label {
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 700;
     color: #2c2219;
     letter-spacing: 0.03em;
@@ -1459,7 +1473,7 @@
 
   .rail-scrub-val {
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 700;
     color: #281e15;
   }
@@ -1467,9 +1481,10 @@
   /* Slide-Out Parchment Flyouts Docked Cleanly Beside the Quick-Rail */
   .studio-stage.fullscreen-mode .parchment-card {
     overflow: visible;
-    width: clamp(300px, 24cqmax, 390px);
-    padding: 12px 15px;
-    border-radius: 8px;
+    width: clamp(356px, 36cqmax, 436px);
+    max-height: calc(100dvh - 28px);
+    padding: 16px 18px;
+    border-radius: 9px;
     z-index: 38;
     opacity: 0;
     pointer-events: none;
@@ -1484,22 +1499,28 @@
     left: 0;
     top: max(14px, env(safe-area-inset-top, 14px));
     height: auto;
-    min-height: 235px;
-    gap: 10px;
+    min-height: 0;
+    gap: 12px;
     transform: translateX(calc(-100% - 24px));
+  }
+
+  .studio-stage.fullscreen-mode .top-view.active {
+    gap: 12px;
   }
 
   .studio-stage.fullscreen-mode .bath-slot {
     left: 0;
     top: auto;
     bottom: max(14px, env(safe-area-inset-bottom, 14px));
-    height: clamp(235px, 31cqmax, 330px);
+    height: auto;
+    min-height: 0;
+    gap: 12px;
     transform: translateX(calc(-100% - 24px));
   }
 
   .studio-stage.fullscreen-mode .top-slot.dock-open,
   .studio-stage.fullscreen-mode .bath-slot.dock-open {
-    transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 134px));
+    transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 158px));
     opacity: 1;
     pointer-events: auto;
   }
@@ -1507,7 +1528,7 @@
   @media (hover: hover) and (pointer: fine) {
     .studio-stage.fullscreen-mode .top-slot:hover,
     .studio-stage.fullscreen-mode .bath-slot:hover {
-      transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 134px));
+      transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 158px));
       opacity: 1;
       pointer-events: auto;
     }
@@ -1528,10 +1549,10 @@
 
   .studio-stage.fullscreen-mode .washi-hotspot {
     width: auto;
-    height: 32px;
-    padding: 0 12px;
+    height: 36px;
+    padding: 0 14px;
     transform: none;
-    background: rgba(214, 203, 184, 0.9);
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     border-radius: 6px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
@@ -1540,11 +1561,11 @@
     gap: 6px;
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.82;
+    opacity: 0.88;
   }
 
   .studio-stage.fullscreen-mode .washi-hotspot:hover {
@@ -1558,16 +1579,16 @@
     right: 0;
     transform: none;
     top: calc(100% + 6px);
-    width: max(150px, 10cqmax);
+    width: max(164px, 11cqmax);
     padding: 8px;
     gap: 6px;
     border-radius: 6px;
   }
 
   .studio-stage.fullscreen-mode .washi-btn {
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 4px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 5px;
   }
 
   .studio-stage.fullscreen-mode .fs-only-label {
@@ -1577,16 +1598,16 @@
   .studio-stage.fullscreen-mode .fs-corner-exit {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border-radius: 6px;
-    background: rgba(214, 203, 184, 0.9);
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
     color: var(--ink-text);
     cursor: pointer;
-    opacity: 0.82;
+    opacity: 0.88;
     transition: opacity 0.15s, background 0.15s;
   }
 
@@ -1596,8 +1617,8 @@
   }
 
   .studio-stage.fullscreen-mode .fs-corner-exit svg {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     stroke: currentColor;
     fill: none;
     stroke-width: 2;
@@ -1611,20 +1632,20 @@
     top: auto;
     bottom: max(12px, env(safe-area-inset-bottom, 12px));
     width: auto;
-    height: 32px;
-    padding: 0 12px;
-    background: rgba(214, 203, 184, 0.9);
+    height: 36px;
+    padding: 0 14px;
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     border-radius: 6px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     z-index: 34;
-    opacity: 0.82;
+    opacity: 0.88;
   }
 
   .studio-stage.fullscreen-mode .water-cup-hotspot::before {
@@ -1636,55 +1657,142 @@
     background: rgba(235, 226, 210, 0.98);
   }
 
-  /* Keep card inner typography & touch controls comfortable in portrait iPad fullscreen */
-  .studio-stage.fullscreen-mode .section-header h2 { font-size: max(12px, 0.95cqmax); }
+  /* Keep card inner typography, swatches, & delete badges crisp and unclipped on iPad */
+  .studio-stage.fullscreen-mode .section-header {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+  .studio-stage.fullscreen-mode .section-header h2 {
+    font-size: 15px;
+    letter-spacing: 0.1em;
+  }
+  .studio-stage.fullscreen-mode .header-right-group {
+    gap: 8px;
+  }
+  .studio-stage.fullscreen-mode .mini-hanko {
+    font-size: 13px;
+    padding: 3px 5px;
+    border-radius: 3px;
+  }
+  .studio-stage.fullscreen-mode .bath-controls-list {
+    gap: 12px;
+    padding-top: 4px;
+  }
+  .studio-stage.fullscreen-mode label.craft-slider {
+    gap: 6px;
+  }
   .studio-stage.fullscreen-mode .craft-slider-header,
-  .studio-stage.fullscreen-mode .water-color-row { font-size: max(11.5px, 0.84cqmax); }
-  .studio-stage.fullscreen-mode .craft-slider-header strong { font-size: max(11px, 0.82cqmax); }
+  .studio-stage.fullscreen-mode .water-color-row {
+    font-size: 13.5px;
+  }
+  .studio-stage.fullscreen-mode .craft-slider-header strong {
+    font-size: 13px;
+  }
   .studio-stage.fullscreen-mode .btn-float-image {
-    height: max(24px, 1.65cqmax);
-    padding: 0 max(8px, 0.55cqmax);
-    font-size: max(10.5px, 0.72cqmax);
+    height: 30px;
+    padding: 0 11px;
+    font-size: 12px;
+    border-radius: 5px;
+    gap: 5px;
   }
   .studio-stage.fullscreen-mode .btn-icon-only {
-    width: max(24px, 1.65cqmax);
+    width: 30px;
+    height: 30px;
     padding: 0;
   }
   .studio-stage.fullscreen-mode .btn-icon-only svg {
-    width: max(13px, 0.92cqmax);
-    height: max(13px, 0.92cqmax);
+    width: 15px;
+    height: 15px;
+  }
+  .studio-stage.fullscreen-mode .colors {
+    max-height: 124px;
+    gap: 12px;
+    padding: 8px 8px 6px 4px;
+    overflow-y: auto;
   }
   .studio-stage.fullscreen-mode .swatch {
-    width: max(26px, 2.05cqmax);
-    height: max(26px, 2.05cqmax);
+    width: 36px;
+    height: 36px;
+    border: 2.5px solid var(--ceramic);
+    box-shadow:
+      0 2px 5px rgba(25, 18, 12, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(60, 45, 30, 0.35);
+  }
+  .studio-stage.fullscreen-mode .swatch[aria-pressed="true"] {
+    box-shadow:
+      0 3px 8px rgba(166, 52, 32, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 2px var(--accent);
+  }
+  .studio-stage.fullscreen-mode .swatch-del {
+    display: flex;
+    top: -6px;
+    right: -6px;
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    line-height: 1;
   }
   .studio-stage.fullscreen-mode .btn-add-color {
-    width: max(26px, 2.0cqmax);
-    height: max(26px, 2.0cqmax);
-    font-size: max(15px, 1.15cqmax);
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    border-radius: 6px;
   }
   .studio-stage.fullscreen-mode .water-swatch-btn {
-    width: max(24px, 1.85cqmax);
-    height: max(24px, 1.85cqmax);
+    width: 30px;
+    height: 30px;
+    border-width: 2.5px;
+  }
+  .studio-stage.fullscreen-mode .mode-toggle {
+    border-radius: 5px;
   }
   .studio-stage.fullscreen-mode .mode-toggle button {
-    font-size: max(9.5px, 0.61cqmax);
-    padding: max(3px, 0.18cqmax) max(6px, 0.42cqmax);
+    font-size: 11.5px;
+    padding: 5px 10px;
   }
-  .studio-stage.fullscreen-mode .cycle-toggle,
+  .studio-stage.fullscreen-mode .cycle-toggle {
+    font-size: 13px;
+    gap: 6px;
+  }
+  .studio-stage.fullscreen-mode .cycle-toggle input {
+    width: 16px;
+    height: 16px;
+  }
+  .studio-stage.fullscreen-mode .pin-controls {
+    gap: 6px;
+    padding-top: 8px;
+  }
+  .studio-stage.fullscreen-mode .pin-row,
+  .studio-stage.fullscreen-mode .pin-row-actions {
+    gap: 7px;
+  }
   .studio-stage.fullscreen-mode .pin-count {
-    font-size: max(10.5px, 0.72cqmax);
+    font-size: 12.5px;
+  }
+  .studio-stage.fullscreen-mode .pin-hint {
+    font-size: 12px;
   }
   .studio-stage.fullscreen-mode .craft-slider input[type="range"] {
-    height: max(7px, 0.55cqmax);
+    height: 8px;
+    margin: 3px 0;
   }
   .studio-stage.fullscreen-mode .craft-slider input[type="range"]::-webkit-slider-thumb {
-    width: max(18px, 1.4cqmax);
-    height: max(18px, 1.4cqmax);
+    width: 22px;
+    height: 22px;
+  }
+  .studio-stage.fullscreen-mode .grid-menu {
+    padding: 6px;
+    gap: 5px;
+    border-radius: 6px;
+    min-width: 128px;
   }
   .studio-stage.fullscreen-mode .grid-menu button {
-    font-size: max(11px, 0.7cqmax);
-    padding: max(5px, 0.3cqmax) max(8px, 0.5cqmax);
+    font-size: 12.5px;
+    padding: 7px 10px;
+    border-radius: 4px;
   }
   .studio-stage.fullscreen-mode .crop-modal-card {
     width: min(88vw, 480px);
@@ -1700,37 +1808,33 @@
     margin: 0 auto;
   }
   .studio-stage.fullscreen-mode .crop-hint {
-    font-size: 12px;
+    font-size: 12.5px;
   }
   .studio-stage.fullscreen-mode .crop-btn {
-    height: 34px;
-    font-size: 12px;
+    height: 36px;
+    font-size: 13px;
     border-radius: 5px;
   }
   .studio-stage.fullscreen-mode .dual-tool-grid {
-    gap: 12px;
-    padding-top: 8px;
+    gap: 14px;
+    padding-top: 10px;
   }
   .studio-stage.fullscreen-mode .tool-col {
-    gap: 7px;
+    gap: 10px;
   }
   .studio-stage.fullscreen-mode .tool-col + .tool-col {
-    padding-left: 11px;
+    padding-left: 14px;
   }
   .studio-stage.fullscreen-mode .tool-col-head {
-    font-size: 10px;
+    font-size: 12px;
   }
   .studio-stage.fullscreen-mode .tool-col-badge {
-    font-size: 9px;
-    padding: 1px 6px;
+    font-size: 10.5px;
+    padding: 2px 7px;
   }
   .studio-stage.fullscreen-mode .unified-footer-note {
-    font-size: 11px;
-    padding-top: 6px;
-  }
-  .studio-stage.fullscreen-mode .colors {
-    max-height: 76px;
-    gap: 8px;
+    font-size: 12px;
+    padding-top: 8px;
   }
   .studio-stage.fullscreen-mode .tool-cursor {
     width: 9.5cqmax;
@@ -1776,19 +1880,19 @@
         <span class="rail-switch-pill" id="rail-brush-pill">ON</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="3.0" aria-valuenow="0.3" title="Slide left/right to adjust Drop Size (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 3.6%"></div>
+      <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Slide left/right to adjust Drop Size (double-tap to reset)">
+        <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 5.56%"></div>
         <div class="rail-scrub-content">
           <span class="rail-scrub-label">Drop</span>
-          <strong class="rail-scrub-val" id="scrub-val-size">0.3x</strong>
+          <strong class="rail-scrub-val" id="scrub-val-size">0.30x</strong>
         </div>
       </div>
 
-      <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Pour Rate" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.4" title="Slide left/right to adjust Pour Rate (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 26.5%"></div>
+      <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Pour Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Slide left/right to adjust Pour Rate (double-tap to reset)">
+        <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 44.83%"></div>
         <div class="rail-scrub-content">
           <span class="rail-scrub-label">Flow</span>
-          <strong class="rail-scrub-val" id="scrub-val-flow">1.4x</strong>
+          <strong class="rail-scrub-val" id="scrub-val-flow">1.40x</strong>
         </div>
       </div>
     </div>
@@ -1805,19 +1909,19 @@
         <span class="rail-switch-pill" id="rail-stick-pill">ON</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Stick Tip Width" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.0" title="Slide left/right to adjust Tip Width (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.1%"></div>
+      <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Stick Tip Width" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Slide left/right to adjust Tip Width (double-tap to reset)">
+        <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.05%"></div>
         <div class="rail-scrub-content">
           <span class="rail-scrub-label">Tip</span>
-          <strong class="rail-scrub-val" id="scrub-val-stick-size">1.0x</strong>
+          <strong class="rail-scrub-val" id="scrub-val-stick-size">1.00x</strong>
         </div>
       </div>
 
-      <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push / Stir Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.0" title="Slide left/right to adjust Push Force (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.4%"></div>
+      <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push / Stir Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Slide left/right to adjust Push Force (double-tap to reset)">
+        <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.37%"></div>
         <div class="rail-scrub-content">
           <span class="rail-scrub-label">Push</span>
-          <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.0x</strong>
+          <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.00x</strong>
         </div>
       </div>
     </div>
@@ -1871,16 +1975,16 @@
           <label class="craft-slider">
             <div class="craft-slider-header">
               <span>Drop Size</span>
-              <strong id="size-read">0.3x</strong>
+              <strong id="size-read">0.30x</strong>
             </div>
-            <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="0.3">
+            <input id="size" type="range" min="0.2" max="2.0" step="any" value="0.3">
           </label>
           <label class="craft-slider" id="pour-slider-wrap">
             <div class="craft-slider-header">
               <span>Pour Rate</span>
-              <strong id="flow-read">1.4x</strong>
+              <strong id="flow-read">1.40x</strong>
             </div>
-            <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.4">
+            <input id="flow" type="range" min="0.1" max="3.0" step="any" value="1.4">
           </label>
         </div>
 
@@ -1892,16 +1996,16 @@
           <label class="craft-slider">
             <div class="craft-slider-header">
               <span>Tip Width</span>
-              <strong id="stick-size-read">1.0x</strong>
+              <strong id="stick-size-read">1.00x</strong>
             </div>
-            <input id="stick-size" type="range" min="0.2" max="4.0" step="0.1" value="1.0">
+            <input id="stick-size" type="range" min="0.2" max="4.0" step="any" value="1.0">
           </label>
           <label class="craft-slider">
             <div class="craft-slider-header">
               <span>Push Force</span>
-              <strong id="stick-drag-read">1.0x</strong>
+              <strong id="stick-drag-read">1.00x</strong>
             </div>
-            <input id="stick-drag" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
+            <input id="stick-drag" type="range" min="0.1" max="5.0" step="any" value="1.0">
           </label>
         </div>
       </div>
@@ -2251,9 +2355,18 @@
 
   function tension() { return 0.35 + (diffValue * 2.15); }
   function viscosity() { return 2.4 - (diffValue * 1.9); }
-  // Reversed viscosity behavior: 0% flows freely (low damping), 100% is thick fluid (high damping)
+  function isFrozenBath() { return glideValue >= 0.995; }
+  // Smoothly tapers fluid motion to 0 as Viscosity approaches 100%, locking stationary at 100%
+  function fluidMobility() {
+    if (glideValue >= 0.995) return 0.0;
+    if (glideValue <= 0.72) return 1.0;
+    const t = (glideValue - 0.72) / (0.995 - 0.72);
+    return 1.0 - t * t * (3.0 - 2.0 * t);
+  }
   function ekmanDamping() {
-    return 0.35 + Math.pow(glideValue, 2.0) * 6.5;
+    const base = 0.35 + Math.pow(glideValue, 2.0) * 6.5;
+    if (glideValue <= 0.72) return base;
+    return base + Math.pow((glideValue - 0.72) / 0.28, 2.0) * 28.0;
   }
 
   // =========================================================
@@ -2416,6 +2529,7 @@ uniform int uIsExport;
 uniform int uIsFullScreen;
 uniform vec2 uOldInkSize;
 uniform vec2 uResizeScale;
+uniform int uStrokeSlot;
 
 // Pin / Slingshot mode: up to MAX_PINS moving tine segments per step.
 // uPinSeg[i] = (prev.xy, cur.xy), uPinVel[i] = physical tine velocity.
@@ -2739,45 +2853,32 @@ void main() {
 
     vec2 origin = gl_FragCoord.xy / uTargetSize;
     vec2 placed = mapBilinear(uForward, origin);
-    float radial = length((placed - uCenter) * uDomain) - uRadius;
+    vec2 pa = (placed - uPrevCenter) * uDomain;
+    vec2 ba = (uCenter - uPrevCenter) * uDomain;
+    float ba2 = dot(ba, ba);
+    float hSeg = ba2 > 1e-10 ? clamp(dot(pa, ba) / ba2, 0.0, 1.0) : 1.0;
+    float radial = length(pa - ba * hSeg) - uRadius;
 
-    // Exact fast-exit: outside the drop where radial >= abs(old.a), all branches preserve old
+    // Exact fast-exit: outside the capsule where radial >= abs(old.a), all branches preserve old
     if (radial >= abs(old.a) && radial > 0.0) {
       fragColor = old;
       return;
     }
 
-    vec2 centerOrigin = bicubic(uMap, uCenter);
-    float centerD = distAt(centerOrigin);
-    vec3 centerColor = pureColorAt(centerOrigin, centerD);
-    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
+    float targetSign = texelFetch(uAuxA, ivec2(uStrokeSlot, 0), 0).r >= 0.0 ? 1.0 : -1.0;
+    bool oldSameSign = ((old.a >= 0.0) == (targetSign >= 0.0));
+    bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && oldSameSign;
 
-    // Always choose a level-set sign that keeps our own ink's sign when pouring onto
-    // same-color ink, and strictly contrasts (-sign) when pouring onto water or another ink
-    // (including when low-viscosity swirling sweeps background fluid under uCenter mid-pour).
-    float targetSign = sameColorAsCenter
-      ? (centerD >= 0.0 ? 1.0 : -1.0)
-      : (centerD >= 0.0 ? -1.0 : 1.0);
-
-    if (uIsNewDrop == 1 && !sameColorAsCenter) {
-      if (radial <= 0.0) {
-        fragColor = vec4(uInkColor, targetSign * (-radial));
-      } else {
-        float sgn = old.a >= 0.0 ? 1.0 : -1.0;
-        fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
-      }
+    if (radial <= 0.0) {
+      float dIn = (uIsNewDrop == 0 && oldSameSign)
+        ? max(abs(old.a), -radial)
+        : (oldMatchesDrop ? max(abs(old.a), -radial) : (-radial));
+      fragColor = vec4(uInkColor, targetSign * dIn);
     } else {
-      bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (targetSign >= 0.0));
-      if (radial <= 0.0) {
-        float dIn = oldMatchesDrop ? max(abs(old.a), -radial) : (-radial);
-        fragColor = vec4(uInkColor, targetSign * dIn);
+      if (oldSameSign) {
+        fragColor = old;
       } else {
-        if (oldMatchesDrop) {
-          fragColor = old;
-        } else {
-          float sgn = old.a >= 0.0 ? 1.0 : -1.0;
-          fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
-        }
+        fragColor = vec4(old.rgb, (-targetSign) * min(abs(old.a), radial));
       }
     }
   }
@@ -2786,7 +2887,11 @@ void main() {
   }
   else if (uPass == 7) {
     vec2 origin = gl_FragCoord.xy / uTargetSize;
-    float d = length((origin - uCenter) * uDomain);
+    vec2 pa = (origin - uPrevCenter) * uDomain;
+    vec2 ba = (uCenter - uPrevCenter) * uDomain;
+    float ba2 = dot(ba, ba);
+    float hSeg = ba2 > 1e-10 ? clamp(dot(pa, ba) / ba2, 0.0, 1.0) : 1.0;
+    float d = length(pa - ba * hSeg);
     vec2 surf = texelFetch(uSurf, ivec2(gl_FragCoord.xy), 0).rg;
     if (d < uRadius) {
       float ker = cos(d / uRadius * 1.57079632679);
@@ -3082,6 +3187,16 @@ void main() {
       fragColor = vec4(col, d);
     }
   }
+  else if (uPass == 24) {
+    vec2 centerOrigin = bicubic(uMap, uCenter);
+    float centerD = distAt(centerOrigin);
+    vec3 centerColor = pureColorAt(centerOrigin, centerD);
+    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
+    float sgn = sameColorAsCenter
+      ? (centerD >= 0.0 ? 1.0 : -1.0)
+      : (centerD >= 0.0 ? -1.0 : 1.0);
+    fragColor = vec4(sgn, 0.0, 0.0, 1.0);
+  }
 }`;
 
   function compile(type, source) {
@@ -3354,6 +3469,7 @@ void main() {
   const uDomainLoc = gl.getUniformLocation(program, "uDomain");
   const uOldInkSizeLoc = gl.getUniformLocation(program, "uOldInkSize");
   const uResizeScaleLoc = gl.getUniformLocation(program, "uResizeScale");
+  const uStrokeSlotLoc = gl.getUniformLocation(program, "uStrokeSlot");
 
   const uPinCountLoc = gl.getUniformLocation(program, "uPinCount");
   const uPinSegLoc = gl.getUniformLocation(program, "uPinSeg");
@@ -3406,7 +3522,7 @@ void main() {
   const PASS_MG_RESTRICT = 12, PASS_MG_PROLONG = 13, PASS_WARM_START = 14;
   const PASS_VORTICITY = 15, PASS_ADVECT_INERTIAL = 16, PASS_NS_DIV = 17;
   const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
-  const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23;
+  const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23, PASS_LATCH_SIGN = 24;
 
   const boundTex = new Array(11).fill(null);
 
@@ -3498,6 +3614,7 @@ void main() {
   allocateMultigrid();
 
   const energyTarget = makeTarget(ENERGY_RES, ENERGY_RES, gl.R32F, gl.RED, gl.FLOAT);
+  const strokeSignTarget = makeTarget(32, 1, gl.R16F, gl.RED, gl.HALF_FLOAT);
   const energyPbo = gl.createBuffer();
   gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
   gl.bufferData(gl.PIXEL_PACK_BUFFER, ENERGY_RES * ENERGY_RES * 4, gl.STREAM_READ);
@@ -3940,23 +4057,63 @@ void main() {
     hasAdvectedSinceBake = false;
   }
 
-  function gpuStamp(isNewDrop) {
-    if (isNewDrop && hasAdvectedSinceBake) {
-      gpuBake();
+  function latchStrokeSign(slot, x, y, col) {
+    gl.uniform3f(
+      uInkColor,
+      (col & 255) / 255,
+      ((col >> 8) & 255) / 255,
+      ((col >> 16) & 255) / 255
+    );
+    gl.uniform2f(uCenter, x, y);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, strokeSignTarget.fbo);
+    gl.viewport(slot, 0, 1, 1);
+    cachedTargetW = -1;
+    cachedTargetH = -1;
+    if (cachedPass !== PASS_LATCH_SIGN) {
+      gl.uniform1i(uPass, PASS_LATCH_SIGN);
+      cachedPass = PASS_LATCH_SIGN;
     }
+    bindInputs(strokeSignTarget.tex, null, null);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  function stampCapsule(slot, x0, y0, x1, y1, radius, col, isNewDrop) {
+    if (isNewDrop) {
+      latchStrokeSign(slot, x0, y0, col);
+    }
+    gl.uniform1i(uStrokeSlotLoc, slot);
     gl.uniform1i(uIsNewDropLoc, isNewDrop ? 1 : 0);
     gl.uniform3f(
       uInkColor,
-      (ink & 255) / 255,
-      ((ink >> 8) & 255) / 255,
-      ((ink >> 16) & 255) / 255
+      (col & 255) / 255,
+      ((col >> 8) & 255) / 255,
+      ((col >> 16) & 255) / 255
     );
-    gl.uniform2f(uCenter, input.x, input.y);
-    gl.uniform1f(uRadius, INK_RADIUS * dropSizeMult);
-    drawTo(inkTex[1 - inkI], PASS_STAMP);
+    gl.uniform2f(uPrevCenter, x0, y0);
+    gl.uniform2f(uCenter, x1, y1);
+    gl.uniform1f(uRadius, radius);
+    drawTo(inkTex[1 - inkI], PASS_STAMP, strokeSignTarget.tex);
     inkI = 1 - inkI;
-    input.stampX = input.x;
-    input.stampY = input.y;
+  }
+
+  function splatCapsule(x0, y0, x1, y1, radius, mass) {
+    if (mass <= 1e-6) return;
+    gl.uniform1f(uMassLoc, mass);
+    gl.uniform2f(uPrevCenter, x0, y0);
+    gl.uniform2f(uCenter, x1, y1);
+    gl.uniform1f(uRadius, radius);
+    drawTo(surfTex[1 - surfI], PASS_SPLAT);
+    surfI = 1 - surfI;
+  }
+
+  let hoverPourTime = 0;
+  function gpuStamp(isNewDrop, x0 = input.xPrev, y0 = input.yPrev, x1 = input.x, y1 = input.y) {
+    if (isNewDrop && hasAdvectedSinceBake) {
+      gpuBake();
+    }
+    stampCapsule(0, x0, y0, x1, y1, INK_RADIUS * dropSizeMult, ink, isNewDrop);
+    input.stampX = x1;
+    input.stampY = y1;
   }
 
   function seedInitialBath() {
@@ -3982,6 +4139,8 @@ void main() {
       ink = hexToPack(dynamicPalette[idx % dynamicPalette.length][1]);
       input.x = x;
       input.y = y;
+      input.xPrev = x;
+      input.yPrev = y;
       dropSizeMult = sz;
       input.tap = true;
       for (let i = 0; i < 8; i++) {
@@ -4257,34 +4416,24 @@ void main() {
     }
 
     const radius = INK_RADIUS * dropSizeMult;
-    const mass = (2.8 + 1.2 * flowRateMult);
-    gl.uniform1f(uMassLoc, mass);
-    gl.uniform1f(uRadius, radius);
+    const mobility = fluidMobility();
+    const mass = (2.2 + 1.0 * flowRateMult) * mobility;
 
-    // 1. Splat surface tension mass for all ink pins simultaneously
-    for (const pin of inkPins) {
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(surfTex[1 - surfI], PASS_SPLAT);
-      surfI = 1 - surfI;
+    // 1. Splat surface tension mass for all ink pins simultaneously (unless bath is frozen at 100% viscosity)
+    if (mass > 1e-6) {
+      for (const pin of inkPins) {
+        splatCapsule(pin.x, pin.y, pin.x, pin.y, radius, mass);
+      }
     }
 
-    // 2. Stamp ink droplets into inkTex simultaneously
-    gl.uniform1i(uIsNewDropLoc, 1);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
+    // 2. Stamp ink droplets into inkTex simultaneously with latched stroke signs
+    for (let idx = 0; idx < inkPins.length; idx++) {
+      const pin = inkPins[idx];
       const col = pin.color !== undefined ? pin.color : ink;
-      gl.uniform3f(
-        uInkColor,
-        (col & 255) / 255,
-        ((col >> 8) & 255) / 255,
-        ((col >> 16) & 255) / 255
-      );
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(inkTex[1 - inkI], PASS_STAMP);
-      inkI = 1 - inkI;
+      stampCapsule(idx, pin.x, pin.y, pin.x, pin.y, radius, col, true);
     }
 
-    isSpreading = true;
+    isSpreading = !isFrozenBath();
 
     // 3. Launch slingshot ink pins, or retire stationary pins if keep is off
     for (const pin of inkPins) {
@@ -4373,33 +4522,23 @@ void main() {
     }
     stepsSincePourBake = 0;
 
-    // Initial surface contact pour
+    // Initial surface contact pour (balanced mass so touch-down blends seamlessly into continuous drag)
     const radius = INK_RADIUS * dropSizeMult;
-    const addedMass = (2.8 + 1.2 * flowRateMult);
-    gl.uniform1f(uMassLoc, addedMass);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(surfTex[1 - surfI], PASS_SPLAT);
-      surfI = 1 - surfI;
+    const mobility = fluidMobility();
+    const addedMass = (0.85 + 0.45 * flowRateMult) * mobility;
+    if (addedMass > 1e-6) {
+      for (const pin of inkPins) {
+        splatCapsule(pin.x, pin.y, pin.x, pin.y, radius, addedMass);
+      }
     }
 
-    gl.uniform1i(uIsNewDropLoc, 1);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
+    for (let idx = 0; idx < inkPins.length; idx++) {
+      const pin = inkPins[idx];
       const col = pin.color !== undefined ? pin.color : ink;
-      gl.uniform3f(
-        uInkColor,
-        (col & 255) / 255,
-        ((col >> 8) & 255) / 255,
-        ((col >> 16) & 255) / 255
-      );
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(inkTex[1 - inkI], PASS_STAMP);
-      inkI = 1 - inkI;
+      stampCapsule(idx, pin.x, pin.y, pin.x, pin.y, radius, col, true);
     }
 
-    isSpreading = true;
+    isSpreading = !isFrozenBath();
     pouredDrop = true;
     drawTo(null, PASS_DISPLAY);
   }
@@ -4464,11 +4603,13 @@ void main() {
 
   function pushPinSeg(ax, ay, bx, by, vx, vy) {
     if (pinSegCount >= MAX_PINS) return;
+    const mobility = fluidMobility();
+    if (mobility <= 1e-6) return;
     const i = pinSegCount++;
     pinSegBuf[i * 4] = ax; pinSegBuf[i * 4 + 1] = ay;
     pinSegBuf[i * 4 + 2] = bx; pinSegBuf[i * 4 + 3] = by;
-    pinVelBuf[i * 2] = vx * domainX * stylusDragMult;
-    pinVelBuf[i * 2 + 1] = vy * domainY * stylusDragMult;
+    pinVelBuf[i * 2] = vx * domainX * stylusDragMult * mobility;
+    pinVelBuf[i * 2 + 1] = vy * domainY * stylusDragMult * mobility;
   }
 
   // Advances pin positions for one sim step and fills the moving-segment uniforms.
@@ -4748,105 +4889,103 @@ void main() {
   }
 
   function step(dt, frameDelta) {
+    const frozen = isFrozenBath();
+    const mobility = fluidMobility();
     const pointerWorking = input.down || input.tap;
-    const pinMotion = advancePins(dt, frameDelta);
+    const pinMotion = frozen ? false : advancePins(dt, frameDelta);
     const isActivelyWorking = pointerWorking || pinMotion;
+    let stampedStatic = false;
 
     if (isActivelyWorking) {
-      if (!isSpreading) {
+      if (!frozen && !isSpreading) {
         isSpreading = true;
       }
       if (input.down && isLatteMode()) {
         const inkPins = pins.filter(p => p.kind === "ink");
         if (inkPins.length > 0) {
-          stepsSincePourBake++;
-          if (stepsSincePourBake >= 40 && hasAdvectedSinceBake) {
-            gpuBake();
-            stepsSincePourBake = 0;
+          if (!frozen) {
+            stepsSincePourBake++;
+            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
+              gpuBake();
+              stepsSincePourBake = 0;
+            }
           }
 
           const dx = input.x - input.xPrev;
           const dy = input.y - input.yPrev;
           const invDt = 1 / Math.max(frameDelta, 0.004);
           const radius = INK_RADIUS * dropSizeMult;
-          const addedMass = (4.4 * dt) * flowRateMult;
+          const addedMass = (4.4 * dt) * flowRateMult * mobility;
 
-          gl.uniform1f(uMassLoc, addedMass);
-          gl.uniform1f(uRadius, radius);
-
-          for (const pin of inkPins) {
+          for (let idx = 0; idx < inkPins.length; idx++) {
+            const pin = inkPins[idx];
             const ox = pin.x, oy = pin.y;
             pin.x = clampUv(pin.x + dx);
             pin.y = clampUv(pin.y + dy);
 
-            // Forward viscous push and dipole wake in the bath
-            if (dx * dx + dy * dy > 1e-12) {
-              pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * invDt, (pin.y - oy) * invDt);
+            if (!frozen) {
+              if (dx * dx + dy * dy > 1e-12) {
+                pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * invDt, (pin.y - oy) * invDt);
+              }
+              splatCapsule(ox, oy, pin.x, pin.y, radius, addedMass);
             }
 
-            // Continuous surfactant mass splat
-            gl.uniform2f(uCenter, pin.x, pin.y);
-            drawTo(surfTex[1 - surfI], PASS_SPLAT);
-            surfI = 1 - surfI;
-
-            // Continuous stamp: if moved beyond threshold or hovered for ~0.075s
-            if (pin.lastStampX === undefined) {
-              pin.lastStampX = pin.x;
-              pin.lastStampY = pin.y;
-              pin.hoverTime = 0;
-            }
-            const movedDist = Math.hypot((pin.x - pin.lastStampX) * domainX, (pin.y - pin.lastStampY) * domainY);
+            // Stamp a continuous capsule along every moved segment so strokes never bead into separate circles
+            const segDist = Math.hypot((pin.x - ox) * domainX, (pin.y - oy) * domainY);
             pin.hoverTime = (pin.hoverTime || 0) + dt;
-
-            if (movedDist > radius * 0.28 || pin.hoverTime > 0.075) {
-              gl.uniform1i(uIsNewDropLoc, 0);
-              gl.uniform1f(uRadius, radius);
+            if (segDist > 1e-5 || (!frozen && pin.hoverTime > 0.06)) {
               const col = pin.color !== undefined ? pin.color : ink;
-              gl.uniform3f(
-                uInkColor,
-                (col & 255) / 255,
-                ((col >> 8) & 255) / 255,
-                ((col >> 16) & 255) / 255
-              );
-              gl.uniform2f(uCenter, pin.x, pin.y);
-              drawTo(inkTex[1 - inkI], PASS_STAMP);
-              inkI = 1 - inkI;
-
+              stampCapsule(idx, ox, oy, pin.x, pin.y, radius, col, false);
               pin.lastStampX = pin.x;
               pin.lastStampY = pin.y;
               pin.hoverTime = 0;
+              stampedStatic = true;
             }
           }
         }
       } else if (pointerWorking && brushOn && !stickOn) {
         if (!input.tap) {
-          stepsSincePourBake++;
-          if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
-            gpuBake();
-            stepsSincePourBake = 0;
+          if (!frozen) {
+            stepsSincePourBake++;
+            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
+              gpuBake();
+              stepsSincePourBake = 0;
+            }
           }
         } else {
           stepsSincePourBake = 0;
+          hoverPourTime = 0;
         }
 
         const radius = INK_RADIUS * dropSizeMult;
-        const addedMass = (4.4 * dt + (input.tap ? 1.35 : 0)) * flowRateMult;
-        gl.uniform1f(uMassLoc, addedMass);
-        gl.uniform2f(uCenter, input.x, input.y);
-        gl.uniform1f(uRadius, radius);
-        drawTo(surfTex[1 - surfI], PASS_SPLAT);
-        surfI = 1 - surfI;
+        const addedMass = (4.4 * dt + (input.tap ? 0.95 : 0)) * flowRateMult * mobility;
+        if (!frozen) {
+          splatCapsule(input.xPrev, input.yPrev, input.x, input.y, radius, addedMass);
+        }
 
         if (input.tap) {
-          gpuStamp(true);
+          gpuStamp(true, input.xPrev, input.yPrev, input.x, input.y);
+          stampedStatic = true;
         } else {
-          const movedDist = Math.hypot((input.x - input.stampX) * domainX, (input.y - input.stampY) * domainY);
-          if (movedDist > radius * 0.30) {
-            gpuStamp(false);
+          const segDist = Math.hypot((input.x - input.xPrev) * domainX, (input.y - input.yPrev) * domainY);
+          hoverPourTime += dt;
+          if (segDist > 1e-5 || (!frozen && hoverPourTime > 0.06)) {
+            gpuStamp(false, input.xPrev, input.yPrev, input.x, input.y);
+            hoverPourTime = 0;
+            stampedStatic = true;
           }
         }
       }
       input.tap = false;
+    }
+
+    // At 100% Viscosity, keep the bath 100% stationary like a traditional drawing canvas
+    if (frozen) {
+      isSpreading = false;
+      if (input.down && isLatteMode()) {
+        ringDirty = true;
+      }
+      return stampedStatic;
     }
 
     if (!isSpreading) return false;
@@ -4854,7 +4993,7 @@ void main() {
     const T = tension();
     const V = viscosity();
     gl.uniform1f(uSeqLoc, 0.042 / T);
-    gl.uniform1f(uRateLoc, 10.5 * T / V);
+    gl.uniform1f(uRateLoc, (10.5 * T / V) * mobility);
 
     drawTo(mgRhs[0], PASS_SURF_RHS);
     gl.uniform1f(uScaleLoc, 0.85);
@@ -4872,10 +5011,10 @@ void main() {
     gl.uniform1f(uFrameDtLoc, frameDelta);
     gl.uniform1f(uDampingLoc, ekmanDamping());
     gl.uniform1f(uViscDiffLoc, 0.15 + 0.35 * (1.0 - diffValue));
-    gl.uniform1f(uVortConfLoc, vortValue * 8.5);
+    gl.uniform1f(uVortConfLoc, vortValue * 8.5 * mobility);
 
     gl.uniform1i(uTool, (pointerWorking && !brushOn && stickOn && !pinsModeActive()) ? 1 : 0);
-    gl.uniform1f(uToolDragLoc, stylusDragMult);
+    gl.uniform1f(uToolDragLoc, stylusDragMult * mobility);
     gl.uniform2f(uCenter, input.x, input.y);
     gl.uniform2f(uPrevCenter, input.xPrev, input.yPrev);
     gl.uniform2f(uRakeDir, input.dirX, input.dirY);
@@ -5899,6 +6038,15 @@ void main() {
   document.getElementById("glide").addEventListener("input", (e) => {
     glideValue = parseFloat(e.target.value);
     document.getElementById("glide-read").textContent = Math.round(glideValue * 100) + "%";
+    if (isFrozenBath()) {
+      isSpreading = false;
+      gl.useProgram(program);
+      drawTo(velTex, PASS_ZERO);
+      drawTo(inertVelTex[0], PASS_ZERO);
+      drawTo(inertVelTex[1], PASS_ZERO);
+      drawTo(surfTex[0], PASS_ZERO);
+      drawTo(surfTex[1], PASS_ZERO);
+    }
   });
 
   document.getElementById("vorticity").addEventListener("input", (e) => {
@@ -5911,13 +6059,13 @@ void main() {
   // =========================================================
   const SCRUB_CONFIG = {
     "size": {
-      min: 0.2, max: 3.0, def: 0.3,
+      min: 0.2, max: 2.0, def: 0.3,
       inputId: "size", readId: "size-read",
       get: () => dropSizeMult,
       set: (v) => { dropSizeMult = v; if (input.inside || isLatteMode()) drawRing(); }
     },
     "flow": {
-      min: 0.1, max: 5.0, def: 1.4,
+      min: 0.1, max: 3.0, def: 1.4,
       inputId: "flow", readId: "flow-read",
       get: () => flowRateMult,
       set: (v) => { flowRateMult = v; }
@@ -5941,16 +6089,17 @@ void main() {
     if (!cfg) return;
     const val = cfg.get();
     const pct = Math.max(0, Math.min(100, ((val - cfg.min) / (cfg.max - cfg.min)) * 100));
+    const disp = val.toFixed(2) + "x";
     const fillEl = document.getElementById(`scrub-fill-${key}`);
     const valEl = document.getElementById(`scrub-val-${key}`);
     const scrubEl = document.querySelector(`.rail-scrub[data-scrub="${key}"]`);
     const inputEl = document.getElementById(cfg.inputId);
     const readEl = document.getElementById(cfg.readId);
-    if (fillEl) fillEl.style.width = pct.toFixed(1) + "%";
-    if (valEl) valEl.textContent = val.toFixed(1) + "x";
-    if (scrubEl) scrubEl.setAttribute("aria-valuenow", val.toFixed(1));
-    if (inputEl && parseFloat(inputEl.value) !== val) inputEl.value = val.toFixed(1);
-    if (readEl) readEl.textContent = val.toFixed(1) + "x";
+    if (fillEl) fillEl.style.width = pct.toFixed(2) + "%";
+    if (valEl) valEl.textContent = disp;
+    if (scrubEl) scrubEl.setAttribute("aria-valuenow", val.toFixed(2));
+    if (inputEl && Math.abs(parseFloat(inputEl.value) - val) > 1e-5) inputEl.value = String(val);
+    if (readEl) readEl.textContent = disp;
   }
 
   function syncAllScrubbersUI() {
@@ -5961,8 +6110,7 @@ void main() {
     const cfg = SCRUB_CONFIG[key];
     if (!cfg || Number.isNaN(rawVal)) return;
     const clamped = Math.max(cfg.min, Math.min(cfg.max, rawVal));
-    const stepped = Math.round(clamped * 10) / 10;
-    cfg.set(stepped);
+    cfg.set(clamped);
     syncScrubberUI(key);
   }
 
@@ -6003,9 +6151,9 @@ void main() {
     scrubEl.addEventListener("pointermove", (e) => {
       if (e.pointerId !== activePointer) return;
       const dx = e.clientX - startX;
-      if (Math.abs(dx) > 3) moved = true;
-      // 118px horizontal drag covers full parameter range smoothly without jumping on initial touch
-      const nextVal = startVal + (dx / 118) * (cfg.max - cfg.min);
+      if (Math.abs(dx) > 2) moved = true;
+      // 132px horizontal drag covers full parameter range continuously without jumping on touch
+      const nextVal = startVal + (dx / 132) * (cfg.max - cfg.min);
       applyParamValue(key, nextVal);
     });
 
@@ -6033,10 +6181,10 @@ void main() {
 
     scrubEl.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-        applyParamValue(key, cfg.get() + 0.1);
+        applyParamValue(key, cfg.get() + 0.05);
         e.preventDefault();
       } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-        applyParamValue(key, cfg.get() - 0.1);
+        applyParamValue(key, cfg.get() - 0.05);
         e.preventDefault();
       }
     });
