@@ -728,13 +728,13 @@
     font-weight: 700;
     letter-spacing: 0.11em;
     text-transform: uppercase;
-    background: linear-gradient(180deg, #cfc5b5, #b0a492);
+    background: linear-gradient(180deg, #bdb3a3, #9f9381);
     color: #46392d;
-    border: 1px solid rgba(40, 30, 20, 0.55);
+    border: 1px solid #5a4b3c;
     box-shadow:
       inset 0 1px 2px rgba(0, 0, 0, 0.25),
       0 1px 2px rgba(0, 0, 0, 0.4);
-    opacity: 0.78;
+    opacity: 1;
     transition: all 0.18s ease;
   }
 
@@ -1254,11 +1254,14 @@
 
   /* Minimalistic Square Icon Buttons for Drop & Push (No LED, No ON Label) */
   .rail-square-btn {
+    -webkit-appearance: none;
+    appearance: none;
     width: 54px;
     height: 54px;
     padding: 0;
     border-radius: 10px;
     border: 1px solid rgba(58, 44, 30, 0.38);
+    background-color: #cfc4b0;
     background: rgba(62, 48, 34, 0.08);
     box-shadow:
       inset 0 1px 3px rgba(0, 0, 0, 0.22),
@@ -1299,12 +1302,14 @@
   }
 
   .rail-square-btn.active {
-    background: linear-gradient(180deg, #5e2418, #3d160e);
-    border-color: #9e402b;
+    background-color: #8c2d19;
+    background: linear-gradient(180deg, #98321d, #631d0f);
+    border-color: #b84830;
     color: #f6ede0;
     box-shadow:
       0 3px 9px rgba(0, 0, 0, 0.46),
-      inset 0 1px 0 rgba(255, 200, 175, 0.3);
+      0 0 8px rgba(184, 66, 42, 0.35),
+      inset 0 1px 0 rgba(255, 200, 175, 0.35);
   }
 
   /* Smoothly Collapse & Hide Sliders When Drop or Push is OFF */
@@ -2286,10 +2291,10 @@
   const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent || "") ||
     (/Macintosh/i.test(navigator.userAgent || "") && navigator.maxTouchPoints > 1);
 
-  const BASE_SIM = 512;
+  const BASE_SIM = isIOSDevice ? 384 : 512;
   const MG_LEVELS = 6;
   const BASE_INK = 2048;
-  const BASE_MAP = 1024;
+  const BASE_MAP = BASE_SIM * 2;
   const ENERGY_RES = 8;
   const DT = 1 / 60;
   const RENDER_BATH_SIZE = 800;
@@ -2350,9 +2355,23 @@
 
   let ink = hexToPack(dynamicPalette[0][1]);
   let stepCount = 0;
+  let idleSimSteps = 0;
+  let surfRemainingTime = 0;
   let isSpreading = false;
   let pouredDrop = false;
   let hasAdvectedSinceBake = false;
+  let fwdValid = true;
+  let rafId = 0;
+  let loopReady = false;
+  let last = 0;
+  let acc = 0;
+
+  function wakeLoop() {
+    if (!loopReady || rafId) return;
+    last = performance.now() - DT * 1000;
+    acc = 0;
+    rafId = requestAnimationFrame(frame);
+  }
 
   const INK_RADIUS = 0.034 * 0.72;
   const STICK_BASE_RADIUS = 0.015;
@@ -2578,6 +2597,7 @@ uniform int uIsFullScreen;
 uniform vec2 uOldInkSize;
 uniform vec2 uResizeScale;
 uniform int uStrokeSlot;
+uniform int uHasImage;
 
 // Pin / Slingshot mode: up to MAX_PINS moving tine segments per step.
 // uPinSeg[i] = (prev.xy, cur.xy), uPinVel[i] = physical tine velocity.
@@ -2589,32 +2609,32 @@ uniform vec2 uPinVel[MAX_PINS];
 in vec2 vUv;
 out vec4 fragColor;
 
-float catmull(int k, float t) {
-  if (k == 0) return t * (-0.5 + t * (1.0 - 0.5 * t));
-  if (k == 1) return 1.0 + t * t * (-2.5 + 1.5 * t);
-  if (k == 2) return t * (0.5 + t * (2.0 - 1.5 * t));
-  return t * t * (-0.5 + 0.5 * t);
-}
-
-vec2 mapFetch(sampler2D tex, int x, int y) {
-  ivec2 last = ivec2(uMapSize) - ivec2(1);
-  return texelFetch(tex, clamp(ivec2(x, y), ivec2(0), last), 0).rg;
+vec4 catmullWeights(float t) {
+  float t2 = t * t;
+  float t3 = t2 * t;
+  return vec4(
+    -0.5 * t + t2 - 0.5 * t3,
+    1.0 - 2.5 * t2 + 1.5 * t3,
+    0.5 * t + 2.0 * t2 - 1.5 * t3,
+    -0.5 * t2 + 0.5 * t3
+  );
 }
 
 vec2 bicubic(sampler2D tex, vec2 uv) {
   vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  vec2 sum = vec2(0.0);
-  for (int j = 0; j < 4; j++) {
-    float wy = catmull(j, f.y);
-    vec2 row = vec2(0.0);
-    for (int k = 0; k < 4; k++) {
-      row += mapFetch(tex, i.x - 1 + k, i.y - 1 + j) * catmull(k, f.x);
-    }
-    sum += row * wy;
-  }
-  return clamp(sum, vec2(0.0), vec2(1.0));
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  int x0 = clamp(i.x - 1, 0, last.x), x1 = clamp(i.x, 0, last.x), x2 = clamp(i.x + 1, 0, last.x), x3 = clamp(i.x + 2, 0, last.x);
+  int y0 = clamp(i.y - 1, 0, last.y), y1 = clamp(i.y, 0, last.y), y2 = clamp(i.y + 1, 0, last.y), y3 = clamp(i.y + 2, 0, last.y);
+  vec4 wx = catmullWeights(f.x);
+  vec4 wy = catmullWeights(f.y);
+
+  vec2 r0 = texelFetch(tex, ivec2(x0, y0), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y0), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y0), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y0), 0).rg * wx.w;
+  vec2 r1 = texelFetch(tex, ivec2(x0, y1), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y1), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y1), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y1), 0).rg * wx.w;
+  vec2 r2 = texelFetch(tex, ivec2(x0, y2), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y2), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y2), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y2), 0).rg * wx.w;
+  vec2 r3 = texelFetch(tex, ivec2(x0, y3), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y3), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y3), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y3), 0).rg * wx.w;
+  return clamp(r0 * wy.x + r1 * wy.y + r2 * wy.z + r3 * wy.w, vec2(0.0), vec2(1.0));
 }
 
 // Monotonicity-clamped Catmull-Rom prevents numerical diffusion of curved flow-map
@@ -2623,23 +2643,24 @@ vec2 mapBicubicClamped(sampler2D tex, vec2 uv) {
   vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  vec2 sum = vec2(0.0);
-  vec2 lo = vec2(1e9);
-  vec2 hi = vec2(-1e9);
-  for (int j = 0; j < 4; j++) {
-    float wy = catmull(j, f.y);
-    vec2 row = vec2(0.0);
-    for (int k = 0; k < 4; k++) {
-      vec2 s = mapFetch(tex, i.x - 1 + k, i.y - 1 + j);
-      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
-        lo = min(lo, s);
-        hi = max(hi, s);
-      }
-      row += s * catmull(k, f.x);
-    }
-    sum += row * wy;
-  }
-  return clamp(sum, lo, hi);
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  int x0 = clamp(i.x - 1, 0, last.x), x1 = clamp(i.x, 0, last.x), x2 = clamp(i.x + 1, 0, last.x), x3 = clamp(i.x + 2, 0, last.x);
+  int y0 = clamp(i.y - 1, 0, last.y), y1 = clamp(i.y, 0, last.y), y2 = clamp(i.y + 1, 0, last.y), y3 = clamp(i.y + 2, 0, last.y);
+  vec4 wx = catmullWeights(f.x);
+  vec4 wy = catmullWeights(f.y);
+
+  vec2 s11 = texelFetch(tex, ivec2(x1, y1), 0).rg;
+  vec2 s21 = texelFetch(tex, ivec2(x2, y1), 0).rg;
+  vec2 s12 = texelFetch(tex, ivec2(x1, y2), 0).rg;
+  vec2 s22 = texelFetch(tex, ivec2(x2, y2), 0).rg;
+  vec2 lo = min(min(s11, s21), min(s12, s22));
+  vec2 hi = max(max(s11, s21), max(s12, s22));
+
+  vec2 r0 = texelFetch(tex, ivec2(x0, y0), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y0), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y0), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y0), 0).rg * wx.w;
+  vec2 r1 = texelFetch(tex, ivec2(x0, y1), 0).rg * wx.x + s11 * wx.y + s21 * wx.z + texelFetch(tex, ivec2(x3, y1), 0).rg * wx.w;
+  vec2 r2 = texelFetch(tex, ivec2(x0, y2), 0).rg * wx.x + s12 * wx.y + s22 * wx.z + texelFetch(tex, ivec2(x3, y2), 0).rg * wx.w;
+  vec2 r3 = texelFetch(tex, ivec2(x0, y3), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y3), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y3), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y3), 0).rg * wx.w;
+  return clamp(r0 * wy.x + r1 * wy.y + r2 * wy.z + r3 * wy.w, lo, hi);
 }
 
 vec2 mapBilinear(sampler2D tex, vec2 uv) {
@@ -2675,33 +2696,32 @@ float distBicubicClampedSize(sampler2D tex, vec2 origin, vec2 texSize) {
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
   ivec2 last = ivec2(texSize) - ivec2(1);
-  float sum = 0.0;
-  float minD = 1e9;
-  float maxD = -1e9;
-  for (int j = 0; j < 4; j++) {
-    float wy = catmull(j, f.y);
-    float row = 0.0;
-    for (int k = 0; k < 4; k++) {
-      ivec2 c = clamp(i + ivec2(k - 1, j - 1), ivec2(0), last);
-      float s = texelFetch(tex, c, 0).a;
-      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
-        minD = min(minD, s);
-        maxD = max(maxD, s);
-      }
-      row += s * catmull(k, f.x);
-    }
-    sum += row * wy;
-  }
-  return clamp(sum, minD, maxD);
+  int x0 = clamp(i.x - 1, 0, last.x), x1 = clamp(i.x, 0, last.x), x2 = clamp(i.x + 1, 0, last.x), x3 = clamp(i.x + 2, 0, last.x);
+  int y0 = clamp(i.y - 1, 0, last.y), y1 = clamp(i.y, 0, last.y), y2 = clamp(i.y + 1, 0, last.y), y3 = clamp(i.y + 2, 0, last.y);
+  vec4 wx = catmullWeights(f.x);
+  vec4 wy = catmullWeights(f.y);
+
+  float d11 = texelFetch(tex, ivec2(x1, y1), 0).a;
+  float d21 = texelFetch(tex, ivec2(x2, y1), 0).a;
+  float d12 = texelFetch(tex, ivec2(x1, y2), 0).a;
+  float d22 = texelFetch(tex, ivec2(x2, y2), 0).a;
+  float minD = min(min(d11, d21), min(d12, d22));
+  float maxD = max(max(d11, d21), max(d12, d22));
+
+  float r0 = texelFetch(tex, ivec2(x0, y0), 0).a * wx.x + texelFetch(tex, ivec2(x1, y0), 0).a * wx.y + texelFetch(tex, ivec2(x2, y0), 0).a * wx.z + texelFetch(tex, ivec2(x3, y0), 0).a * wx.w;
+  float r1 = texelFetch(tex, ivec2(x0, y1), 0).a * wx.x + d11 * wx.y + d21 * wx.z + texelFetch(tex, ivec2(x3, y1), 0).a * wx.w;
+  float r2 = texelFetch(tex, ivec2(x0, y2), 0).a * wx.x + d12 * wx.y + d22 * wx.z + texelFetch(tex, ivec2(x3, y2), 0).a * wx.w;
+  float r3 = texelFetch(tex, ivec2(x0, y3), 0).a * wx.x + texelFetch(tex, ivec2(x1, y3), 0).a * wx.y + texelFetch(tex, ivec2(x2, y3), 0).a * wx.z + texelFetch(tex, ivec2(x3, y3), 0).a * wx.w;
+  return clamp(r0 * wy.x + r1 * wy.y + r2 * wy.z + r3 * wy.w, minD, maxD);
 }
 
 float distBicubicClamped(vec2 origin) {
   return distBicubicClampedSize(uInk, origin, uInkSize);
 }
 
-// Sign-masked bilinear sampling keeps level-set ink boundaries razor-sharp
-// while smoothly interpolating continuous-tone uploaded images.
-vec3 pureColorAtSize(sampler2D tex, vec2 origin, float targetSign, vec2 texSize) {
+// Pure discrete ink selector keeps Suminagashi colors 100% unmixed across unlimited bakes
+// (never averaging Black + White into Grey), while preserving smooth tones for uploaded photos.
+vec3 sampleInkColor(sampler2D tex, vec2 origin, float targetSign, vec2 texSize, bool allowSubpixelEdgeAA) {
   vec2 p = clamp(origin, vec2(0.0), vec2(1.0)) * texSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
@@ -2711,28 +2731,81 @@ vec3 pureColorAtSize(sampler2D tex, vec2 origin, float targetSign, vec2 texSize)
   vec4 s01 = texelFetch(tex, clamp(i + ivec2(0, 1), ivec2(0), last), 0);
   vec4 s11 = texelFetch(tex, clamp(i + ivec2(1, 1), ivec2(0), last), 0);
 
-  float w00 = (1.0 - f.x) * (1.0 - f.y);
-  float w10 = f.x * (1.0 - f.y);
-  float w01 = (1.0 - f.x) * f.y;
-  float w11 = f.x * f.y;
-
   bool wantPos = (targetSign >= 0.0);
-  vec3 colorSum = vec3(0.0);
-  float weightSum = 0.0;
+  float m00 = ((s00.a >= 0.0) == wantPos) ? (1.0 - f.x) * (1.0 - f.y) : 0.0;
+  float m10 = ((s10.a >= 0.0) == wantPos) ? f.x * (1.0 - f.y) : 0.0;
+  float m01 = ((s01.a >= 0.0) == wantPos) ? (1.0 - f.x) * f.y : 0.0;
+  float m11 = ((s11.a >= 0.0) == wantPos) ? f.x * f.y : 0.0;
+  float weightSum = m00 + m10 + m01 + m11;
 
-  if ((s00.a >= 0.0) == wantPos) { colorSum += s00.rgb * w00; weightSum += w00; }
-  if ((s10.a >= 0.0) == wantPos) { colorSum += s10.rgb * w10; weightSum += w10; }
-  if ((s01.a >= 0.0) == wantPos) { colorSum += s01.rgb * w01; weightSum += w01; }
-  if ((s11.a >= 0.0) == wantPos) { colorSum += s11.rgb * w11; weightSum += w11; }
-
-  if (weightSum > 1e-5) {
-    return colorSum / weightSum;
+  if (weightSum <= 1e-5) {
+    // Pick the single texel closest to targetSign — never average opposite colors into grey
+    vec4 best = s00;
+    float bestScore = wantPos ? s00.a : -s00.a;
+    float sc10 = wantPos ? s10.a : -s10.a;
+    if (sc10 > bestScore) { bestScore = sc10; best = s10; }
+    float sc01 = wantPos ? s01.a : -s01.a;
+    if (sc01 > bestScore) { bestScore = sc01; best = s01; }
+    float sc11 = wantPos ? s11.a : -s11.a;
+    if (sc11 > bestScore) { best = s11; }
+    return best.rgb;
   }
-  return s00.rgb * w00 + s10.rgb * w10 + s01.rgb * w01 + s11.rgb * w11;
+
+  if (uHasImage != 0) {
+    return (s00.rgb * m00 + s10.rgb * m10 + s01.rgb * m01 + s11.rgb * m11) / weightSum;
+  }
+
+  // Fast path (>99% of pixels): all 4 texels share the exact same ink color
+  if (distance(s00.rgb, s11.rgb) < 0.005 && distance(s00.rgb, s10.rgb) < 0.005 && distance(s00.rgb, s01.rgb) < 0.005) {
+    return s00.rgb;
+  }
+
+  // Group identical colors among same-sign corners so pure palette colors never bake into grey
+  float g00 = m00
+    + (distance(s00.rgb, s10.rgb) < 0.005 ? m10 : 0.0)
+    + (distance(s00.rgb, s01.rgb) < 0.005 ? m01 : 0.0)
+    + (distance(s00.rgb, s11.rgb) < 0.005 ? m11 : 0.0);
+  float g10 = m10
+    + (distance(s10.rgb, s00.rgb) < 0.005 ? m00 : 0.0)
+    + (distance(s10.rgb, s01.rgb) < 0.005 ? m01 : 0.0)
+    + (distance(s10.rgb, s11.rgb) < 0.005 ? m11 : 0.0);
+  float g01 = m01
+    + (distance(s01.rgb, s00.rgb) < 0.005 ? m00 : 0.0)
+    + (distance(s01.rgb, s10.rgb) < 0.005 ? m10 : 0.0)
+    + (distance(s01.rgb, s11.rgb) < 0.005 ? m11 : 0.0);
+  float g11 = m11
+    + (distance(s11.rgb, s00.rgb) < 0.005 ? m00 : 0.0)
+    + (distance(s11.rgb, s10.rgb) < 0.005 ? m10 : 0.0)
+    + (distance(s11.rgb, s01.rgb) < 0.005 ? m01 : 0.0);
+
+  vec3 winCol = s00.rgb;
+  float winW = g00;
+  if (g10 > winW) { winW = g10; winCol = s10.rgb; }
+  if (g01 > winW) { winW = g01; winCol = s01.rgb; }
+  if (g11 > winW) { winW = g11; winCol = s11.rgb; }
+
+  if (allowSubpixelEdgeAA && winW < weightSum * 0.62) {
+    vec3 secondCol = winCol;
+    float secondW = -1.0;
+    if (distance(s00.rgb, winCol) >= 0.005 && g00 > secondW) { secondW = g00; secondCol = s00.rgb; }
+    if (distance(s10.rgb, winCol) >= 0.005 && g10 > secondW) { secondW = g10; secondCol = s10.rgb; }
+    if (distance(s01.rgb, winCol) >= 0.005 && g01 > secondW) { secondW = g01; secondCol = s01.rgb; }
+    if (distance(s11.rgb, winCol) >= 0.005 && g11 > secondW) { secondW = g11; secondCol = s11.rgb; }
+    if (secondW > 0.0) {
+      float edgeT = clamp((winW / weightSum - 0.5) / 0.12, 0.0, 1.0);
+      return mix(secondCol, winCol, 0.5 + 0.5 * edgeT);
+    }
+  }
+
+  return winCol;
+}
+
+vec3 pureColorAtSize(sampler2D tex, vec2 origin, float targetSign, vec2 texSize) {
+  return sampleInkColor(tex, origin, targetSign, texSize, false);
 }
 
 vec3 pureColorAt(vec2 origin, float targetSign) {
-  return pureColorAtSize(uInk, origin, targetSign, uInkSize);
+  return sampleInkColor(uInk, origin, targetSign, uInkSize, false);
 }
 
 // Hardware bilinear sample on RG16F gl.LINEAR textures (uVel, uSurf, uInertVel)
@@ -2752,23 +2825,19 @@ float coarseBilinearR(sampler2D tex, vec2 uv, vec2 coarseSize) {
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
-// 4th-order Runge-Kutta backward & forward characteristic tracing in physical domain
+// 2nd-order Midpoint RK2 backward & forward characteristic tracing in physical domain
 vec2 rk4Back(vec2 uv, float dt) {
   vec2 invDom = 1.0 / uDomain;
   vec2 k1 = simBilinearRG(uVel, uv) * invDom;
   vec2 k2 = simBilinearRG(uVel, clamp(uv - 0.5 * dt * k1, vec2(0.0), vec2(1.0))) * invDom;
-  vec2 k3 = simBilinearRG(uVel, clamp(uv - 0.5 * dt * k2, vec2(0.0), vec2(1.0))) * invDom;
-  vec2 k4 = simBilinearRG(uVel, clamp(uv - dt * k3, vec2(0.0), vec2(1.0))) * invDom;
-  return clamp(uv - (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+  return clamp(uv - dt * k2, vec2(0.0), vec2(1.0));
 }
 
 vec2 rk4Fwd(vec2 uv, float dt) {
   vec2 invDom = 1.0 / uDomain;
   vec2 k1 = simBilinearRG(uVel, uv) * invDom;
   vec2 k2 = simBilinearRG(uVel, clamp(uv + 0.5 * dt * k1, vec2(0.0), vec2(1.0))) * invDom;
-  vec2 k3 = simBilinearRG(uVel, clamp(uv + 0.5 * dt * k2, vec2(0.0), vec2(1.0))) * invDom;
-  vec2 k4 = simBilinearRG(uVel, clamp(uv + dt * k3, vec2(0.0), vec2(1.0))) * invDom;
-  return clamp(uv + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+  return clamp(uv + dt * k2, vec2(0.0), vec2(1.0));
 }
 
 // Shared bamboo-tine forcing in isotropic physical coordinates (uv * uDomain)
@@ -2891,7 +2960,10 @@ void main() {
   else if (uPass == 4) {
     vec2 world = gl_FragCoord.xy / uTargetSize;
     vec2 origin = bicubic(uMap, world);
-    float d = distBicubicClamped(origin);
+    vec2 h = uDomain / uTargetSize;
+    float band = min(h.x, h.y) * 3.5;
+    float dFast = distAt(origin);
+    float d = abs(dFast) < band ? distBicubicClamped(origin) : dFast;
     vec3 c = pureColorAt(origin, d);
     fragColor = vec4(c, d);
   }
@@ -2965,6 +3037,9 @@ void main() {
     float div = (uR - uL) / (2.0 * h.x) + (vT - vB) / (2.0 * h.y);
     float factor = exp(clamp(-div * uDt, -1.2, 1.2));
     float newS = clamp(surf.r * factor, 0.0, 14.0);
+    if (newS > uSeq) {
+      newS = uSeq + (newS - uSeq) * exp(-0.35 * uDt);
+    }
     float newAge = clamp(surf.g + 0.045 * uDt, 0.0, 1.0);
     fragColor = vec4(newS, newAge, 0.0, 1.0);
   }
@@ -3144,6 +3219,12 @@ void main() {
   }
   else if (uPass == 19) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
+    vec2 wInert = texelFetch(uInertVel, coord, 0).rg;
+    if (uRate <= 1e-6) {
+      fragColor = vec4(wInert, 0.0, 1.0);
+      return;
+    }
+
     ivec2 last = ivec2(uTargetSize) - ivec2(1);
     vec2 h = uDomain / uTargetSize;
 
@@ -3162,10 +3243,7 @@ void main() {
     float spM = length(vMarangoni);
     if (spM > 0.45) vMarangoni *= 0.45 / spM;
 
-    vec2 wInert = texelFetch(uInertVel, coord, 0).rg;
-    vec2 totalVel = wInert + vMarangoni;
-
-    fragColor = vec4(totalVel, 0.0, 1.0);
+    fragColor = vec4(wInert + vMarangoni, 0.0, 1.0);
   }
   else if (uPass == 20) {
     ivec2 coord = ivec2(gl_FragCoord.xy);
@@ -3197,15 +3275,13 @@ void main() {
     ivec2 lastSim = ivec2(uSimSize) - ivec2(1);
     ivec2 base = block * stride;
     float maxAct = 0.0;
-    for (int y = 0; y < 160; y += 4) {
+    for (int y = 0; y < 160; y += 2) {
       if (y >= stride.y) break;
-      for (int x = 0; x < 160; x += 4) {
+      for (int x = 0; x < 160; x += 2) {
         if (x >= stride.x) break;
         ivec2 c = clamp(base + ivec2(x, y), ivec2(0), lastSim);
         vec2 v = texelFetch(uVel, c, 0).rg;
-        float s = texelFetch(uSurf, c, 0).r;
-        float act = length(v) + max(0.0, s - uSeq) * 0.5;
-        maxAct = max(maxAct, act);
+        maxAct = max(maxAct, length(v));
       }
     }
     fragColor = vec4(maxAct, 0.0, 0.0, 1.0);
@@ -3353,39 +3429,39 @@ uniform float uDt;
 uniform int uPass;
 out vec4 fragColor;
 
-float catmull(int k, float t) {
-  if (k == 0) return t * (-0.5 + t * (1.0 - 0.5 * t));
-  if (k == 1) return 1.0 + t * t * (-2.5 + 1.5 * t);
-  if (k == 2) return t * (0.5 + t * (2.0 - 1.5 * t));
-  return t * t * (-0.5 + 0.5 * t);
-}
-
-vec2 mapFetch(sampler2D tex, int x, int y) {
-  ivec2 last = ivec2(uMapSize) - ivec2(1);
-  return texelFetch(tex, clamp(ivec2(x, y), ivec2(0), last), 0).rg;
+vec4 catmullWeights(float t) {
+  float t2 = t * t;
+  float t3 = t2 * t;
+  return vec4(
+    -0.5 * t + t2 - 0.5 * t3,
+    1.0 - 2.5 * t2 + 1.5 * t3,
+    0.5 * t + 2.0 * t2 - 1.5 * t3,
+    -0.5 * t2 + 0.5 * t3
+  );
 }
 
 vec2 mapBicubicClamped(sampler2D tex, vec2 uv) {
   vec2 p = clamp(uv, vec2(0.0), vec2(1.0)) * uMapSize - 0.5;
   ivec2 i = ivec2(floor(p));
   vec2 f = p - vec2(i);
-  vec2 sum = vec2(0.0);
-  vec2 lo = vec2(1e9);
-  vec2 hi = vec2(-1e9);
-  for (int j = 0; j < 4; j++) {
-    float wy = catmull(j, f.y);
-    vec2 row = vec2(0.0);
-    for (int k = 0; k < 4; k++) {
-      vec2 s = mapFetch(tex, i.x - 1 + k, i.y - 1 + j);
-      if (j >= 1 && j <= 2 && k >= 1 && k <= 2) {
-        lo = min(lo, s);
-        hi = max(hi, s);
-      }
-      row += s * catmull(k, f.x);
-    }
-    sum += row * wy;
-  }
-  return clamp(sum, lo, hi);
+  ivec2 last = ivec2(uMapSize) - ivec2(1);
+  int x0 = clamp(i.x - 1, 0, last.x), x1 = clamp(i.x, 0, last.x), x2 = clamp(i.x + 1, 0, last.x), x3 = clamp(i.x + 2, 0, last.x);
+  int y0 = clamp(i.y - 1, 0, last.y), y1 = clamp(i.y, 0, last.y), y2 = clamp(i.y + 1, 0, last.y), y3 = clamp(i.y + 2, 0, last.y);
+  vec4 wx = catmullWeights(f.x);
+  vec4 wy = catmullWeights(f.y);
+
+  vec2 s11 = texelFetch(tex, ivec2(x1, y1), 0).rg;
+  vec2 s21 = texelFetch(tex, ivec2(x2, y1), 0).rg;
+  vec2 s12 = texelFetch(tex, ivec2(x1, y2), 0).rg;
+  vec2 s22 = texelFetch(tex, ivec2(x2, y2), 0).rg;
+  vec2 lo = min(min(s11, s21), min(s12, s22));
+  vec2 hi = max(max(s11, s21), max(s12, s22));
+
+  vec2 r0 = texelFetch(tex, ivec2(x0, y0), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y0), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y0), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y0), 0).rg * wx.w;
+  vec2 r1 = texelFetch(tex, ivec2(x0, y1), 0).rg * wx.x + s11 * wx.y + s21 * wx.z + texelFetch(tex, ivec2(x3, y1), 0).rg * wx.w;
+  vec2 r2 = texelFetch(tex, ivec2(x0, y2), 0).rg * wx.x + s12 * wx.y + s22 * wx.z + texelFetch(tex, ivec2(x3, y2), 0).rg * wx.w;
+  vec2 r3 = texelFetch(tex, ivec2(x0, y3), 0).rg * wx.x + texelFetch(tex, ivec2(x1, y3), 0).rg * wx.y + texelFetch(tex, ivec2(x2, y3), 0).rg * wx.z + texelFetch(tex, ivec2(x3, y3), 0).rg * wx.w;
+  return clamp(r0 * wy.x + r1 * wy.y + r2 * wy.z + r3 * wy.w, lo, hi);
 }
 
 vec2 mapBilinear(sampler2D tex, vec2 uv) {
@@ -3408,18 +3484,14 @@ vec2 rk4Back(vec2 uv, float dt) {
   vec2 invDom = 1.0 / uDomain;
   vec2 k1 = velAt(uv) * invDom;
   vec2 k2 = velAt(uv - 0.5 * dt * k1) * invDom;
-  vec2 k3 = velAt(uv - 0.5 * dt * k2) * invDom;
-  vec2 k4 = velAt(uv - dt * k3) * invDom;
-  return clamp(uv - (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+  return clamp(uv - dt * k2, vec2(0.0), vec2(1.0));
 }
 
 vec2 rk4Fwd(vec2 uv, float dt) {
   vec2 invDom = 1.0 / uDomain;
   vec2 k1 = velAt(uv) * invDom;
   vec2 k2 = velAt(uv + 0.5 * dt * k1) * invDom;
-  vec2 k3 = velAt(uv + 0.5 * dt * k2) * invDom;
-  vec2 k4 = velAt(uv + dt * k3) * invDom;
-  return clamp(uv + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4), vec2(0.0), vec2(1.0));
+  return clamp(uv + dt * k2, vec2(0.0), vec2(1.0));
 }
 
 void main() {
@@ -3715,27 +3787,29 @@ void main() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  function drawFlowStep(sdt, subSteps) {
+  function drawFlowStep(dtStep, updateFwd) {
     gl.useProgram(flowProgram);
-    gl.uniform1f(flowUDt, sdt);
+    gl.uniform1f(flowUDt, dtStep);
     gl.uniform2f(flowUTargetSize, mapW, mapH);
     gl.viewport(0, 0, mapW, mapH);
     setUnit(3, velTex.tex);
 
-    for (let s = 0; s < subSteps; s++) {
-      const dstBack = back[1 - backI];
-      setUnit(1, back[backI].tex);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, dstBack.fbo);
-      gl.uniform1i(flowUPass, PASS_BACK);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      backI = 1 - backI;
+    const dstBack = back[1 - backI];
+    setUnit(1, back[backI].tex);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dstBack.fbo);
+    gl.uniform1i(flowUPass, PASS_BACK);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    backI = 1 - backI;
 
+    if (updateFwd) {
       const dstFwd = fwd[1 - fwdI];
       setUnit(2, fwd[fwdI].tex);
       gl.bindFramebuffer(gl.FRAMEBUFFER, dstFwd.fbo);
       gl.uniform1i(flowUPass, PASS_FWD);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       fwdI = 1 - fwdI;
+    } else {
+      fwdValid = false;
     }
 
     gl.useProgram(program);
@@ -3868,7 +3942,10 @@ void main() {
     drawTo(curlTex, PASS_ZERO);
 
     isSpreading = false;
+    idleSimSteps = 0;
+    surfRemainingTime = 0;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
 
     const remapX = oldDomX / domainX;
     const remapY = oldDomY / domainY;
@@ -3916,9 +3993,8 @@ void main() {
 
     for (let cycle = 0; cycle < numVCycles; cycle++) {
       for (let l = 0; l < MG_LEVELS - 1; l++) {
-        const preSmoothSteps = (l === 0) ? 2 : 3;
         const rhsTex = mgRhs[l].tex;
-        for (let s = 0; s < preSmoothSteps; s++) {
+        for (let s = 0; s < 2; s++) {
           const src = mgCurIdx[l];
           const dst = 1 - src;
           drawMg(mgSol[l][dst], PASS_MG_SMOOTH, mgSol[l][src].tex, rhsTex);
@@ -3931,7 +4007,7 @@ void main() {
 
       const coarsest = MG_LEVELS - 1;
       const coarseRhsTex = mgRhs[coarsest].tex;
-      for (let s = 0; s < 10; s++) {
+      for (let s = 0; s < 4; s++) {
         const src = mgCurIdx[coarsest];
         const dst = 1 - src;
         drawMg(mgSol[coarsest][dst], PASS_MG_SMOOTH, mgSol[coarsest][src].tex, coarseRhsTex);
@@ -3944,9 +4020,8 @@ void main() {
         drawMg(mgSol[l][dst], PASS_MG_PROLONG, mgSol[l][src].tex, mgSol[l + 1][mgCurIdx[l + 1]].tex);
         mgCurIdx[l] = dst;
 
-        const postSmoothSteps = (l === 0) ? 2 : 3;
         const rhsTex = mgRhs[l].tex;
-        for (let s = 0; s < postSmoothSteps; s++) {
+        for (let s = 0; s < 2; s++) {
           const sSrc = mgCurIdx[l];
           const sDst = 1 - sSrc;
           drawMg(mgSol[l][sDst], PASS_MG_SMOOTH, mgSol[l][sSrc].tex, rhsTex);
@@ -3961,12 +4036,15 @@ void main() {
 
   function pollAsyncGpuActivity(isActivelyWorking) {
     if (isActivelyWorking) {
+      idleSimSteps = 0;
       if (pendingSync) {
         gl.deleteSync(pendingSync);
         pendingSync = null;
       }
       return;
     }
+
+    idleSimSteps++;
 
     if (pendingSync) {
       const status = gl.clientWaitSync(pendingSync, 0, 0);
@@ -3983,14 +4061,18 @@ void main() {
           if (energyReadBuf[i] > maxActivity) maxActivity = energyReadBuf[i];
         }
 
-        if (maxActivity <= 0.00045) {
+        if (maxActivity <= 0.00055) {
           isSpreading = false;
+          surfRemainingTime = 0;
           drawTo(velTex, PASS_ZERO);
           drawTo(inertVelTex[0], PASS_ZERO);
           drawTo(inertVelTex[1], PASS_ZERO);
+          drawTo(surfTex[0], PASS_ZERO);
+          drawTo(surfTex[1], PASS_ZERO);
+          drawTo(phiTex, PASS_ZERO);
         }
       }
-    } else if (stepCount % 10 === 0) {
+    } else if (idleSimSteps >= 12 && idleSimSteps % 10 === 0) {
       drawTo(energyTarget, PASS_ENERGY);
       gl.bindFramebuffer(gl.FRAMEBUFFER, energyTarget.fbo);
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
@@ -4052,8 +4134,7 @@ void main() {
     }
 
     ctx.putImageData(imgData, 0, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, view.width, view.height);
+    drawTo(null, PASS_DISPLAY);
 
     return tempCanvas.toDataURL(mimeType, 1.0);
   }
@@ -4074,7 +4155,10 @@ void main() {
     drawTo(curlTex, PASS_ZERO);
     stepCount = 0;
     isSpreading = false;
+    idleSimSteps = 0;
+    surfRemainingTime = 0;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
   }
 
   function placeImageInBath(squareCanvas) {
@@ -4093,16 +4177,20 @@ void main() {
     drawTo(null, PASS_DISPLAY);
   }
 
-  function gpuBake() {
-    if (!hasAdvectedSinceBake) return;
+  function gpuBake(redistancePasses = 1) {
+    if (!hasAdvectedSinceBake) {
+      fwdValid = true;
+      return;
+    }
     drawTo(inkTex[1 - inkI], PASS_BAKE); inkI = 1 - inkI;
-    for (let r = 0; r < 2; r++) {
+    for (let r = 0; r < redistancePasses; r++) {
       drawTo(inkTex[1 - inkI], PASS_REDISTANCE);
       inkI = 1 - inkI;
     }
     drawTo(back[1 - backI], PASS_IDENTITY); backI = 1 - backI;
     drawTo(fwd[1 - fwdI], PASS_IDENTITY); fwdI = 1 - fwdI;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
   }
 
   function latchStrokeSign(slot, x, y, col) {
@@ -4126,6 +4214,9 @@ void main() {
   }
 
   function stampCapsule(slot, x0, y0, x1, y1, radius, col, isNewDrop) {
+    if (!fwdValid && hasAdvectedSinceBake) {
+      gpuBake();
+    }
     if (isNewDrop) {
       latchStrokeSign(slot, x0, y0, col);
     }
@@ -4146,6 +4237,7 @@ void main() {
 
   function splatCapsule(x0, y0, x1, y1, radius, mass) {
     if (mass <= 1e-6) return;
+    surfRemainingTime = 18.0;
     gl.uniform1f(uMassLoc, mass);
     gl.uniform2f(uPrevCenter, x0, y0);
     gl.uniform2f(uCenter, x1, y1);
@@ -4514,6 +4606,7 @@ void main() {
 
     drawTo(null, PASS_DISPLAY);
     updatePinUI();
+    wakeLoop();
     return inkPins.length;
   }
 
@@ -4608,6 +4701,7 @@ void main() {
       }
     }
     updatePinUI();
+    if (fired > 0) wakeLoop();
     return fired;
   }
 
@@ -4870,11 +4964,11 @@ void main() {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Rich ink bead
-        ctx.save();
-        ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-        ctx.shadowBlur = 4 * unit;
-        ctx.shadowOffsetY = 1.5 * unit;
+        // Rich ink bead (crisp shadow disc avoids expensive CPU/CoreGraphics Gaussian blur on iPad)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.34)";
+        ctx.beginPath();
+        ctx.arc(x, y + 1.6 * unit, beadR + 1.2 * unit, 0, Math.PI * 2);
+        ctx.fill();
 
         const hex = pin.colorHex || "#161514";
         const grad = ctx.createRadialGradient(x - beadR * 0.35, y - beadR * 0.4, beadR * 0.1, x, y, beadR);
@@ -4886,7 +4980,6 @@ void main() {
         ctx.beginPath();
         ctx.arc(x, y, beadR, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
 
         // Droplet rim
         ctx.strokeStyle = isSling ? "rgba(222, 92, 62, 0.95)" : "rgba(255, 250, 240, 0.75)";
@@ -4953,8 +5046,8 @@ void main() {
         if (inkPins.length > 0) {
           if (!frozen) {
             stepsSincePourBake++;
-            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
-              gpuBake();
+            if (stepsSincePourBake >= 75 && hasAdvectedSinceBake) {
+              gpuBake(1);
               stepsSincePourBake = 0;
             }
           }
@@ -4995,8 +5088,8 @@ void main() {
         if (!input.tap) {
           if (!frozen) {
             stepsSincePourBake++;
-            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
-              gpuBake();
+            if (stepsSincePourBake >= 75 && hasAdvectedSinceBake) {
+              gpuBake(1);
               stepsSincePourBake = 0;
             }
           }
@@ -5038,18 +5131,23 @@ void main() {
 
     if (!isSpreading) return false;
 
-    const T = tension();
-    const V = viscosity();
-    gl.uniform1f(uSeqLoc, 0.042 / T);
-    gl.uniform1f(uRateLoc, (10.5 * T / V) * mobility);
+    const surfActive = surfRemainingTime > 0;
+    if (surfActive) {
+      const T = tension();
+      const V = viscosity();
+      gl.uniform1f(uSeqLoc, 0.042 / T);
+      gl.uniform1f(uRateLoc, (10.5 * T / V) * mobility);
 
-    drawTo(mgRhs[0], PASS_SURF_RHS);
-    gl.uniform1f(uScaleLoc, 0.85);
-    drawTo(mgSol[0][0], PASS_WARM_START, phiTex.tex);
-    const phiFinalIdx = solveMultigridVCycle(0.06, 2);
-    const tmpPhi = phiTex;
-    phiTex = mgSol[0][phiFinalIdx];
-    mgSol[0][phiFinalIdx] = tmpPhi;
+      drawTo(mgRhs[0], PASS_SURF_RHS);
+      gl.uniform1f(uScaleLoc, 0.85);
+      drawTo(mgSol[0][0], PASS_WARM_START, phiTex.tex);
+      const phiFinalIdx = solveMultigridVCycle(0.06, 1);
+      const tmpPhi = phiTex;
+      phiTex = mgSol[0][phiFinalIdx];
+      mgSol[0][phiFinalIdx] = tmpPhi;
+    } else {
+      gl.uniform1f(uRateLoc, 0.0);
+    }
 
     if (vortValue > 1e-5) {
       drawTo(curlTex, PASS_VORTICITY);
@@ -5081,7 +5179,7 @@ void main() {
     drawTo(mgRhs[0], PASS_NS_DIV);
     gl.uniform1f(uScaleLoc, 0.90);
     drawTo(mgSol[0][0], PASS_WARM_START, pressTex.tex);
-    const pressFinalIdx = solveMultigridVCycle(0.0002, 2);
+    const pressFinalIdx = solveMultigridVCycle(0.0002, 1);
     const tmpPress = pressTex;
     pressTex = mgSol[0][pressFinalIdx];
     mgSol[0][pressFinalIdx] = tmpPress;
@@ -5091,14 +5189,18 @@ void main() {
 
     drawTo(velTex, PASS_COMBINE_VEL);
 
-    const sub = 3;
-    const sdt = dt / sub;
-    gl.uniform1f(uDt, sdt);
-    for (let s = 0; s < sub; s++) {
+    gl.uniform1f(uDt, dt);
+    if (surfActive) {
       drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF);
       surfI = 1 - surfI;
+      surfRemainingTime = Math.max(0, surfRemainingTime - dt);
+      if (surfRemainingTime === 0) {
+        drawTo(surfTex[0], PASS_ZERO);
+        drawTo(surfTex[1], PASS_ZERO);
+        drawTo(phiTex, PASS_ZERO);
+      }
     }
-    drawFlowStep(sdt, sub);
+    drawFlowStep(dt, brushOn && pointerWorking);
 
     if (pinMotion || (input.down && isLatteMode())) {
       ringDirty = true;
@@ -5115,6 +5217,16 @@ void main() {
 
   let ringHasContent = true;
   let ringDirty = true;
+  let ringPrevBox = null;
+
+  function clearPreviousRing() {
+    if (ringPrevBox) {
+      ringCtx.clearRect(ringPrevBox.x, ringPrevBox.y, ringPrevBox.w, ringPrevBox.h);
+      ringPrevBox = null;
+    } else {
+      ringCtx.clearRect(0, 0, ring.width, ring.height);
+    }
+  }
 
   function hasVisiblePins() {
     if (pinGesture) return true;
@@ -5131,7 +5243,7 @@ void main() {
 
     if (!showCursor && !showPins) {
       if (ringHasContent) {
-        ringCtx.clearRect(0, 0, ring.width, ring.height);
+        clearPreviousRing();
         ringHasContent = false;
       }
       toolCursor.classList.remove("visible");
@@ -5141,49 +5253,87 @@ void main() {
     const w = ring.width;
     const h = ring.height;
     const minDim = Math.min(w, h);
-    ringCtx.clearRect(0, 0, w, h);
+    clearPreviousRing();
     ringHasContent = true;
+
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+    let fullClearNext = false;
 
     if (showPins) {
       drawPins();
-    }
-
-    if (!showCursor) {
-      toolCursor.classList.remove("visible");
-      return;
-    }
-
-    ringCtx.lineWidth = Math.max(1.2, minDim / 480);
-
-    if (stickOn) {
-      const pushRadius = STICK_BASE_RADIUS * minDim * stylusRadiusMult;
-      ringCtx.save();
-      if (brushOn) {
-        ringCtx.setLineDash([Math.max(3, minDim / 180), Math.max(3, minDim / 180)]);
-        ringCtx.strokeStyle = "rgba(245, 232, 206, 0.52)";
-      } else {
-        ringCtx.strokeStyle = "rgba(235, 225, 210, 0.72)";
+      if (pinGesture || pins.length > 1 || (pins.length === 1 && pins[0].launch)) {
+        fullClearNext = true;
+      } else if (pins.length === 1) {
+        const p0 = pins[0];
+        const px = p0.x * w, py = p0.y * h;
+        const pinPad = Math.max(
+          INK_RADIUS * dropSizeMult * minDim * 1.6,
+          STICK_BASE_RADIUS * stylusRadiusMult * minDim * 1.15,
+          18 * (minDim / 800)
+        ) + 8;
+        minX = Math.min(minX, px - pinPad);
+        minY = Math.min(minY, py - pinPad);
+        maxX = Math.max(maxX, px + pinPad);
+        maxY = Math.max(maxY, py + pinPad);
       }
-      ringCtx.beginPath();
-      ringCtx.arc(input.x * w, input.y * h, pushRadius, 0, Math.PI * 2);
-      ringCtx.stroke();
-      ringCtx.restore();
     }
 
-    if (brushOn) {
-      const dropRadius = 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult;
-      ringCtx.strokeStyle = "rgba(235, 225, 210, 0.68)";
-      ringCtx.beginPath();
-      ringCtx.arc(input.x * w, input.y * h, dropRadius, 0, Math.PI * 2);
-      ringCtx.stroke();
+    if (showCursor) {
+      ringCtx.lineWidth = Math.max(1.2, minDim / 480);
+      const cx = input.x * w;
+      const cy = input.y * h;
+      let maxCurR = 0;
+
+      if (stickOn) {
+        const pushRadius = STICK_BASE_RADIUS * minDim * stylusRadiusMult;
+        if (pushRadius > maxCurR) maxCurR = pushRadius;
+        ringCtx.save();
+        if (brushOn) {
+          ringCtx.setLineDash([Math.max(3, minDim / 180), Math.max(3, minDim / 180)]);
+          ringCtx.strokeStyle = "rgba(245, 232, 206, 0.52)";
+        } else {
+          ringCtx.strokeStyle = "rgba(235, 225, 210, 0.72)";
+        }
+        ringCtx.beginPath();
+        ringCtx.arc(cx, cy, pushRadius, 0, Math.PI * 2);
+        ringCtx.stroke();
+        ringCtx.restore();
+      }
+
+      if (brushOn) {
+        const dropRadius = 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult;
+        if (dropRadius > maxCurR) maxCurR = dropRadius;
+        ringCtx.strokeStyle = "rgba(235, 225, 210, 0.68)";
+        ringCtx.beginPath();
+        ringCtx.arc(cx, cy, dropRadius, 0, Math.PI * 2);
+        ringCtx.stroke();
+      }
+
+      const curPad = maxCurR + 8;
+      minX = Math.min(minX, cx - curPad);
+      minY = Math.min(minY, cy - curPad);
+      maxX = Math.max(maxX, cx + curPad);
+      maxY = Math.max(maxY, cy + curPad);
+
+      // GPU-composited transform avoids layout invalidation on high-rate touch/Pencil move
+      syncToolCursorImage();
+      const [stageX, stageY] = stageFromWorld(input.x, input.y);
+      const pressSuffix = input.down ? " scale(0.95) rotate(-3deg)" : "";
+      toolCursor.style.transform = `translate3d(${stageX.toFixed(1)}px, ${stageY.toFixed(1)}px, 0) translate(-7.5%, -91%)${pressSuffix}`;
+      toolCursor.classList.add("visible");
+    } else {
+      toolCursor.classList.remove("visible");
     }
 
-    // GPU-composited transform avoids layout invalidation on high-rate touch/Pencil move
-    syncToolCursorImage();
-    const [stageX, stageY] = stageFromWorld(input.x, input.y);
-    const pressSuffix = input.down ? " scale(0.95) rotate(-3deg)" : "";
-    toolCursor.style.transform = `translate3d(${stageX.toFixed(1)}px, ${stageY.toFixed(1)}px, 0) translate(-7.5%, -91%)${pressSuffix}`;
-    toolCursor.classList.add("visible");
+    if (fullClearNext || minX >= maxX || minY >= maxY) {
+      ringPrevBox = null;
+    } else {
+      const bx = Math.max(0, Math.floor(minX));
+      const by = Math.max(0, Math.floor(minY));
+      const bw = Math.min(w - bx, Math.ceil(maxX) - bx);
+      const bh = Math.min(h - by, Math.ceil(maxY) - by);
+      ringPrevBox = { x: bx, y: by, w: bw, h: bh };
+    }
   }
 
   function layout() {
@@ -5208,6 +5358,7 @@ void main() {
         ring.width = rW;
         ring.height = rH;
         ringHasContent = true;
+        ringPrevBox = null;
       }
       resizeSimulationIfNeeded(W, H, viewDpr);
     } else {
@@ -5221,6 +5372,7 @@ void main() {
         ring.width = rPx;
         ring.height = rPx;
         ringHasContent = true;
+        ringPrevBox = null;
       }
       resizeSimulationIfNeeded(RENDER_BATH_SIZE, RENDER_BATH_SIZE, viewDpr);
     }
@@ -5745,6 +5897,7 @@ void main() {
       };
     }
     drawRing();
+    wakeLoop();
     e.preventDefault();
   });
 
@@ -5753,6 +5906,7 @@ void main() {
     input.x = p[0]; input.y = p[1];
     input.inside = true;
     ringDirty = true;
+    wakeLoop();
     const g = pinGesture;
     if (g && e.pointerId === g.pointerId) {
       g.px = p[0]; g.py = p[1];
@@ -5803,6 +5957,7 @@ void main() {
       view.releasePointerCapture(e.pointerId);
     }
     drawRing();
+    wakeLoop();
   }
 
   view.addEventListener("pointerup", endPointer);
@@ -6157,12 +6312,19 @@ void main() {
     document.getElementById("glide-read").textContent = Math.round(glideValue * 100) + "%";
     if (isFrozenBath()) {
       isSpreading = false;
+      idleSimSteps = 0;
+      surfRemainingTime = 0;
+      if (pendingSync) {
+        gl.deleteSync(pendingSync);
+        pendingSync = null;
+      }
       gl.useProgram(program);
       drawTo(velTex, PASS_ZERO);
       drawTo(inertVelTex[0], PASS_ZERO);
       drawTo(inertVelTex[1], PASS_ZERO);
       drawTo(surfTex[0], PASS_ZERO);
       drawTo(surfTex[1], PASS_ZERO);
+      drawTo(null, PASS_DISPLAY);
     }
   });
 
@@ -6411,8 +6573,7 @@ void main() {
 
       gl.deleteTexture(exportTex);
       gl.deleteFramebuffer(exportFbo);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, view.width, view.height);
+      drawTo(null, PASS_DISPLAY);
 
       // 2. Dynamic Color Quantization (Preserves floated photo colors alongside inks)
       const waterHex = (document.getElementById("bath-color").value || "#b8b0a2").toLowerCase();
@@ -6686,11 +6847,21 @@ void main() {
     const stageObserver = new ResizeObserver(() => layout());
     stageObserver.observe(stage);
   }
-
-  let last = performance.now();
-  let acc = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && loopReady) {
+      drawTo(null, PASS_DISPLAY);
+      wakeLoop();
+    }
+  });
+  window.addEventListener("pageshow", () => {
+    if (loopReady) {
+      drawTo(null, PASS_DISPLAY);
+      wakeLoop();
+    }
+  });
 
   function frame(now) {
+    rafId = 0;
     let delta = (now - last) / 1000;
     last = now;
     if (delta > 0.05) delta = 0.05;
@@ -6750,14 +6921,19 @@ void main() {
 
     if (painted) drawTo(null, PASS_DISPLAY);
     if (ringDirty) drawRing();
-    requestAnimationFrame(frame);
+
+    const hasActivePins = !!pinGesture || !!masterStroke || pins.some(p => p.state === "flying" || p.state === "following");
+    if (isSpreading || input.down || input.tap || ringDirty || hasActivePins) {
+      rafId = requestAnimationFrame(frame);
+    }
   }
 
   layout();
   seedInitialBath();
   syncAllScrubbersUI();
   syncToolStateUI();
-  requestAnimationFrame(frame);
+  loopReady = true;
+  wakeLoop();
 })();
 </script>
 </body>
