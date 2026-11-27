@@ -2875,20 +2875,25 @@ void main() {
   if (uPass == 0) {
     vec2 world = vec2(vUv.x, 1.0 - vUv.y);
     vec2 origin = bicubic(uMap, world);
-    float d = distAt(origin);
-    vec3 c = pureColorAt(origin, d);
+    vec2 hInk = uDomain / uInkSize;
+    float dFast = distAt(origin);
+    float d = abs(dFast) < min(hInk.x, hInk.y) * 8.0 ? distBicubicClamped(origin) : dFast;
+    vec3 c = sampleInkColor(uInk, origin, d, uInkSize, uIsExport == 0);
     float fw = max(fwidth(d), 1e-5);
     vec2 g = vec2(dFdx(d), dFdy(d));
     float pixels = abs(d) / fw;
-    vec2 pixelStep = g * (-d / max(dot(g, g), 1e-8));
-    vec2 worldStep = pixelStep.x * dFdx(world) + pixelStep.y * dFdy(world);
 
-    // Only sample opposite contour color on the ~1.5% of pixels straddling an ink boundary
+    // Tight 0.5px analytical contour AA keeps thin filaments pure black instead of blurring grey
     vec3 baseCol = c;
-    if (uIsExport == 0 && pixels < 1.0) {
-      vec2 otherOrigin = bicubic(uMap, world + 2.0 * worldStep);
-      vec3 other = pureColorAt(otherOrigin, -d);
-      baseCol = mix(other, c, 0.5 + 0.5 * pixels);
+    if (uIsExport == 0 && pixels < 0.5) {
+      float g2 = dot(g, g);
+      if (g2 > 1e-10) {
+        vec2 pixelStep = clamp(g * (-d / g2), vec2(-1.2), vec2(1.2));
+        vec2 worldStep = pixelStep.x * dFdx(world) + pixelStep.y * dFdy(world);
+        vec2 otherOrigin = bicubic(uMap, world + 1.6 * worldStep);
+        vec3 other = pureColorAt(otherOrigin, -d);
+        baseCol = mix(other, c, 0.5 + pixels);
+      }
     }
 
     // Full-bleed unshadowed output when pulling JPG/SVG prints
@@ -2961,7 +2966,7 @@ void main() {
     vec2 world = gl_FragCoord.xy / uTargetSize;
     vec2 origin = bicubic(uMap, world);
     vec2 h = uDomain / uTargetSize;
-    float band = min(h.x, h.y) * 3.5;
+    float band = min(h.x, h.y) * 8.0;
     float dFast = distAt(origin);
     float d = abs(dFast) < band ? distBicubicClamped(origin) : dFast;
     vec3 c = pureColorAt(origin, d);
@@ -3590,6 +3595,8 @@ void main() {
   const uOldInkSizeLoc = gl.getUniformLocation(program, "uOldInkSize");
   const uResizeScaleLoc = gl.getUniformLocation(program, "uResizeScale");
   const uStrokeSlotLoc = gl.getUniformLocation(program, "uStrokeSlot");
+  const uHasImageLoc = gl.getUniformLocation(program, "uHasImage");
+  gl.uniform1i(uHasImageLoc, 0);
 
   const uPinCountLoc = gl.getUniformLocation(program, "uPinCount");
   const uPinSegLoc = gl.getUniformLocation(program, "uPinSeg");
@@ -4159,12 +4166,14 @@ void main() {
     surfRemainingTime = 0;
     hasAdvectedSinceBake = false;
     fwdValid = true;
+    gl.uniform1i(uHasImageLoc, 0);
   }
 
   function placeImageInBath(squareCanvas) {
     input.tap = false;
     input.down = false;
     gpuClear();
+    gl.uniform1i(uHasImageLoc, 1);
 
     gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, uploadTex);
@@ -5046,8 +5055,8 @@ void main() {
         if (inkPins.length > 0) {
           if (!frozen) {
             stepsSincePourBake++;
-            if (stepsSincePourBake >= 75 && hasAdvectedSinceBake) {
-              gpuBake(1);
+            if (stepsSincePourBake >= 140 && hasAdvectedSinceBake) {
+              gpuBake(2);
               stepsSincePourBake = 0;
             }
           }
@@ -5088,8 +5097,8 @@ void main() {
         if (!input.tap) {
           if (!frozen) {
             stepsSincePourBake++;
-            if (stepsSincePourBake >= 75 && hasAdvectedSinceBake) {
-              gpuBake(1);
+            if (stepsSincePourBake >= 140 && hasAdvectedSinceBake) {
+              gpuBake(2);
               stepsSincePourBake = 0;
             }
           }
