@@ -172,17 +172,14 @@
   }
 
   .mini-hanko {
-    display: inline-grid;
-    place-items: center;
-    width: 1.35cqw;
-    height: 1.35cqw;
-    border: 1.5px solid #9e2a1b;
-    border-radius: 2px;
-    color: #9e2a1b;
-    font-size: 0.8cqw;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8f3020;
+    font-size: 0.9cqw;
     font-weight: 700;
     line-height: 1;
-    opacity: 0.85;
+    opacity: 0.72;
   }
 
   .cycle-toggle {
@@ -364,7 +361,11 @@
   }
 
   .tool-col.is-off {
-    opacity: 0.38;
+    opacity: 0.45;
+  }
+
+  .tool-col.is-off label.craft-slider {
+    display: none;
   }
 
   .tool-col-head {
@@ -716,17 +717,16 @@
   }
 
   .plaque-label {
-    width: 88%;
-    height: 22%;
+    width: 84%;
+    height: 21%;
     border-radius: 0.28cqw;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.32cqw;
     padding: 0 0.35cqw;
-    font-size: 0.64cqw;
+    font-size: 0.66cqw;
     font-weight: 700;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
     background: linear-gradient(180deg, #cfc5b5, #b0a492);
     color: #46392d;
@@ -738,24 +738,6 @@
     transition: all 0.18s ease;
   }
 
-  .plaque-dot {
-    width: 0.48cqw;
-    height: 0.48cqw;
-    border-radius: 50%;
-    border: 1.5px solid rgba(70, 57, 45, 0.65);
-    background: transparent;
-    flex-shrink: 0;
-    transition: all 0.18s ease;
-  }
-
-  .plaque-state {
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 0.52cqw;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    opacity: 0.75;
-  }
-
   .tool-hotspot.active .plaque-label {
     opacity: 1;
     background: linear-gradient(180deg, #5e2418, #3d160e);
@@ -765,17 +747,6 @@
       0 0.25cqw 0.55cqw rgba(0, 0, 0, 0.75),
       0 0 0.6cqw rgba(184, 66, 42, 0.45),
       inset 0 1px 0 rgba(255, 190, 160, 0.35);
-  }
-
-  .tool-hotspot.active .plaque-dot {
-    background: #f0b265;
-    border-color: #ffdca8;
-    box-shadow: 0 0 5px rgba(240, 178, 101, 0.9);
-  }
-
-  .tool-hotspot.active .plaque-state {
-    color: #ffdca8;
-    opacity: 1;
   }
 
   /* =========================================================
@@ -1166,15 +1137,15 @@
   }
 
   /* =========================================================
-     Middle Drop + Push Control Card & Original Top/Bottom Flyouts (Full-Screen / iPad)
+     Middle Drop + Push Dockable Flyout & Expandable Micro-Sliders (Full-Screen / iPad)
      ========================================================= */
   .studio-stage.fullscreen-mode .sumi-rail {
     position: absolute;
-    left: max(10px, env(safe-area-inset-left, 10px));
+    left: 0;
     top: 50%;
-    transform: translateY(-50%);
-    width: 142px;
-    padding: 9px;
+    transform: translateX(calc(-100% + 6px)) translateY(-50%);
+    width: 112px;
+    padding: 10px;
     border-radius: 9px;
     background-color: #d6cbb8;
     background-image:
@@ -1185,136 +1156,221 @@
     box-shadow:
       inset 0 0 14px rgba(68, 50, 32, 0.36),
       inset 0 1px 0 rgba(255, 250, 240, 0.6),
-      0 8px 26px rgba(0, 0, 0, 0.68);
+      0 10px 30px rgba(0, 0, 0, 0.72);
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    z-index: 34;
+    align-items: center;
+    gap: 8px;
+    z-index: 36;
+    overflow: visible;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .studio-stage.fullscreen-mode .sumi-rail.dock-open {
+    transform: translateX(max(12px, env(safe-area-inset-left, 12px))) translateY(-50%);
+    z-index: 39;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .studio-stage.fullscreen-mode .sumi-rail:hover {
+      transform: translateX(max(12px, env(safe-area-inset-left, 12px))) translateY(-50%);
+      z-index: 39;
+    }
+  }
+
+  .studio-stage.fullscreen-mode .sumi-rail .dock-tab {
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .rail-divider {
+    width: 100%;
     height: 1px;
-    background: rgba(75, 58, 40, 0.26);
-    margin: 2px 0;
+    background: rgba(75, 58, 40, 0.24);
+    margin: 1px 0;
   }
 
   .rail-tool-block {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
   }
 
-  /* Tactile Urushi Lacquer ON/OFF Switch (Drop / Push) */
-  .rail-switch-btn {
-    width: 100%;
-    height: 34px;
-    padding: 0 9px;
-    border-radius: 6px;
-    border: 1px solid rgba(55, 42, 28, 0.55);
-    background: linear-gradient(180deg, #cbbda8, #b5a791);
+  /* Minimalistic Square Icon Buttons for Drop & Push (No LED, No ON Label) */
+  .rail-square-btn {
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid rgba(58, 44, 30, 0.38);
+    background: rgba(62, 48, 34, 0.08);
     box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.28),
+      inset 0 1px 3px rgba(0, 0, 0, 0.22),
       0 1px 0 rgba(255, 250, 240, 0.45);
-    color: #4a3c2f;
+    color: rgba(58, 44, 30, 0.62);
     font-family: inherit;
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 4px;
     cursor: pointer;
-    transition: all 0.16s ease;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
   }
 
-  .rail-switch-left {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  .rail-square-btn:active {
+    transform: scale(0.94);
   }
 
-  .rail-switch-dot {
-    width: 8.5px;
-    height: 8.5px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(74, 60, 47, 0.65);
-    background: transparent;
-    transition: all 0.16s ease;
+  .rail-square-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.85;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.18s ease;
   }
 
-  .rail-switch-pill {
+  .rail-square-label {
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: rgba(55, 42, 28, 0.14);
-    color: #574738;
-    transition: all 0.16s ease;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
   }
 
-  .rail-switch-btn.active {
-    background: linear-gradient(180deg, #632619, #3e160e);
-    border-color: #a84630;
+  .rail-square-btn.active {
+    background: linear-gradient(180deg, #5e2418, #3d160e);
+    border-color: #9e402b;
     color: #f6ede0;
     box-shadow:
-      0 2px 6px rgba(0, 0, 0, 0.48),
-      0 0 8px rgba(184, 66, 42, 0.28),
-      inset 0 1px 0 rgba(255, 195, 165, 0.32);
+      0 3px 9px rgba(0, 0, 0, 0.46),
+      inset 0 1px 0 rgba(255, 200, 175, 0.3);
   }
 
-  .rail-switch-btn.active .rail-switch-dot {
-    background: #f2b668;
-    border-color: #ffe2b8;
-    box-shadow: 0 0 6px rgba(242, 182, 104, 0.95);
+  /* Smoothly Collapse & Hide Sliders When Drop or Push is OFF */
+  .rail-sliders-collapse {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 64px;
+    margin-top: 7px;
+    opacity: 1;
+    overflow: visible;
+    transition:
+      max-height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.18s ease,
+      margin-top 0.24s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .rail-switch-btn.active .rail-switch-pill {
-    background: rgba(242, 182, 104, 0.22);
-    color: #ffdca8;
+  .rail-tool-block.is-off .rail-sliders-collapse {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
 
-  /* Continuous Touch Sliders Underneath Drop & Push */
-  .rail-tool-block.is-off .rail-scrub {
-    opacity: 0.38;
-    transition: opacity 0.18s ease;
-  }
-
-  .rail-scrub {
+  /* Fixed-Height Slot so Unfurling Slider Never Shifts Layout Vertically */
+  .rail-scrub-slot {
     position: relative;
-    height: 29px;
+    width: 92px;
+    height: 22px;
+  }
+
+  .rail-scrub-slot:has(.rail-scrub.expanded) {
+    z-index: 60;
+  }
+
+  /* Compact Micro-Slider that Springs Outward on Click/Press & Compresses Back */
+  .rail-scrub {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 92px;
+    height: 22px;
     border-radius: 6px;
-    background: rgba(58, 44, 30, 0.16);
-    border: 1px solid rgba(60, 45, 30, 0.48);
+    background: rgba(58, 44, 30, 0.14);
+    border: 1px solid rgba(60, 45, 30, 0.42);
     box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.32),
-      0 1px 0 rgba(255, 250, 240, 0.45);
+      inset 0 1px 2px rgba(0, 0, 0, 0.26),
+      0 1px 0 rgba(255, 250, 240, 0.4);
     overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 9px;
+    padding: 0 7px;
     cursor: ew-resize;
     touch-action: none;
+    z-index: 2;
+    transition:
+      width 0.28s cubic-bezier(0.2, 1.22, 0.28, 1),
+      height 0.24s cubic-bezier(0.2, 1.22, 0.28, 1),
+      border-radius 0.24s ease,
+      padding 0.24s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.24s ease,
+      opacity 0.18s ease;
+  }
+
+  /* Dim sibling micro-sliders while one slider is expanded */
+  .sumi-rail.has-expanded-scrub .rail-scrub:not(.expanded) {
+    opacity: 0.38;
+  }
+
+  /* Visually Interesting Unfurled Precision Slider State */
+  .rail-scrub.expanded {
+    width: 248px;
+    height: 40px;
+    border-radius: 10px;
+    padding: 0 14px;
+    background-color: #eee4d2;
+    border: 1.5px solid #9e311d;
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255, 248, 235, 0.35),
+      inset 0 1px 3px rgba(0, 0, 0, 0.22);
+    z-index: 60;
+  }
+
+  /* Subtle Engraved Scale Tick Marks Revealed Only When Expanded */
+  .rail-scrub::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 3px;
+    height: 4px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(72, 52, 34, 0.38) 0px,
+      rgba(72, 52, 34, 0.38) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .rail-scrub.expanded::after {
+    opacity: 1;
   }
 
   .rail-scrub-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     pointer-events: none;
-  }
-
-  .rail-scrub.scrubbing {
-    border-color: #9e311d;
-    box-shadow:
-      0 0 0 1px rgba(166, 52, 32, 0.45),
-      inset 0 1px 3px rgba(0, 0, 0, 0.35);
   }
 
   .rail-scrub-fill {
@@ -1323,31 +1379,74 @@
     top: 0;
     bottom: 0;
     width: 25%;
-    background: linear-gradient(90deg, rgba(158, 49, 29, 0.32), rgba(196, 145, 62, 0.62));
-    border-right: 1.5px solid rgba(145, 92, 24, 0.8);
+    background: linear-gradient(90deg, rgba(158, 49, 29, 0.28), rgba(196, 145, 62, 0.58));
+    border-right: 1.5px solid rgba(145, 92, 24, 0.78);
     pointer-events: none;
+  }
+
+  .rail-scrub.expanded .rail-scrub-fill {
+    background: linear-gradient(90deg, rgba(158, 49, 29, 0.36), rgba(206, 152, 64, 0.72));
+    border-right-width: 2px;
+  }
+
+  /* Burnished Brass Thumb Jewel Materializing on Expansion */
+  .rail-scrub-thumb {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f7dc9c 0%, #c69344 50%, #784f18 100%);
+    border: 1px solid rgba(48, 30, 12, 0.85);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 246, 220, 0.8);
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.22s cubic-bezier(0.2, 1.3, 0.3, 1), opacity 0.16s ease;
+  }
+
+  .rail-scrub.expanded .rail-scrub-thumb {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 
   .rail-scrub-label,
   .rail-scrub-val {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     pointer-events: none;
     line-height: 1;
+    transition: font-size 0.2s ease, color 0.2s ease;
   }
 
   .rail-scrub-label {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 700;
-    color: #2c2219;
+    color: #36291e;
     letter-spacing: 0.03em;
   }
 
   .rail-scrub-val {
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 12px;
+    font-size: 9.5px;
     font-weight: 700;
-    color: #281e15;
+    color: rgba(44, 33, 22, 0.78);
+  }
+
+  .rail-scrub.expanded .rail-scrub-label {
+    font-size: 13px;
+    color: #241a12;
+  }
+
+  .rail-scrub.expanded .rail-scrub-val {
+    font-size: 13px;
+    color: #5a1f13;
+    background: rgba(255, 250, 242, 0.72);
+    padding: 3px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(90, 31, 19, 0.22);
   }
 
   /* Original Left-Edge Docked Palette (Above) & Bath (Below) Flyouts */
@@ -1594,9 +1693,10 @@
     gap: 8px;
   }
   .studio-stage.fullscreen-mode .mini-hanko {
-    font-size: 13px;
-    padding: 3px 5px;
-    border-radius: 3px;
+    font-size: 14px;
+    padding: 0 2px;
+    width: auto;
+    height: auto;
   }
   .studio-stage.fullscreen-mode .bath-controls-list {
     gap: 12px;
@@ -1776,30 +1876,43 @@
 
 <div class="studio-stage" id="studio-stage">
 
-  <!-- MIDDLE LEFT SECTION (Full-Screen / iPad): Drop + Push & Sliders ONLY -->
-  <aside class="sumi-rail" id="sumi-rail" aria-label="Drop and Push Controls">
+  <!-- MIDDLE LEFT FLYOUT (Full-Screen / iPad): Minimalist Square Drop + Push & Expandable Sliders -->
+  <aside class="sumi-rail dock-open" id="sumi-rail" aria-label="Drop and Push Controls">
+    <button class="dock-tab" id="tools-dock-tab" type="button" title="Hover or tap for Drop &amp; Push Controls">
+      <span class="dock-tab-kanji">筆</span>
+      <span class="dock-tab-text">Tools</span>
+    </button>
+
     <div class="rail-tool-block" id="rail-brush-block">
-      <button class="rail-switch-btn active" id="rail-brush-toggle" type="button" aria-pressed="true" title="Toggle Drop ON or OFF">
-        <span class="rail-switch-left">
-          <span class="rail-switch-dot"></span>
-          <span class="rail-switch-name">Drop</span>
-        </span>
-        <span class="rail-switch-pill" id="rail-brush-pill">ON</span>
+      <button class="rail-square-btn active" id="rail-brush-toggle" type="button" aria-pressed="true" title="Toggle Drop">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3.2C9.4 7 6.8 10.1 6.8 13.3a5.2 5.2 0 0 0 10.4 0C17.2 10.1 14.6 7 12 3.2Z"/>
+          <path d="M5.5 20.2c1.8.9 4.1 1.3 6.5 1.3s4.7-.4 6.5-1.3" stroke-opacity="0.65"/>
+        </svg>
+        <span class="rail-square-label">Drop</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Slide left/right to adjust Size (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 5.56%"></div>
-        <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Size</span>
-          <strong class="rail-scrub-val" id="scrub-val-size">0.30x</strong>
+      <div class="rail-sliders-collapse">
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Tap or drag to adjust Size (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 5.56%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-size" style="left: 5.56%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Size</span>
+              <strong class="rail-scrub-val" id="scrub-val-size">0.30x</strong>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Drop Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Slide left/right to adjust Rate (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 44.83%"></div>
-        <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Rate</span>
-          <strong class="rail-scrub-val" id="scrub-val-flow">1.40x</strong>
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Drop Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Tap or drag to adjust Rate (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 44.83%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-flow" style="left: 44.83%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Rate</span>
+              <strong class="rail-scrub-val" id="scrub-val-flow">1.40x</strong>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1807,27 +1920,36 @@
     <div class="rail-divider"></div>
 
     <div class="rail-tool-block" id="rail-stick-block">
-      <button class="rail-switch-btn active" id="rail-stick-toggle" type="button" aria-pressed="true" title="Toggle Push ON or OFF">
-        <span class="rail-switch-left">
-          <span class="rail-switch-dot"></span>
-          <span class="rail-switch-name">Push</span>
-        </span>
-        <span class="rail-switch-pill" id="rail-stick-pill">ON</span>
+      <button class="rail-square-btn active" id="rail-stick-toggle" type="button" aria-pressed="true" title="Toggle Push">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18.5 3.8L9.6 15.2"/>
+          <path d="M4 17.2c2.6-1.8 5.4-1.8 8 0s5.4 1.8 8 0"/>
+          <path d="M5.5 20.6c2.2-1.2 4.6-1.2 6.8 0s4.6 1.2 6.8 0" stroke-opacity="0.65"/>
+        </svg>
+        <span class="rail-square-label">Push</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Push Size" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Slide left/right to adjust Size (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.05%"></div>
-        <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Size</span>
-          <strong class="rail-scrub-val" id="scrub-val-stick-size">1.00x</strong>
+      <div class="rail-sliders-collapse">
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Push Size" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Tap or drag to adjust Size (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.05%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-stick-size" style="left: 21.05%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Size</span>
+              <strong class="rail-scrub-val" id="scrub-val-stick-size">1.00x</strong>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Slide left/right to adjust Force (double-tap to reset)">
-        <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.37%"></div>
-        <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Force</span>
-          <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.00x</strong>
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Tap or drag to adjust Force (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.37%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-stick-drag" style="left: 18.37%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Force</span>
+              <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.00x</strong>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1870,7 +1992,6 @@
         <div class="tool-col" id="pour-col">
           <div class="tool-col-head">
             <span class="tool-col-title">Drop</span>
-            <span class="tool-col-badge" id="pour-col-badge">ON</span>
           </div>
           <label class="craft-slider">
             <div class="craft-slider-header">
@@ -1891,7 +2012,6 @@
         <div class="tool-col" id="push-col">
           <div class="tool-col-head">
             <span class="tool-col-title">Push</span>
-            <span class="tool-col-badge" id="push-col-badge">ON</span>
           </div>
           <label class="craft-slider">
             <div class="craft-slider-header">
@@ -1963,21 +2083,13 @@
     </div>
   </div>
 
-  <!-- 2. MIDDLE TOOL RACK HOTSPOTS (Studio Table Mode ON/OFF Switches) -->
-  <button class="tool-hotspot active" data-tool="0" type="button" aria-pressed="true" title="Toggle Drop ON or OFF">
-    <span class="plaque-label">
-      <span class="plaque-dot"></span>
-      <span>Drop</span>
-      <span class="plaque-state" data-plaque-state="0">ON</span>
-    </span>
+  <!-- 2. MIDDLE TOOL RACK HOTSPOTS (Studio Table Mode Switches) -->
+  <button class="tool-hotspot active" data-tool="0" type="button" aria-pressed="true" title="Toggle Drop">
+    <span class="plaque-label">Drop</span>
   </button>
 
-  <button class="tool-hotspot active" data-tool="1" type="button" aria-pressed="true" title="Toggle Push ON or OFF">
-    <span class="plaque-label">
-      <span class="plaque-dot"></span>
-      <span>Push</span>
-      <span class="plaque-state" data-plaque-state="1">ON</span>
-    </span>
+  <button class="tool-hotspot active" data-tool="1" type="button" aria-pressed="true" title="Toggle Push">
+    <span class="plaque-label">Push</span>
   </button>
 
   <!-- 3. BOTTOM CARD OVERLAY: Water Bath Controls -->
@@ -5299,10 +5411,44 @@ void main() {
   const fullscreenBtn = document.getElementById("fullscreen-btn");
   const fsCornerExitBtn = document.getElementById("fs-corner-exit");
   const topDockCard = document.getElementById("top-dock-card");
+  const sumiRail = document.getElementById("sumi-rail");
   const bathDockCard = document.getElementById("bath-dock-card");
   const topDockTab = document.getElementById("top-dock-tab");
+  const toolsDockTab = document.getElementById("tools-dock-tab");
   const bathDockTab = document.getElementById("bath-dock-tab");
   let hadNativeFullscreen = false;
+  let openScrubEl = null;
+  let compressScrubTimer = null;
+
+  function collapseAllScrubbers() {
+    if (compressScrubTimer) {
+      clearTimeout(compressScrubTimer);
+      compressScrubTimer = null;
+    }
+    document.querySelectorAll(".rail-scrub.expanded").forEach(el => el.classList.remove("expanded"));
+    if (sumiRail) sumiRail.classList.remove("has-expanded-scrub");
+    openScrubEl = null;
+  }
+
+  function expandScrubber(el) {
+    if (compressScrubTimer) {
+      clearTimeout(compressScrubTimer);
+      compressScrubTimer = null;
+    }
+    document.querySelectorAll(".rail-scrub.expanded").forEach(other => {
+      if (other !== el) other.classList.remove("expanded");
+    });
+    el.classList.add("expanded");
+    if (sumiRail) sumiRail.classList.add("has-expanded-scrub");
+    openScrubEl = el;
+  }
+
+  function scheduleCompressScrubber(delayMs = 160) {
+    if (compressScrubTimer) clearTimeout(compressScrubTimer);
+    compressScrubTimer = setTimeout(() => {
+      collapseAllScrubbers();
+    }, delayMs);
+  }
 
   if (fullscreenBtn) {
     fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
@@ -5314,7 +5460,9 @@ void main() {
   }
 
   function closeDockedDrawers() {
+    collapseAllScrubbers();
     if (topDockCard) topDockCard.classList.remove("dock-open");
+    if (sumiRail) sumiRail.classList.remove("dock-open");
     if (bathDockCard) bathDockCard.classList.remove("dock-open");
   }
 
@@ -5392,20 +5540,47 @@ void main() {
   if (topDockTab && topDockCard) {
     topDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
+      collapseAllScrubbers();
       const opening = !topDockCard.classList.contains("dock-open");
       topDockCard.classList.toggle("dock-open", opening);
-      if (opening && bathDockCard) bathDockCard.classList.remove("dock-open");
+      if (opening) {
+        if (sumiRail) sumiRail.classList.remove("dock-open");
+        if (bathDockCard) bathDockCard.classList.remove("dock-open");
+      }
+    });
+  }
+
+  if (toolsDockTab && sumiRail) {
+    toolsDockTab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      collapseAllScrubbers();
+      const opening = !sumiRail.classList.contains("dock-open");
+      sumiRail.classList.toggle("dock-open", opening);
+      if (opening) {
+        if (topDockCard) topDockCard.classList.remove("dock-open");
+        if (bathDockCard) bathDockCard.classList.remove("dock-open");
+      }
     });
   }
 
   if (bathDockTab && bathDockCard) {
     bathDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
+      collapseAllScrubbers();
       const opening = !bathDockCard.classList.contains("dock-open");
       bathDockCard.classList.toggle("dock-open", opening);
-      if (opening && topDockCard) topDockCard.classList.remove("dock-open");
+      if (opening) {
+        if (topDockCard) topDockCard.classList.remove("dock-open");
+        if (sumiRail) sumiRail.classList.remove("dock-open");
+      }
     });
   }
+
+  document.addEventListener("pointerdown", (e) => {
+    if (openScrubEl && !openScrubEl.contains(e.target)) {
+      collapseAllScrubbers();
+    }
+  });
 
   view.addEventListener("pointerdown", (e) => {
     flushPendingColorIfAny();
@@ -5572,40 +5747,32 @@ void main() {
   // =========================================================
   const railBrushBlock = document.getElementById("rail-brush-block");
   const railBrushToggle = document.getElementById("rail-brush-toggle");
-  const railBrushPill = document.getElementById("rail-brush-pill");
   const railStickBlock = document.getElementById("rail-stick-block");
   const railStickToggle = document.getElementById("rail-stick-toggle");
-  const railStickPill = document.getElementById("rail-stick-pill");
 
   const pourCol = document.getElementById("pour-col");
-  const pourColBadge = document.getElementById("pour-col-badge");
   const pushCol = document.getElementById("push-col");
-  const pushColBadge = document.getElementById("push-col-badge");
   const stickSubmodeWrap = document.getElementById("stick-submode-wrap");
   const inkPinControls = document.getElementById("ink-pin-controls");
   const pinControls = document.getElementById("pin-controls");
   const unifiedFooterNote = document.getElementById("unified-footer-note");
 
   function syncToolStateUI() {
-    // 1. Drop visual state
+    // 1. Drop visual state (collapses sliders underneath when OFF)
     if (railBrushToggle) {
       railBrushToggle.classList.toggle("active", brushOn);
       railBrushToggle.setAttribute("aria-pressed", brushOn ? "true" : "false");
     }
-    if (railBrushPill) railBrushPill.textContent = brushOn ? "ON" : "OFF";
     if (railBrushBlock) railBrushBlock.classList.toggle("is-off", !brushOn);
     if (pourCol) pourCol.classList.toggle("is-off", !brushOn);
-    if (pourColBadge) pourColBadge.textContent = brushOn ? "ON" : "OFF";
 
-    // 2. Push visual state
+    // 2. Push visual state (collapses sliders underneath when OFF)
     if (railStickToggle) {
       railStickToggle.classList.toggle("active", stickOn);
       railStickToggle.setAttribute("aria-pressed", stickOn ? "true" : "false");
     }
-    if (railStickPill) railStickPill.textContent = stickOn ? "ON" : "OFF";
     if (railStickBlock) railStickBlock.classList.toggle("is-off", !stickOn);
     if (pushCol) pushCol.classList.toggle("is-off", !stickOn);
-    if (pushColBadge) pushColBadge.textContent = stickOn ? "ON" : "OFF";
 
     // 3. Studio Table tool rack plaques
     document.querySelectorAll(".tool-hotspot").forEach(btn => {
@@ -5613,8 +5780,6 @@ void main() {
       const isOn = idx === 0 ? brushOn : stickOn;
       btn.classList.toggle("active", isOn);
       btn.setAttribute("aria-pressed", isOn ? "true" : "false");
-      const badge = btn.querySelector("[data-plaque-state]");
-      if (badge) badge.textContent = isOn ? "ON" : "OFF";
     });
 
     // 4. Studio Table contextual sub-controls (hidden in Full-Screen / iPad mode)
@@ -5652,6 +5817,7 @@ void main() {
   }
 
   function toggleToolSwitch(which) {
+    collapseAllScrubbers();
     if (which === "brush") {
       brushOn = !brushOn;
       if (!brushOn && !stickOn) stickOn = true;
@@ -5907,11 +6073,13 @@ void main() {
     const pct = Math.max(0, Math.min(100, ((val - cfg.min) / (cfg.max - cfg.min)) * 100));
     const disp = val.toFixed(2) + "x";
     const fillEl = document.getElementById(`scrub-fill-${key}`);
+    const thumbEl = document.getElementById(`scrub-thumb-${key}`);
     const valEl = document.getElementById(`scrub-val-${key}`);
     const scrubEl = document.querySelector(`.rail-scrub[data-scrub="${key}"]`);
     const inputEl = document.getElementById(cfg.inputId);
     const readEl = document.getElementById(cfg.readId);
     if (fillEl) fillEl.style.width = pct.toFixed(2) + "%";
+    if (thumbEl) thumbEl.style.left = `calc(${(pct / 100).toFixed(4)} * (100% - 16px) + 8px)`;
     if (valEl) valEl.textContent = disp;
     if (scrubEl) scrubEl.setAttribute("aria-valuenow", val.toFixed(2));
     if (inputEl && Math.abs(parseFloat(inputEl.value) - val) > 1e-5) inputEl.value = String(val);
@@ -5950,7 +6118,16 @@ void main() {
     let startX = 0;
     let startVal = cfg.def;
     let moved = false;
+    let wasAlreadyExpanded = false;
     let lastTapTime = 0;
+
+    function valueFromExpandedTrack(clientX) {
+      const rect = scrubEl.getBoundingClientRect();
+      const pad = 12;
+      const usable = Math.max(1, rect.width - pad * 2);
+      const t = Math.max(0, Math.min(1, (clientX - rect.left - pad) / usable));
+      return cfg.min + t * (cfg.max - cfg.min);
+    }
 
     scrubEl.addEventListener("pointerdown", (e) => {
       if (activePointer !== null) return;
@@ -5958,7 +6135,13 @@ void main() {
       startX = e.clientX;
       startVal = cfg.get();
       moved = false;
-      scrubEl.classList.add("scrubbing");
+      wasAlreadyExpanded = scrubEl.classList.contains("expanded");
+
+      expandScrubber(scrubEl);
+      if (wasAlreadyExpanded) {
+        applyParamValue(key, valueFromExpandedTrack(e.clientX));
+      }
+
       scrubEl.setPointerCapture(e.pointerId);
       e.stopPropagation();
       e.preventDefault();
@@ -5968,9 +6151,14 @@ void main() {
       if (e.pointerId !== activePointer) return;
       const dx = e.clientX - startX;
       if (Math.abs(dx) > 2) moved = true;
-      // 132px horizontal drag covers full parameter range continuously without jumping on touch
-      const nextVal = startVal + (dx / 132) * (cfg.max - cfg.min);
-      applyParamValue(key, nextVal);
+
+      if (wasAlreadyExpanded) {
+        applyParamValue(key, valueFromExpandedTrack(e.clientX));
+      } else {
+        // Smooth continuous adjustment across expanded width without jumping on initial touch
+        const nextVal = startVal + (dx / 185) * (cfg.max - cfg.min);
+        applyParamValue(key, nextVal);
+      }
     });
 
     function endScrub(e) {
@@ -5978,7 +6166,6 @@ void main() {
       if (scrubEl.hasPointerCapture(e.pointerId)) {
         scrubEl.releasePointerCapture(e.pointerId);
       }
-      scrubEl.classList.remove("scrubbing");
       activePointer = null;
 
       if (!moved && e.type === "pointerup") {
@@ -5986,10 +6173,21 @@ void main() {
         if (now - lastTapTime < 320) {
           applyParamValue(key, cfg.def);
           lastTapTime = 0;
-        } else {
-          lastTapTime = now;
+          scheduleCompressScrubber(160);
+          return;
         }
+        lastTapTime = now;
+
+        // If already expanded, tapping a spot on the expanded track completes the selection and compresses back
+        if (wasAlreadyExpanded) {
+          scheduleCompressScrubber(160);
+        }
+        // If tapped from compact without dragging, remain expanded until user taps/drags a value (or taps outside)
+        return;
       }
+
+      // Selection finished via drag -> compress back into compact pill
+      scheduleCompressScrubber(160);
     }
 
     scrubEl.addEventListener("pointerup", endScrub);
@@ -5997,11 +6195,17 @@ void main() {
 
     scrubEl.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+        expandScrubber(scrubEl);
         applyParamValue(key, cfg.get() + 0.05);
+        scheduleCompressScrubber(600);
         e.preventDefault();
       } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+        expandScrubber(scrubEl);
         applyParamValue(key, cfg.get() - 0.05);
+        scheduleCompressScrubber(600);
         e.preventDefault();
+      } else if (e.key === "Escape" || e.key === "Enter") {
+        collapseAllScrubbers();
       }
     });
   });
