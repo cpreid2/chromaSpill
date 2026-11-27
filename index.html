@@ -172,17 +172,14 @@
   }
 
   .mini-hanko {
-    display: inline-grid;
-    place-items: center;
-    width: 1.35cqw;
-    height: 1.35cqw;
-    border: 1.5px solid #9e2a1b;
-    border-radius: 2px;
-    color: #9e2a1b;
-    font-size: 0.8cqw;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8f3020;
+    font-size: 0.9cqw;
     font-weight: 700;
     line-height: 1;
-    opacity: 0.85;
+    opacity: 0.72;
   }
 
   .cycle-toggle {
@@ -209,10 +206,10 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.55cqw;
-    max-height: 4.8cqw;
+    gap: 0.6cqw;
+    max-height: 5.4cqw;
     overflow-y: auto;
-    padding: 0.2cqw 0.15cqw;
+    padding: 0.45cqw 0.45cqw 0.35cqw 0.25cqw;
   }
 
   .swatches-list {
@@ -254,24 +251,34 @@
 
   .swatch-del {
     position: absolute;
-    top: -0.25cqw;
-    right: -0.25cqw;
-    width: 0.95cqw;
-    height: 0.95cqw;
-    background: #f5efe6;
-    color: #5c4b3c;
-    border: 1px solid rgba(0,0,0,0.3);
+    top: -0.32cqw;
+    right: -0.32cqw;
+    width: 1.05cqw;
+    height: 1.05cqw;
+    background: #f7f1e6;
+    color: #5a2216;
+    border: 1px solid rgba(55, 40, 26, 0.48);
     border-radius: 50%;
-    font-size: 0.65cqw;
-    line-height: 0.85cqw;
-    text-align: center;
+    font-size: 0.72cqw;
+    font-weight: 700;
+    line-height: 1;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     display: none;
-    font-family: sans-serif;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+    font-family: system-ui, -apple-system, sans-serif;
   }
 
   .swatch-wrap:hover .swatch-del {
-    display: block;
+    display: flex;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .swatch-del {
+      display: flex;
+    }
   }
 
   .btn-add-color,
@@ -333,20 +340,73 @@
   /* =========================================================
      Skeuomorphic Recessed Groove & Brass Knob Sliders
      ========================================================= */
-  .compact-sliders {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55cqw;
-    padding-top: 0.4cqw;
-    border-top: 1px solid rgba(75, 58, 40, 0.2);
+  .dual-tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75cqw;
+    padding-top: 0.35cqw;
+    border-top: 1px solid rgba(75, 58, 40, 0.22);
   }
 
-  .stick-sliders-wrap {
+  .tool-col {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    flex: 1;
-    padding: 0.4cqw 0;
+    gap: 0.42cqw;
+    transition: opacity 0.18s ease;
+  }
+
+  .tool-col + .tool-col {
+    padding-left: 0.7cqw;
+    border-left: 1px solid rgba(75, 58, 40, 0.2);
+  }
+
+  .tool-col.is-off {
+    opacity: 0.45;
+  }
+
+  .tool-col.is-off label.craft-slider {
+    display: none;
+  }
+
+  .tool-col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.65cqw;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+  }
+
+  .tool-col-badge {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.56cqw;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 0.06cqw 0.32cqw;
+    border-radius: 999px;
+    background: rgba(94, 36, 24, 0.15);
+    color: #5e2418;
+  }
+
+  .tool-col.is-off .tool-col-badge {
+    background: rgba(75, 58, 40, 0.12);
+    color: var(--muted-text);
+  }
+
+  .colors.is-off {
+    opacity: 0.42;
+  }
+
+  .unified-footer-note {
+    margin: 0;
+    padding-top: 0.3cqw;
+    border-top: 1px solid rgba(75, 58, 40, 0.18);
+    font-size: 0.65cqw;
+    font-style: italic;
+    color: var(--muted-text);
+    text-align: center;
   }
 
   /* Bamboo Stick: Stir / Pins segmented toggle */
@@ -657,25 +717,29 @@
   }
 
   .plaque-label {
-    width: 82%;
-    height: 20%;
-    border-radius: 0.25cqw;
-    display: grid;
-    place-items: center;
-    font-size: 0.68cqw;
+    width: 84%;
+    height: 21%;
+    border-radius: 0.28cqw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.35cqw;
+    font-size: 0.66cqw;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
-    background: linear-gradient(180deg, #d7cec0, #b8ad9c);
-    color: #2b221a;
-    border: 1px solid rgba(40, 30, 20, 0.65);
+    background: linear-gradient(180deg, #bdb3a3, #9f9381);
+    color: #46392d;
+    border: 1px solid #5a4b3c;
     box-shadow:
-      0 0.2cqw 0.45cqw rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    transition: all 0.2s ease;
+      inset 0 1px 2px rgba(0, 0, 0, 0.25),
+      0 1px 2px rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    transition: all 0.18s ease;
   }
 
   .tool-hotspot.active .plaque-label {
+    opacity: 1;
     background: linear-gradient(180deg, #5e2418, #3d160e);
     color: #f3e9d8;
     border-color: #a84630;
@@ -1045,7 +1109,8 @@
     display: block;
   }
 
-  .dock-tab {
+  .dock-tab,
+  .sumi-rail {
     display: none;
   }
 
@@ -1067,40 +1132,423 @@
     box-shadow: none;
   }
 
-  /* Left Docked Hoverable Parchment Windows (Same Core Top/Middle/Bottom Layout) */
+  .studio-stage.fullscreen-mode .tool-hotspot {
+    display: none;
+  }
+
+  /* =========================================================
+     Middle Drop + Push Dockable Flyout & Expandable Micro-Sliders (Full-Screen / iPad)
+     ========================================================= */
+  .studio-stage.fullscreen-mode .sumi-rail {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateX(calc(-100% + 6px)) translateY(-50%);
+    width: 112px;
+    padding: 10px;
+    border-radius: 9px;
+    background-color: #d6cbb8;
+    background-image:
+      radial-gradient(circle at 25% 20%, rgba(248, 242, 230, 0.78), transparent 60%),
+      radial-gradient(circle at 80% 85%, rgba(175, 158, 134, 0.48), transparent 65%),
+      repeating-linear-gradient(0deg, rgba(60, 45, 30, 0.025) 0px, rgba(60, 45, 30, 0.025) 1px, transparent 1px, transparent 3px);
+    border: 1px solid rgba(55, 42, 28, 0.78);
+    box-shadow:
+      inset 0 0 14px rgba(68, 50, 32, 0.36),
+      inset 0 1px 0 rgba(255, 250, 240, 0.6),
+      0 10px 30px rgba(0, 0, 0, 0.72);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 36;
+    overflow: visible;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .studio-stage.ios-device #fullscreen-btn,
+  .studio-stage.ios-device #fs-corner-exit {
+    display: none !important;
+  }
+
+  /* Live 1:1 Circular Diameter Preview Floating Beside Size Sliders */
+  .size-diameter-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 85;
+    opacity: 0;
+    transform: scale(0.78);
+    transition: opacity 0.16s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .size-diameter-preview.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .size-preview-wake,
+  .size-preview-core {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .size-preview-wake {
+    border: 1.5px dashed rgba(246, 236, 218, 0.78);
+    background: radial-gradient(circle, rgba(246, 236, 218, 0.08) 0%, rgba(246, 236, 218, 0.02) 70%, transparent 100%);
+    box-shadow: 0 0 0 1px rgba(24, 16, 10, 0.38);
+  }
+
+  .size-preview-core {
+    border: 2px solid rgba(252, 244, 228, 0.96);
+    background: rgba(245, 226, 192, 0.14);
+    box-shadow:
+      0 0 0 1px rgba(24, 16, 10, 0.65),
+      inset 0 0 0 1px rgba(24, 16, 10, 0.32),
+      0 6px 18px rgba(0, 0, 0, 0.36);
+  }
+
+  .size-preview-core::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(252, 244, 228, 0.95);
+    box-shadow: 0 0 0 1px rgba(24, 16, 10, 0.65);
+  }
+
+  .studio-stage.fullscreen-mode .sumi-rail.dock-open {
+    transform: translateX(max(12px, env(safe-area-inset-left, 12px))) translateY(-50%);
+    z-index: 39;
+  }
+
+  .studio-stage.fullscreen-mode .sumi-rail .dock-tab {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .rail-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(75, 58, 40, 0.24);
+    margin: 1px 0;
+  }
+
+  .rail-tool-block {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Minimalistic Square Icon Buttons for Drop & Push (No LED, No ON Label) */
+  .rail-square-btn {
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid rgba(58, 44, 30, 0.38);
+    background: rgba(62, 48, 34, 0.08);
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.22),
+      0 1px 0 rgba(255, 250, 240, 0.45);
+    color: rgba(58, 44, 30, 0.62);
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+  }
+
+  .rail-square-btn:active {
+    transform: scale(0.94);
+  }
+
+  .rail-square-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.85;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.18s ease;
+  }
+
+  .rail-square-label {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .rail-square-btn.active {
+    background: linear-gradient(180deg, #5e2418, #3d160e);
+    border-color: #9e402b;
+    color: #f6ede0;
+    box-shadow:
+      0 3px 9px rgba(0, 0, 0, 0.46),
+      inset 0 1px 0 rgba(255, 200, 175, 0.3);
+  }
+
+  /* Smoothly Collapse & Hide Sliders When Drop or Push is OFF */
+  .rail-sliders-collapse {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 64px;
+    margin-top: 7px;
+    opacity: 1;
+    overflow: visible;
+    transition:
+      max-height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.18s ease,
+      margin-top 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .rail-tool-block.is-off .rail-sliders-collapse {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Fixed-Height Slot so Unfurling Slider Never Shifts Layout Vertically */
+  .rail-scrub-slot {
+    position: relative;
+    width: 92px;
+    height: 22px;
+  }
+
+  .rail-scrub-slot:has(.rail-scrub.expanded) {
+    z-index: 60;
+  }
+
+  /* Compact Micro-Slider that Springs Outward on Click/Press & Compresses Back */
+  .rail-scrub {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 92px;
+    height: 22px;
+    border-radius: 6px;
+    background: rgba(58, 44, 30, 0.14);
+    border: 1px solid rgba(60, 45, 30, 0.42);
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.26),
+      0 1px 0 rgba(255, 250, 240, 0.4);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 0 7px;
+    cursor: ew-resize;
+    touch-action: none;
+    z-index: 2;
+    transition:
+      width 0.28s cubic-bezier(0.2, 1.22, 0.28, 1),
+      height 0.24s cubic-bezier(0.2, 1.22, 0.28, 1),
+      border-radius 0.24s ease,
+      padding 0.24s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.24s ease,
+      opacity 0.18s ease;
+  }
+
+  /* Dim sibling micro-sliders while one slider is expanded */
+  .sumi-rail.has-expanded-scrub .rail-scrub:not(.expanded) {
+    opacity: 0.38;
+  }
+
+  /* Visually Interesting Unfurled Precision Slider State */
+  .rail-scrub.expanded {
+    width: 248px;
+    height: 40px;
+    border-radius: 10px;
+    padding: 0 14px;
+    background-color: #eee4d2;
+    border: 1.5px solid #9e311d;
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255, 248, 235, 0.35),
+      inset 0 1px 3px rgba(0, 0, 0, 0.22);
+    z-index: 60;
+  }
+
+  /* Subtle Engraved Scale Tick Marks Revealed Only When Expanded */
+  .rail-scrub::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 3px;
+    height: 4px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(72, 52, 34, 0.38) 0px,
+      rgba(72, 52, 34, 0.38) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .rail-scrub.expanded::after {
+    opacity: 1;
+  }
+
+  .rail-scrub-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .rail-scrub-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 25%;
+    background: linear-gradient(90deg, rgba(158, 49, 29, 0.28), rgba(196, 145, 62, 0.58));
+    border-right: 1.5px solid rgba(145, 92, 24, 0.78);
+    pointer-events: none;
+  }
+
+  .rail-scrub.expanded .rail-scrub-fill {
+    background: linear-gradient(90deg, rgba(158, 49, 29, 0.36), rgba(206, 152, 64, 0.72));
+    border-right-width: 2px;
+  }
+
+  /* Burnished Brass Thumb Jewel Materializing on Expansion */
+  .rail-scrub-thumb {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f7dc9c 0%, #c69344 50%, #784f18 100%);
+    border: 1px solid rgba(48, 30, 12, 0.85);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 246, 220, 0.8);
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.22s cubic-bezier(0.2, 1.3, 0.3, 1), opacity 0.16s ease;
+  }
+
+  .rail-scrub.expanded .rail-scrub-thumb {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  .rail-scrub-label,
+  .rail-scrub-val {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    line-height: 1;
+    transition: font-size 0.2s ease, color 0.2s ease;
+  }
+
+  .rail-scrub-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #36291e;
+    letter-spacing: 0.03em;
+  }
+
+  .rail-scrub-val {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: rgba(44, 33, 22, 0.78);
+  }
+
+  .rail-scrub.expanded .rail-scrub-label {
+    font-size: 13px;
+    color: #241a12;
+  }
+
+  .rail-scrub.expanded .rail-scrub-val {
+    font-size: 13px;
+    color: #5a1f13;
+    background: rgba(255, 250, 242, 0.72);
+    padding: 3px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(90, 31, 19, 0.22);
+  }
+
+  /* Original Left-Edge Docked Palette (Above) & Bath (Below) Flyouts */
   .studio-stage.fullscreen-mode .parchment-card {
     overflow: visible;
-    width: clamp(276px, 21.5cqmax, 365px);
-    padding: 1.05cqmax 1.3cqmax;
-    border-radius: 0.45cqmax;
-    z-index: 35;
+    width: clamp(300px, 28cqmax, 380px);
+    max-height: calc(100dvh - 28px);
+    padding: 15px 17px;
+    border-radius: 9px;
+    z-index: 38;
     box-shadow:
-      inset 0 0 1.4cqmax rgba(68, 50, 32, 0.42),
-      inset 0 1px 0 rgba(255, 250, 240, 0.5),
-      0 10px 30px rgba(0, 0, 0, 0.72);
-    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+      inset 0 0 16px rgba(68, 50, 32, 0.4),
+      inset 0 1px 0 rgba(255, 250, 240, 0.55),
+      0 12px 34px rgba(0, 0, 0, 0.75);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .studio-stage.fullscreen-mode .top-slot {
     left: 0;
     top: max(12px, env(safe-area-inset-top, 12px));
-    height: clamp(210px, 28cqmax, 310px);
+    height: auto;
+    min-height: 0;
+    gap: 10px;
     transform: translateX(calc(-100% + 6px));
+  }
+
+  .studio-stage.fullscreen-mode .top-view.active {
+    height: auto;
+    gap: 10px;
+  }
+
+  /* In Full-Screen / iPad mode, Top Flyout has ONLY Palette Selection + Auto Toggle */
+  .studio-stage.fullscreen-mode .dual-tool-grid,
+  .studio-stage.fullscreen-mode .pin-controls,
+  .studio-stage.fullscreen-mode .unified-footer-note,
+  .studio-stage.fullscreen-mode #stick-submode-wrap {
+    display: none !important;
   }
 
   .studio-stage.fullscreen-mode .bath-slot {
     left: 0;
     top: auto;
     bottom: max(12px, env(safe-area-inset-bottom, 12px));
-    height: clamp(230px, 31.5cqmax, 340px);
+    height: auto;
+    min-height: 0;
+    gap: 12px;
     transform: translateX(calc(-100% + 6px));
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .studio-stage.fullscreen-mode .top-slot:hover,
-    .studio-stage.fullscreen-mode .bath-slot:hover {
-      transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
-    }
   }
 
   .studio-stage.fullscreen-mode .top-slot.dock-open,
@@ -1108,24 +1556,22 @@
     transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
   }
 
-  /* Protruding Parchment Handle Tabs on Docked Windows */
+  /* Protruding Parchment Handle Tabs on Palette (Above) & Bath (Below) Flyouts */
   .studio-stage.fullscreen-mode .dock-tab {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 5px;
     position: absolute;
     left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    padding: 12px 4px;
+    width: 34px;
+    padding: 13px 5px;
     background-color: #d6cbb8;
     background-image: linear-gradient(90deg, #c6b9a3, #dfd4c2);
-    border: 1px solid rgba(55, 42, 28, 0.75);
+    border: 1px solid rgba(55, 42, 28, 0.78);
     border-left: none;
-    border-radius: 0 7px 7px 0;
+    border-radius: 0 8px 8px 0;
     box-shadow: 4px 3px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 250, 240, 0.55);
     color: var(--ink-text);
     font-family: inherit;
@@ -1133,8 +1579,16 @@
     z-index: 2;
   }
 
+  .studio-stage.fullscreen-mode .top-slot .dock-tab {
+    top: 16px;
+  }
+
+  .studio-stage.fullscreen-mode .bath-slot .dock-tab {
+    bottom: 16px;
+  }
+
   .studio-stage.fullscreen-mode .dock-tab-kanji {
-    font-size: 12px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #9e2a1b;
     line-height: 1;
@@ -1143,42 +1597,11 @@
   .studio-stage.fullscreen-mode .dock-tab-text {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-text);
-  }
-
-  /* Middle-Left Tool Selector Plaques in Fullscreen */
-  .studio-stage.fullscreen-mode .tool-hotspot {
-    left: max(10px, env(safe-area-inset-left, 10px));
-    width: auto;
-    height: auto;
-    z-index: 34;
-    opacity: 0.82;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .studio-stage.fullscreen-mode .tool-hotspot:hover,
-  .studio-stage.fullscreen-mode .tool-hotspot.active {
-    opacity: 1;
-  }
-
-  .studio-stage.fullscreen-mode .tool-hotspot[data-tool="0"] {
-    top: calc(50% - 34px);
-  }
-
-  .studio-stage.fullscreen-mode .tool-hotspot[data-tool="1"] {
-    top: calc(50% + 4px);
-  }
-
-  .studio-stage.fullscreen-mode .plaque-label {
-    width: auto;
-    height: auto;
-    padding: 7px 12px;
-    border-radius: 5px;
-    font-size: 11px;
   }
 
   /* Right-Side Docked Print & Clear Plaques + Quick Exit Fullscreen Button */
@@ -1196,10 +1619,10 @@
 
   .studio-stage.fullscreen-mode .washi-hotspot {
     width: auto;
-    height: 32px;
-    padding: 0 12px;
+    height: 36px;
+    padding: 0 14px;
     transform: none;
-    background: rgba(214, 203, 184, 0.9);
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     border-radius: 6px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
@@ -1208,11 +1631,11 @@
     gap: 6px;
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.82;
+    opacity: 0.88;
   }
 
   .studio-stage.fullscreen-mode .washi-hotspot:hover {
@@ -1226,16 +1649,16 @@
     right: 0;
     transform: none;
     top: calc(100% + 6px);
-    width: max(150px, 10cqmax);
+    width: max(164px, 11cqmax);
     padding: 8px;
     gap: 6px;
     border-radius: 6px;
   }
 
   .studio-stage.fullscreen-mode .washi-btn {
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 4px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 5px;
   }
 
   .studio-stage.fullscreen-mode .fs-only-label {
@@ -1245,16 +1668,16 @@
   .studio-stage.fullscreen-mode .fs-corner-exit {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border-radius: 6px;
-    background: rgba(214, 203, 184, 0.9);
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
     color: var(--ink-text);
     cursor: pointer;
-    opacity: 0.82;
+    opacity: 0.88;
     transition: opacity 0.15s, background 0.15s;
   }
 
@@ -1264,8 +1687,8 @@
   }
 
   .studio-stage.fullscreen-mode .fs-corner-exit svg {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     stroke: currentColor;
     fill: none;
     stroke-width: 2;
@@ -1279,20 +1702,20 @@
     top: auto;
     bottom: max(12px, env(safe-area-inset-bottom, 12px));
     width: auto;
-    height: 32px;
-    padding: 0 12px;
-    background: rgba(214, 203, 184, 0.9);
+    height: 36px;
+    padding: 0 14px;
+    background: rgba(214, 203, 184, 0.92);
     border: 1px solid rgba(55, 42, 28, 0.72);
     border-radius: 6px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 250, 240, 0.55);
     color: var(--ink-text);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     z-index: 34;
-    opacity: 0.82;
+    opacity: 0.88;
   }
 
   .studio-stage.fullscreen-mode .water-cup-hotspot::before {
@@ -1304,55 +1727,143 @@
     background: rgba(235, 226, 210, 0.98);
   }
 
-  /* Keep card inner typography & touch controls comfortable in portrait iPad fullscreen */
-  .studio-stage.fullscreen-mode .section-header h2 { font-size: max(12px, 0.95cqmax); }
+  /* Keep card inner typography, swatches, & delete badges crisp and unclipped on iPad */
+  .studio-stage.fullscreen-mode .section-header {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+  .studio-stage.fullscreen-mode .section-header h2 {
+    font-size: 15px;
+    letter-spacing: 0.1em;
+  }
+  .studio-stage.fullscreen-mode .header-right-group {
+    gap: 8px;
+  }
+  .studio-stage.fullscreen-mode .mini-hanko {
+    font-size: 14px;
+    padding: 0 2px;
+    width: auto;
+    height: auto;
+  }
+  .studio-stage.fullscreen-mode .bath-controls-list {
+    gap: 12px;
+    padding-top: 4px;
+  }
+  .studio-stage.fullscreen-mode label.craft-slider {
+    gap: 6px;
+  }
   .studio-stage.fullscreen-mode .craft-slider-header,
-  .studio-stage.fullscreen-mode .water-color-row { font-size: max(11.5px, 0.84cqmax); }
-  .studio-stage.fullscreen-mode .craft-slider-header strong { font-size: max(11px, 0.82cqmax); }
+  .studio-stage.fullscreen-mode .water-color-row {
+    font-size: 13.5px;
+  }
+  .studio-stage.fullscreen-mode .craft-slider-header strong {
+    font-size: 13px;
+  }
   .studio-stage.fullscreen-mode .btn-float-image {
-    height: max(24px, 1.65cqmax);
-    padding: 0 max(8px, 0.55cqmax);
-    font-size: max(10.5px, 0.72cqmax);
+    height: 30px;
+    padding: 0 11px;
+    font-size: 12px;
+    border-radius: 5px;
+    gap: 5px;
   }
   .studio-stage.fullscreen-mode .btn-icon-only {
-    width: max(24px, 1.65cqmax);
+    width: 30px;
+    height: 30px;
     padding: 0;
   }
   .studio-stage.fullscreen-mode .btn-icon-only svg {
-    width: max(13px, 0.92cqmax);
-    height: max(13px, 0.92cqmax);
+    width: 15px;
+    height: 15px;
+  }
+  .studio-stage.fullscreen-mode .colors {
+    max-height: 124px;
+    gap: 12px;
+    padding: 8px 8px 6px 4px;
+    overflow-y: auto;
   }
   .studio-stage.fullscreen-mode .swatch {
-    width: max(26px, 2.05cqmax);
-    height: max(26px, 2.05cqmax);
+    width: 36px;
+    height: 36px;
+    border: 2.5px solid var(--ceramic);
+    box-shadow:
+      0 2px 5px rgba(25, 18, 12, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(60, 45, 30, 0.35);
+  }
+  .studio-stage.fullscreen-mode .swatch[aria-pressed="true"] {
+    box-shadow:
+      0 3px 8px rgba(166, 52, 32, 0.45),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 2px var(--accent);
+  }
+  .studio-stage.fullscreen-mode .swatch-del {
+    display: flex;
+    top: -6px;
+    right: -6px;
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    line-height: 1;
   }
   .studio-stage.fullscreen-mode .btn-add-color {
-    width: max(26px, 2.0cqmax);
-    height: max(26px, 2.0cqmax);
-    font-size: max(15px, 1.15cqmax);
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    border-radius: 6px;
   }
   .studio-stage.fullscreen-mode .water-swatch-btn {
-    width: max(24px, 1.85cqmax);
-    height: max(24px, 1.85cqmax);
+    width: 30px;
+    height: 30px;
+    border-width: 2.5px;
+  }
+  .studio-stage.fullscreen-mode .mode-toggle {
+    border-radius: 5px;
   }
   .studio-stage.fullscreen-mode .mode-toggle button {
-    font-size: max(9.5px, 0.61cqmax);
-    padding: max(3px, 0.18cqmax) max(6px, 0.42cqmax);
+    font-size: 11.5px;
+    padding: 5px 10px;
   }
-  .studio-stage.fullscreen-mode .cycle-toggle,
+  .studio-stage.fullscreen-mode .cycle-toggle {
+    font-size: 13px;
+    gap: 6px;
+  }
+  .studio-stage.fullscreen-mode .cycle-toggle input {
+    width: 16px;
+    height: 16px;
+  }
+  .studio-stage.fullscreen-mode .pin-controls {
+    gap: 6px;
+    padding-top: 8px;
+  }
+  .studio-stage.fullscreen-mode .pin-row,
+  .studio-stage.fullscreen-mode .pin-row-actions {
+    gap: 7px;
+  }
   .studio-stage.fullscreen-mode .pin-count {
-    font-size: max(10.5px, 0.72cqmax);
+    font-size: 12.5px;
+  }
+  .studio-stage.fullscreen-mode .pin-hint {
+    font-size: 12px;
   }
   .studio-stage.fullscreen-mode .craft-slider input[type="range"] {
-    height: max(7px, 0.55cqmax);
+    height: 8px;
+    margin: 3px 0;
   }
   .studio-stage.fullscreen-mode .craft-slider input[type="range"]::-webkit-slider-thumb {
-    width: max(18px, 1.4cqmax);
-    height: max(18px, 1.4cqmax);
+    width: 22px;
+    height: 22px;
+  }
+  .studio-stage.fullscreen-mode .grid-menu {
+    padding: 6px;
+    gap: 5px;
+    border-radius: 6px;
+    min-width: 128px;
   }
   .studio-stage.fullscreen-mode .grid-menu button {
-    font-size: max(11px, 0.7cqmax);
-    padding: max(5px, 0.3cqmax) max(8px, 0.5cqmax);
+    font-size: 12.5px;
+    padding: 7px 10px;
+    border-radius: 4px;
   }
   .studio-stage.fullscreen-mode .crop-modal-card {
     width: min(88vw, 480px);
@@ -1368,12 +1879,33 @@
     margin: 0 auto;
   }
   .studio-stage.fullscreen-mode .crop-hint {
-    font-size: 12px;
+    font-size: 12.5px;
   }
   .studio-stage.fullscreen-mode .crop-btn {
-    height: 34px;
-    font-size: 12px;
+    height: 36px;
+    font-size: 13px;
     border-radius: 5px;
+  }
+  .studio-stage.fullscreen-mode .dual-tool-grid {
+    gap: 14px;
+    padding-top: 10px;
+  }
+  .studio-stage.fullscreen-mode .tool-col {
+    gap: 10px;
+  }
+  .studio-stage.fullscreen-mode .tool-col + .tool-col {
+    padding-left: 14px;
+  }
+  .studio-stage.fullscreen-mode .tool-col-head {
+    font-size: 12px;
+  }
+  .studio-stage.fullscreen-mode .tool-col-badge {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+  .studio-stage.fullscreen-mode .unified-footer-note {
+    font-size: 12px;
+    padding-top: 8px;
   }
   .studio-stage.fullscreen-mode .tool-cursor {
     width: 9.5cqmax;
@@ -1392,32 +1924,110 @@
 
 <div class="studio-stage" id="studio-stage">
 
-  <!-- 1. TOP CARD OVERLAY: Sumi Inks (Tool 0) OR Bamboo Stick (Tool 1) -->
+  <!-- MIDDLE LEFT FLYOUT (Full-Screen / iPad): Minimalist Square Drop + Push & Expandable Sliders -->
+  <aside class="sumi-rail dock-open" id="sumi-rail" aria-label="Drop and Push Controls">
+    <button class="dock-tab" id="tools-dock-tab" type="button" title="Hover or tap for Drop &amp; Push Controls">
+      <span class="dock-tab-kanji">筆</span>
+      <span class="dock-tab-text">Tools</span>
+    </button>
+
+    <div class="rail-tool-block" id="rail-brush-block">
+      <button class="rail-square-btn active" id="rail-brush-toggle" type="button" aria-pressed="true" title="Toggle Drop">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3.2C9.4 7 6.8 10.1 6.8 13.3a5.2 5.2 0 0 0 10.4 0C17.2 10.1 14.6 7 12 3.2Z"/>
+          <path d="M5.5 20.2c1.8.9 4.1 1.3 6.5 1.3s4.7-.4 6.5-1.3" stroke-opacity="0.65"/>
+        </svg>
+        <span class="rail-square-label">Drop</span>
+      </button>
+
+      <div class="rail-sliders-collapse">
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Tap or drag to adjust Size (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 5.56%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-size" style="left: 5.56%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Size</span>
+              <strong class="rail-scrub-val" id="scrub-val-size">0.30x</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Drop Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Tap or drag to adjust Rate (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 44.83%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-flow" style="left: 44.83%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Rate</span>
+              <strong class="rail-scrub-val" id="scrub-val-flow">1.40x</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rail-divider"></div>
+
+    <div class="rail-tool-block" id="rail-stick-block">
+      <button class="rail-square-btn active" id="rail-stick-toggle" type="button" aria-pressed="true" title="Toggle Push">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18.5 3.8L9.6 15.2"/>
+          <path d="M4 17.2c2.6-1.8 5.4-1.8 8 0s5.4 1.8 8 0"/>
+          <path d="M5.5 20.6c2.2-1.2 4.6-1.2 6.8 0s4.6 1.2 6.8 0" stroke-opacity="0.65"/>
+        </svg>
+        <span class="rail-square-label">Push</span>
+      </button>
+
+      <div class="rail-sliders-collapse">
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Push Size" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Tap or drag to adjust Size (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.05%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-stick-size" style="left: 21.05%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Size</span>
+              <strong class="rail-scrub-val" id="scrub-val-stick-size">1.00x</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail-scrub-slot">
+          <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Tap or drag to adjust Force (double-tap to reset)">
+            <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.37%"></div>
+            <div class="rail-scrub-thumb" id="scrub-thumb-stick-drag" style="left: 18.37%"></div>
+            <div class="rail-scrub-content">
+              <span class="rail-scrub-label">Force</span>
+              <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.00x</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 1. TOP CARD OVERLAY: Sumi Ink Palette Flyout -->
   <div class="parchment-card top-slot" id="top-dock-card">
-    <button class="dock-tab" id="top-dock-tab" type="button" title="Hover or tap for Tool Parameters">
+    <button class="dock-tab" id="top-dock-tab" type="button" title="Hover or tap for Ink Palette">
       <span class="dock-tab-kanji">墨</span>
       <span class="dock-tab-text" id="top-dock-tab-text">Inks</span>
     </button>
-    <!-- View 0: Sumi Ink Palette + Brush Sliders -->
-    <div class="top-view active" id="panel-0">
+    <div class="top-view active" id="panel-unified">
       <div>
         <div class="section-header">
           <div class="header-title-group">
-            <h2>Sumi Inks</h2>
+            <h2 id="unified-card-title">Sumi Inks</h2>
           </div>
           <div class="header-right-group">
-            <div class="mode-toggle" role="group" aria-label="Ink mode">
-              <button type="button" class="active" data-ink-mode="drop" aria-pressed="true" title="Drop and pour ink directly onto the bath">Drop</button>
-              <button type="button" class="active" data-ink-mode="push" aria-pressed="true" title="Toggle Push with Drop: hold & drag to pour fluid while pushing pin, touch anywhere to relocate">Push</button>
+            <div class="mode-toggle" id="stick-submode-wrap" role="group" aria-label="Stick mode" style="display: none;">
+              <button type="button" class="active" data-stick-mode="stir" aria-pressed="true" title="Stir the bath directly with the stick">Stir</button>
+              <button type="button" data-stick-mode="pins" aria-pressed="false" title="Place pins, aim slingshots, then sweep or release">Pins</button>
             </div>
-            <label class="cycle-toggle" title="Automatically alternate ink dishes on each drop">
+            <label class="cycle-toggle" id="auto-cycle-wrap" title="Automatically alternate ink dishes on each stroke">
               <input type="checkbox" id="sumi-mode" checked> Auto
             </label>
             <span class="mini-hanko">墨</span>
           </div>
         </div>
 
-        <div class="colors">
+        <div class="colors" id="colors-row">
           <div class="swatches-list" id="swatches"></div>
           <label class="btn-add-color" id="add-to-palette" title="Add custom ink color">
             <span aria-hidden="true">+</span>
@@ -1426,73 +2036,46 @@
         </div>
       </div>
 
-      <div class="compact-sliders" id="brush-sliders">
-        <label class="craft-slider">
-          <div class="craft-slider-header">
-            <span>Drop Size</span>
-            <strong id="size-read">0.3x</strong>
+      <div class="dual-tool-grid">
+        <div class="tool-col" id="pour-col">
+          <div class="tool-col-head">
+            <span class="tool-col-title">Drop</span>
           </div>
-          <input id="size" type="range" min="0.2" max="3.0" step="0.1" value="0.3">
-        </label>
-        <label class="craft-slider" id="pour-slider-wrap">
-          <div class="craft-slider-header">
-            <span>Pour Rate</span>
-            <strong id="flow-read">1.4x</strong>
-          </div>
-          <input id="flow" type="range" min="0.1" max="5.0" step="0.1" value="1.4">
-        </label>
-      </div>
-
-      <div class="pin-controls active" id="ink-pin-controls">
-        <div class="pin-row">
-          <span class="pin-count" id="ink-pin-count">1 push pin</span>
-          <div class="pin-row-actions">
-            <div class="grid-dropdown-wrap">
-              <button class="btn-float-image btn-grid" id="ink-grid-btn" type="button" title="Place symmetric grid of push pins">Grid &blacktriangledown;</button>
-              <div class="grid-menu" id="ink-grid-menu">
-                <button type="button" data-grid-tool="ink" data-grid="1pin">1 Pin (Center)</button>
-                <button type="button" data-grid-tool="ink" data-grid="2x2">2 &times; 2 (4)</button>
-                <button type="button" data-grid-tool="ink" data-grid="3x3">3 &times; 3 (9)</button>
-                <button type="button" data-grid-tool="ink" data-grid="4x4">4 &times; 4 (16)</button>
-                <button type="button" data-grid-tool="ink" data-grid="ring6">Ring (6)</button>
-                <button type="button" data-grid-tool="ink" data-grid="ring8">Ring (8)</button>
-                <button type="button" data-grid-tool="ink" data-grid="cross">Cross (5)</button>
-              </div>
+          <label class="craft-slider">
+            <div class="craft-slider-header">
+              <span>Size</span>
+              <strong id="size-read">0.30x</strong>
             </div>
-            <button class="btn-float-image" id="ink-pin-clear" type="button" title="Clear push pins (Delete)">Clear</button>
-          </div>
+            <input id="size" type="range" min="0.2" max="2.0" step="any" value="0.3">
+          </label>
+          <label class="craft-slider" id="pour-slider-wrap">
+            <div class="craft-slider-header">
+              <span>Rate</span>
+              <strong id="flow-read">1.40x</strong>
+            </div>
+            <input id="flow" type="range" min="0.1" max="3.0" step="any" value="1.4">
+          </label>
         </div>
-      </div>
-    </div>
 
-    <!-- View 1: Bamboo Stick Parameters -->
-    <div class="top-view" id="panel-1">
-      <div class="section-header">
-        <h2>Bamboo Stick</h2>
-        <div class="header-right-group">
-          <div class="mode-toggle" role="group" aria-label="Stick mode">
-            <button type="button" class="active" data-stick-mode="stir" aria-pressed="true" title="Stir the bath directly with the stick">Stir</button>
-            <button type="button" data-stick-mode="pins" aria-pressed="false" title="Place pins, aim slingshots, then sweep or release">Pins</button>
+        <div class="tool-col" id="push-col">
+          <div class="tool-col-head">
+            <span class="tool-col-title">Push</span>
           </div>
-          <span class="mini-hanko">墨</span>
+          <label class="craft-slider">
+            <div class="craft-slider-header">
+              <span>Size</span>
+              <strong id="stick-size-read">1.00x</strong>
+            </div>
+            <input id="stick-size" type="range" min="0.2" max="4.0" step="any" value="1.0">
+          </label>
+          <label class="craft-slider">
+            <div class="craft-slider-header">
+              <span>Force</span>
+              <strong id="stick-drag-read">1.00x</strong>
+            </div>
+            <input id="stick-drag" type="range" min="0.1" max="5.0" step="any" value="1.0">
+          </label>
         </div>
-      </div>
-
-      <div class="stick-sliders-wrap">
-        <label class="craft-slider">
-          <div class="craft-slider-header">
-            <span>Tip Thickness</span>
-            <strong id="stick-size-read">1.0x</strong>
-          </div>
-          <input id="stick-size" type="range" min="0.2" max="4.0" step="0.1" value="1.0">
-        </label>
-        <label class="craft-slider">
-          <div class="craft-slider-header">
-            <span>Stir Force</span>
-            <strong id="stick-drag-read">1.0x</strong>
-          </div>
-          <input id="stick-drag" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
-        </label>
       </div>
 
       <div class="pin-controls" id="pin-controls">
@@ -1523,13 +2106,13 @@
     </div>
   </div>
 
-  <!-- 2. MIDDLE TOOL RACK HOTSPOTS -->
-  <button class="tool-hotspot active" data-tool="0" type="button" title="Suminagashi Twin Brushes (Dropper)">
-    <span class="plaque-label">Brushes</span>
+  <!-- 2. MIDDLE TOOL RACK HOTSPOTS (Studio Table Mode Switches) -->
+  <button class="tool-hotspot active" data-tool="0" type="button" aria-pressed="true" title="Toggle Drop">
+    <span class="plaque-label">Drop</span>
   </button>
 
-  <button class="tool-hotspot" data-tool="1" type="button" title="Bamboo Stylus Stick">
-    <span class="plaque-label">Stick</span>
+  <button class="tool-hotspot active" data-tool="1" type="button" aria-pressed="true" title="Toggle Push">
+    <span class="plaque-label">Push</span>
   </button>
 
   <!-- 3. BOTTOM CARD OVERLAY: Water Bath Controls -->
@@ -1601,6 +2184,12 @@
 
   <!-- Skeuomorphic Tool Cursor Hovering Over the Bath Circle -->
   <img id="tool-cursor" class="tool-cursor" src="brush.png" alt="" aria-hidden="true">
+
+  <!-- Live Circular Tool Diameter Preview Next to Active Size Slider -->
+  <div class="size-diameter-preview" id="size-diameter-preview" aria-hidden="true">
+    <div class="size-preview-wake" id="size-preview-wake"></div>
+    <div class="size-preview-core" id="size-preview-core"></div>
+  </div>
 
   <!-- Optional Corner Calibration Pins (Press 'P' to show/drag) -->
   <div class="corner-pin" data-corner="0" data-label="TL"></div>
@@ -1713,8 +2302,11 @@
   let inkH = BASE_INK;
   let domainX = 1.0;
   let domainY = 1.0;
-  // Default to opening directly in Full Screen mode on iPad
+  // Default to opening directly in Full Screen mode on iPad (and hide fullscreen buttons on iPad)
   let isFullScreenMode = isIOSDevice;
+  if (isIOSDevice) {
+    stage.classList.add("ios-device");
+  }
   if (isFullScreenMode) {
     stage.classList.add("fullscreen-mode");
   }
@@ -1758,14 +2350,28 @@
 
   let ink = hexToPack(dynamicPalette[0][1]);
   let stepCount = 0;
+  let idleSimSteps = 0;
   let isSpreading = false;
   let pouredDrop = false;
   let hasAdvectedSinceBake = false;
+  let fwdValid = true;
+  let rafId = 0;
+  let loopReady = false;
+  let last = 0;
+  let acc = 0;
+
+  function wakeLoop() {
+    if (!loopReady || rafId) return;
+    last = performance.now() - DT * 1000;
+    acc = 0;
+    rafId = requestAnimationFrame(frame);
+  }
 
   const INK_RADIUS = 0.034 * 0.72;
   const STICK_BASE_RADIUS = 0.015;
 
-  let activeTool = 0;
+  let brushOn = true;
+  let stickOn = true;
   let sumiMode = true;
   let currentSwatchIndex = 0;
 
@@ -1810,9 +2416,18 @@
 
   function tension() { return 0.35 + (diffValue * 2.15); }
   function viscosity() { return 2.4 - (diffValue * 1.9); }
-  // Reversed viscosity behavior: 0% flows freely (low damping), 100% is thick fluid (high damping)
+  function isFrozenBath() { return glideValue >= 0.995; }
+  // Smoothly tapers fluid motion to 0 as Viscosity approaches 100%, locking stationary at 100%
+  function fluidMobility() {
+    if (glideValue >= 0.995) return 0.0;
+    if (glideValue <= 0.72) return 1.0;
+    const t = (glideValue - 0.72) / (0.995 - 0.72);
+    return 1.0 - t * t * (3.0 - 2.0 * t);
+  }
   function ekmanDamping() {
-    return 0.35 + Math.pow(glideValue, 2.0) * 6.5;
+    const base = 0.35 + Math.pow(glideValue, 2.0) * 6.5;
+    if (glideValue <= 0.72) return base;
+    return base + Math.pow((glideValue - 0.72) / 0.28, 2.0) * 28.0;
   }
 
   // =========================================================
@@ -1906,11 +2521,11 @@
   }
 
   function syncToolCursorImage() {
-    const targetSrc = activeTool === 0 ? "brush.png" : "stick.png";
+    const targetSrc = brushOn ? "brush.png" : "stick.png";
     if (toolCursor.getAttribute("src") !== targetSrc) {
       toolCursor.setAttribute("src", targetSrc);
     }
-    if (activeTool === 0) {
+    if (brushOn) {
       toolCursor.style.transformOrigin = "7.2% 90.2%";
     } else {
       toolCursor.style.transformOrigin = "7.8% 92.2%";
@@ -1975,6 +2590,7 @@ uniform int uIsExport;
 uniform int uIsFullScreen;
 uniform vec2 uOldInkSize;
 uniform vec2 uResizeScale;
+uniform int uStrokeSlot;
 
 // Pin / Slingshot mode: up to MAX_PINS moving tine segments per step.
 // uPinSeg[i] = (prev.xy, cur.xy), uPinVel[i] = physical tine velocity.
@@ -2298,45 +2914,32 @@ void main() {
 
     vec2 origin = gl_FragCoord.xy / uTargetSize;
     vec2 placed = mapBilinear(uForward, origin);
-    float radial = length((placed - uCenter) * uDomain) - uRadius;
+    vec2 pa = (placed - uPrevCenter) * uDomain;
+    vec2 ba = (uCenter - uPrevCenter) * uDomain;
+    float ba2 = dot(ba, ba);
+    float hSeg = ba2 > 1e-10 ? clamp(dot(pa, ba) / ba2, 0.0, 1.0) : 1.0;
+    float radial = length(pa - ba * hSeg) - uRadius;
 
-    // Exact fast-exit: outside the drop where radial >= abs(old.a), all branches preserve old
+    // Exact fast-exit: outside the capsule where radial >= abs(old.a), all branches preserve old
     if (radial >= abs(old.a) && radial > 0.0) {
       fragColor = old;
       return;
     }
 
-    vec2 centerOrigin = bicubic(uMap, uCenter);
-    float centerD = distAt(centerOrigin);
-    vec3 centerColor = pureColorAt(centerOrigin, centerD);
-    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
+    float targetSign = texelFetch(uAuxA, ivec2(uStrokeSlot, 0), 0).r >= 0.0 ? 1.0 : -1.0;
+    bool oldSameSign = ((old.a >= 0.0) == (targetSign >= 0.0));
+    bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && oldSameSign;
 
-    // Always choose a level-set sign that keeps our own ink's sign when pouring onto
-    // same-color ink, and strictly contrasts (-sign) when pouring onto water or another ink
-    // (including when low-viscosity swirling sweeps background fluid under uCenter mid-pour).
-    float targetSign = sameColorAsCenter
-      ? (centerD >= 0.0 ? 1.0 : -1.0)
-      : (centerD >= 0.0 ? -1.0 : 1.0);
-
-    if (uIsNewDrop == 1 && !sameColorAsCenter) {
-      if (radial <= 0.0) {
-        fragColor = vec4(uInkColor, targetSign * (-radial));
-      } else {
-        float sgn = old.a >= 0.0 ? 1.0 : -1.0;
-        fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
-      }
+    if (radial <= 0.0) {
+      float dIn = (uIsNewDrop == 0 && oldSameSign)
+        ? max(abs(old.a), -radial)
+        : (oldMatchesDrop ? max(abs(old.a), -radial) : (-radial));
+      fragColor = vec4(uInkColor, targetSign * dIn);
     } else {
-      bool oldMatchesDrop = (distance(old.rgb, uInkColor) < 0.005) && ((old.a >= 0.0) == (targetSign >= 0.0));
-      if (radial <= 0.0) {
-        float dIn = oldMatchesDrop ? max(abs(old.a), -radial) : (-radial);
-        fragColor = vec4(uInkColor, targetSign * dIn);
+      if (oldSameSign) {
+        fragColor = old;
       } else {
-        if (oldMatchesDrop) {
-          fragColor = old;
-        } else {
-          float sgn = old.a >= 0.0 ? 1.0 : -1.0;
-          fragColor = vec4(old.rgb, sgn * min(abs(old.a), radial));
-        }
+        fragColor = vec4(old.rgb, (-targetSign) * min(abs(old.a), radial));
       }
     }
   }
@@ -2345,7 +2948,11 @@ void main() {
   }
   else if (uPass == 7) {
     vec2 origin = gl_FragCoord.xy / uTargetSize;
-    float d = length((origin - uCenter) * uDomain);
+    vec2 pa = (origin - uPrevCenter) * uDomain;
+    vec2 ba = (uCenter - uPrevCenter) * uDomain;
+    float ba2 = dot(ba, ba);
+    float hSeg = ba2 > 1e-10 ? clamp(dot(pa, ba) / ba2, 0.0, 1.0) : 1.0;
+    float d = length(pa - ba * hSeg);
     vec2 surf = texelFetch(uSurf, ivec2(gl_FragCoord.xy), 0).rg;
     if (d < uRadius) {
       float ker = cos(d / uRadius * 1.57079632679);
@@ -2371,6 +2978,9 @@ void main() {
     float div = (uR - uL) / (2.0 * h.x) + (vT - vB) / (2.0 * h.y);
     float factor = exp(clamp(-div * uDt, -1.2, 1.2));
     float newS = clamp(surf.r * factor, 0.0, 14.0);
+    if (newS > uSeq) {
+      newS = uSeq + (newS - uSeq) * exp(-0.35 * uDt);
+    }
     float newAge = clamp(surf.g + 0.045 * uDt, 0.0, 1.0);
     fragColor = vec4(newS, newAge, 0.0, 1.0);
   }
@@ -2603,15 +3213,13 @@ void main() {
     ivec2 lastSim = ivec2(uSimSize) - ivec2(1);
     ivec2 base = block * stride;
     float maxAct = 0.0;
-    for (int y = 0; y < 160; y += 4) {
+    for (int y = 0; y < 160; y += 2) {
       if (y >= stride.y) break;
-      for (int x = 0; x < 160; x += 4) {
+      for (int x = 0; x < 160; x += 2) {
         if (x >= stride.x) break;
         ivec2 c = clamp(base + ivec2(x, y), ivec2(0), lastSim);
         vec2 v = texelFetch(uVel, c, 0).rg;
-        float s = texelFetch(uSurf, c, 0).r;
-        float act = length(v) + max(0.0, s - uSeq) * 0.5;
-        maxAct = max(maxAct, act);
+        maxAct = max(maxAct, length(v));
       }
     }
     fragColor = vec4(maxAct, 0.0, 0.0, 1.0);
@@ -2640,6 +3248,16 @@ void main() {
     } else {
       fragColor = vec4(col, d);
     }
+  }
+  else if (uPass == 24) {
+    vec2 centerOrigin = bicubic(uMap, uCenter);
+    float centerD = distAt(centerOrigin);
+    vec3 centerColor = pureColorAt(centerOrigin, centerD);
+    bool sameColorAsCenter = (distance(centerColor, uInkColor) < 0.005) && (abs(centerD) < 0.99);
+    float sgn = sameColorAsCenter
+      ? (centerD >= 0.0 ? 1.0 : -1.0)
+      : (centerD >= 0.0 ? -1.0 : 1.0);
+    fragColor = vec4(sgn, 0.0, 0.0, 1.0);
   }
 }`;
 
@@ -2913,6 +3531,7 @@ void main() {
   const uDomainLoc = gl.getUniformLocation(program, "uDomain");
   const uOldInkSizeLoc = gl.getUniformLocation(program, "uOldInkSize");
   const uResizeScaleLoc = gl.getUniformLocation(program, "uResizeScale");
+  const uStrokeSlotLoc = gl.getUniformLocation(program, "uStrokeSlot");
 
   const uPinCountLoc = gl.getUniformLocation(program, "uPinCount");
   const uPinSegLoc = gl.getUniformLocation(program, "uPinSeg");
@@ -2965,7 +3584,7 @@ void main() {
   const PASS_MG_RESTRICT = 12, PASS_MG_PROLONG = 13, PASS_WARM_START = 14;
   const PASS_VORTICITY = 15, PASS_ADVECT_INERTIAL = 16, PASS_NS_DIV = 17;
   const PASS_NS_PROJECT = 18, PASS_COMBINE_VEL = 19, PASS_REDISTANCE = 20, PASS_ENERGY = 21;
-  const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23;
+  const PASS_LOAD_IMAGE = 22, PASS_RESIZE_INK = 23, PASS_LATCH_SIGN = 24;
 
   const boundTex = new Array(11).fill(null);
 
@@ -3057,6 +3676,7 @@ void main() {
   allocateMultigrid();
 
   const energyTarget = makeTarget(ENERGY_RES, ENERGY_RES, gl.R32F, gl.RED, gl.FLOAT);
+  const strokeSignTarget = makeTarget(32, 1, gl.R16F, gl.RED, gl.HALF_FLOAT);
   const energyPbo = gl.createBuffer();
   gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
   gl.bufferData(gl.PIXEL_PACK_BUFFER, ENERGY_RES * ENERGY_RES * 4, gl.STREAM_READ);
@@ -3109,27 +3729,29 @@ void main() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  function drawFlowStep(sdt, subSteps) {
+  function drawFlowStep(dtStep, updateFwd) {
     gl.useProgram(flowProgram);
-    gl.uniform1f(flowUDt, sdt);
+    gl.uniform1f(flowUDt, dtStep);
     gl.uniform2f(flowUTargetSize, mapW, mapH);
     gl.viewport(0, 0, mapW, mapH);
     setUnit(3, velTex.tex);
 
-    for (let s = 0; s < subSteps; s++) {
-      const dstBack = back[1 - backI];
-      setUnit(1, back[backI].tex);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, dstBack.fbo);
-      gl.uniform1i(flowUPass, PASS_BACK);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      backI = 1 - backI;
+    const dstBack = back[1 - backI];
+    setUnit(1, back[backI].tex);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dstBack.fbo);
+    gl.uniform1i(flowUPass, PASS_BACK);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    backI = 1 - backI;
 
+    if (updateFwd) {
       const dstFwd = fwd[1 - fwdI];
       setUnit(2, fwd[fwdI].tex);
       gl.bindFramebuffer(gl.FRAMEBUFFER, dstFwd.fbo);
       gl.uniform1i(flowUPass, PASS_FWD);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       fwdI = 1 - fwdI;
+    } else {
+      fwdValid = false;
     }
 
     gl.useProgram(program);
@@ -3262,7 +3884,9 @@ void main() {
     drawTo(curlTex, PASS_ZERO);
 
     isSpreading = false;
+    idleSimSteps = 0;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
 
     const remapX = oldDomX / domainX;
     const remapY = oldDomY / domainY;
@@ -3355,12 +3979,15 @@ void main() {
 
   function pollAsyncGpuActivity(isActivelyWorking) {
     if (isActivelyWorking) {
+      idleSimSteps = 0;
       if (pendingSync) {
         gl.deleteSync(pendingSync);
         pendingSync = null;
       }
       return;
     }
+
+    idleSimSteps++;
 
     if (pendingSync) {
       const status = gl.clientWaitSync(pendingSync, 0, 0);
@@ -3377,14 +4004,15 @@ void main() {
           if (energyReadBuf[i] > maxActivity) maxActivity = energyReadBuf[i];
         }
 
-        if (maxActivity <= 0.00045) {
+        if (maxActivity <= 0.00055) {
           isSpreading = false;
           drawTo(velTex, PASS_ZERO);
           drawTo(inertVelTex[0], PASS_ZERO);
           drawTo(inertVelTex[1], PASS_ZERO);
+          drawTo(phiTex, PASS_ZERO);
         }
       }
-    } else if (stepCount % 10 === 0) {
+    } else if (idleSimSteps >= 12 && idleSimSteps % 10 === 0) {
       drawTo(energyTarget, PASS_ENERGY);
       gl.bindFramebuffer(gl.FRAMEBUFFER, energyTarget.fbo);
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, energyPbo);
@@ -3446,8 +4074,7 @@ void main() {
     }
 
     ctx.putImageData(imgData, 0, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, view.width, view.height);
+    drawTo(null, PASS_DISPLAY);
 
     return tempCanvas.toDataURL(mimeType, 1.0);
   }
@@ -3468,7 +4095,9 @@ void main() {
     drawTo(curlTex, PASS_ZERO);
     stepCount = 0;
     isSpreading = false;
+    idleSimSteps = 0;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
   }
 
   function placeImageInBath(squareCanvas) {
@@ -3488,7 +4117,10 @@ void main() {
   }
 
   function gpuBake() {
-    if (!hasAdvectedSinceBake) return;
+    if (!hasAdvectedSinceBake) {
+      fwdValid = true;
+      return;
+    }
     drawTo(inkTex[1 - inkI], PASS_BAKE); inkI = 1 - inkI;
     for (let r = 0; r < 2; r++) {
       drawTo(inkTex[1 - inkI], PASS_REDISTANCE);
@@ -3497,25 +4129,69 @@ void main() {
     drawTo(back[1 - backI], PASS_IDENTITY); backI = 1 - backI;
     drawTo(fwd[1 - fwdI], PASS_IDENTITY); fwdI = 1 - fwdI;
     hasAdvectedSinceBake = false;
+    fwdValid = true;
   }
 
-  function gpuStamp(isNewDrop) {
-    if (isNewDrop && hasAdvectedSinceBake) {
+  function latchStrokeSign(slot, x, y, col) {
+    gl.uniform3f(
+      uInkColor,
+      (col & 255) / 255,
+      ((col >> 8) & 255) / 255,
+      ((col >> 16) & 255) / 255
+    );
+    gl.uniform2f(uCenter, x, y);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, strokeSignTarget.fbo);
+    gl.viewport(slot, 0, 1, 1);
+    cachedTargetW = -1;
+    cachedTargetH = -1;
+    if (cachedPass !== PASS_LATCH_SIGN) {
+      gl.uniform1i(uPass, PASS_LATCH_SIGN);
+      cachedPass = PASS_LATCH_SIGN;
+    }
+    bindInputs(strokeSignTarget.tex, null, null);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  function stampCapsule(slot, x0, y0, x1, y1, radius, col, isNewDrop) {
+    if (!fwdValid && hasAdvectedSinceBake) {
       gpuBake();
     }
+    if (isNewDrop) {
+      latchStrokeSign(slot, x0, y0, col);
+    }
+    gl.uniform1i(uStrokeSlotLoc, slot);
     gl.uniform1i(uIsNewDropLoc, isNewDrop ? 1 : 0);
     gl.uniform3f(
       uInkColor,
-      (ink & 255) / 255,
-      ((ink >> 8) & 255) / 255,
-      ((ink >> 16) & 255) / 255
+      (col & 255) / 255,
+      ((col >> 8) & 255) / 255,
+      ((col >> 16) & 255) / 255
     );
-    gl.uniform2f(uCenter, input.x, input.y);
-    gl.uniform1f(uRadius, INK_RADIUS * dropSizeMult);
-    drawTo(inkTex[1 - inkI], PASS_STAMP);
+    gl.uniform2f(uPrevCenter, x0, y0);
+    gl.uniform2f(uCenter, x1, y1);
+    gl.uniform1f(uRadius, radius);
+    drawTo(inkTex[1 - inkI], PASS_STAMP, strokeSignTarget.tex);
     inkI = 1 - inkI;
-    input.stampX = input.x;
-    input.stampY = input.y;
+  }
+
+  function splatCapsule(x0, y0, x1, y1, radius, mass) {
+    if (mass <= 1e-6) return;
+    gl.uniform1f(uMassLoc, mass);
+    gl.uniform2f(uPrevCenter, x0, y0);
+    gl.uniform2f(uCenter, x1, y1);
+    gl.uniform1f(uRadius, radius);
+    drawTo(surfTex[1 - surfI], PASS_SPLAT);
+    surfI = 1 - surfI;
+  }
+
+  let hoverPourTime = 0;
+  function gpuStamp(isNewDrop, x0 = input.xPrev, y0 = input.yPrev, x1 = input.x, y1 = input.y) {
+    if (isNewDrop && hasAdvectedSinceBake) {
+      gpuBake();
+    }
+    stampCapsule(0, x0, y0, x1, y1, INK_RADIUS * dropSizeMult, ink, isNewDrop);
+    input.stampX = x1;
+    input.stampY = y1;
   }
 
   function seedInitialBath() {
@@ -3530,17 +4206,19 @@ void main() {
       [0.52, 0.48, 1.2],
       [0.52, 0.48, 0.95]
     ];
-    const savedTool = activeTool;
-    const savedPush = pushInkActive;
+    const savedBrush = brushOn;
+    const savedStick = stickOn;
     const savedDropSize = dropSizeMult;
     const savedFlowRate = flowRateMult;
-    pushInkActive = false;
-    activeTool = 0;
+    brushOn = true;
+    stickOn = false;
     flowRateMult = 1.0;
     drops.forEach(([x, y, sz], idx) => {
       ink = hexToPack(dynamicPalette[idx % dynamicPalette.length][1]);
       input.x = x;
       input.y = y;
+      input.xPrev = x;
+      input.yPrev = y;
       dropSizeMult = sz;
       input.tap = true;
       for (let i = 0; i < 8; i++) {
@@ -3551,7 +4229,8 @@ void main() {
     flowRateMult = savedFlowRate;
     ink = hexToPack(dynamicPalette[currentSwatchIndex][1]);
 
-    activeTool = 1;
+    brushOn = false;
+    stickOn = true;
     input.down = true;
     const path = [
       [0.25, 0.30], [0.45, 0.28], [0.65, 0.45],
@@ -3570,8 +4249,8 @@ void main() {
       }
     }
     input.down = false;
-    pushInkActive = savedPush;
-    activeTool = savedTool;
+    brushOn = savedBrush;
+    stickOn = savedStick;
     drawTo(null, PASS_DISPLAY);
   }
 
@@ -3589,8 +4268,7 @@ void main() {
   const SLING_MAX_PULL = 0.25;    // max elastic stretch in bath UV
   const PIN_TAP_PX = 6;           // screen px before a press counts as a drag
 
-  let pushInkActive = true;       // false = Drop only; true = Drop + Push (latte pin push)
-  let stickMode = "stir";         // "stir" | "pins"
+  let stickMode = "stir";         // "stir" | "pins" (when Stick ONLY is active)
   let keepInkPins = false;
   let keepStickPins = false;
   const pins = [];                // { kind, x, y, color, colorHex, launch: [dx, dy] | null, state, flight, hoverTime, lastStampX, lastStampY }
@@ -3601,13 +4279,13 @@ void main() {
   let pinSegCount = 0;
   let stepsSincePourBake = 0;
 
+  function isLatteMode() { return brushOn && stickOn; }
   function activePinKind() {
-    if (activeTool === 0 && pushInkActive) return "ink";
-    if (activeTool === 1 && stickMode === "pins") return "stick";
+    if (brushOn && stickOn) return "ink";
+    if (!brushOn && stickOn && stickMode === "pins") return "stick";
     return null;
   }
   function pinsModeActive() { return activePinKind() !== null; }
-  function isLatteMode() { return activeTool === 0 && pushInkActive; }
 
   function ensureLattePins() {
     const inkPins = pins.filter(p => p.kind === "ink");
@@ -3816,34 +4494,24 @@ void main() {
     }
 
     const radius = INK_RADIUS * dropSizeMult;
-    const mass = (2.8 + 1.2 * flowRateMult);
-    gl.uniform1f(uMassLoc, mass);
-    gl.uniform1f(uRadius, radius);
+    const mobility = fluidMobility();
+    const mass = (2.2 + 1.0 * flowRateMult) * mobility;
 
-    // 1. Splat surface tension mass for all ink pins simultaneously
-    for (const pin of inkPins) {
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(surfTex[1 - surfI], PASS_SPLAT);
-      surfI = 1 - surfI;
+    // 1. Splat surface tension mass for all ink pins simultaneously (unless bath is frozen at 100% viscosity)
+    if (mass > 1e-6) {
+      for (const pin of inkPins) {
+        splatCapsule(pin.x, pin.y, pin.x, pin.y, radius, mass);
+      }
     }
 
-    // 2. Stamp ink droplets into inkTex simultaneously
-    gl.uniform1i(uIsNewDropLoc, 1);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
+    // 2. Stamp ink droplets into inkTex simultaneously with latched stroke signs
+    for (let idx = 0; idx < inkPins.length; idx++) {
+      const pin = inkPins[idx];
       const col = pin.color !== undefined ? pin.color : ink;
-      gl.uniform3f(
-        uInkColor,
-        (col & 255) / 255,
-        ((col >> 8) & 255) / 255,
-        ((col >> 16) & 255) / 255
-      );
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(inkTex[1 - inkI], PASS_STAMP);
-      inkI = 1 - inkI;
+      stampCapsule(idx, pin.x, pin.y, pin.x, pin.y, radius, col, true);
     }
 
-    isSpreading = true;
+    isSpreading = !isFrozenBath();
 
     // 3. Launch slingshot ink pins, or retire stationary pins if keep is off
     for (const pin of inkPins) {
@@ -3876,6 +4544,7 @@ void main() {
 
     drawTo(null, PASS_DISPLAY);
     updatePinUI();
+    wakeLoop();
     return inkPins.length;
   }
 
@@ -3932,33 +4601,23 @@ void main() {
     }
     stepsSincePourBake = 0;
 
-    // Initial surface contact pour
+    // Initial surface contact pour (balanced mass so touch-down blends seamlessly into continuous drag)
     const radius = INK_RADIUS * dropSizeMult;
-    const addedMass = (2.8 + 1.2 * flowRateMult);
-    gl.uniform1f(uMassLoc, addedMass);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(surfTex[1 - surfI], PASS_SPLAT);
-      surfI = 1 - surfI;
+    const mobility = fluidMobility();
+    const addedMass = (0.85 + 0.45 * flowRateMult) * mobility;
+    if (addedMass > 1e-6) {
+      for (const pin of inkPins) {
+        splatCapsule(pin.x, pin.y, pin.x, pin.y, radius, addedMass);
+      }
     }
 
-    gl.uniform1i(uIsNewDropLoc, 1);
-    gl.uniform1f(uRadius, radius);
-    for (const pin of inkPins) {
+    for (let idx = 0; idx < inkPins.length; idx++) {
+      const pin = inkPins[idx];
       const col = pin.color !== undefined ? pin.color : ink;
-      gl.uniform3f(
-        uInkColor,
-        (col & 255) / 255,
-        ((col >> 8) & 255) / 255,
-        ((col >> 16) & 255) / 255
-      );
-      gl.uniform2f(uCenter, pin.x, pin.y);
-      drawTo(inkTex[1 - inkI], PASS_STAMP);
-      inkI = 1 - inkI;
+      stampCapsule(idx, pin.x, pin.y, pin.x, pin.y, radius, col, true);
     }
 
-    isSpreading = true;
+    isSpreading = !isFrozenBath();
     pouredDrop = true;
     drawTo(null, PASS_DISPLAY);
   }
@@ -3980,6 +4639,7 @@ void main() {
       }
     }
     updatePinUI();
+    if (fired > 0) wakeLoop();
     return fired;
   }
 
@@ -4023,11 +4683,13 @@ void main() {
 
   function pushPinSeg(ax, ay, bx, by, vx, vy) {
     if (pinSegCount >= MAX_PINS) return;
+    const mobility = fluidMobility();
+    if (mobility <= 1e-6) return;
     const i = pinSegCount++;
     pinSegBuf[i * 4] = ax; pinSegBuf[i * 4 + 1] = ay;
     pinSegBuf[i * 4 + 2] = bx; pinSegBuf[i * 4 + 3] = by;
-    pinVelBuf[i * 2] = vx * domainX * stylusDragMult;
-    pinVelBuf[i * 2 + 1] = vy * domainY * stylusDragMult;
+    pinVelBuf[i * 2] = vx * domainX * stylusDragMult * mobility;
+    pinVelBuf[i * 2 + 1] = vy * domainY * stylusDragMult * mobility;
   }
 
   // Advances pin positions for one sim step and fills the moving-segment uniforms.
@@ -4166,7 +4828,7 @@ void main() {
     }
 
     for (const pin of pins) {
-      if (pin.kind === "ink" && !pushInkActive) continue;
+      if (pin.kind === "ink" && (!isLatteMode() || (!input.down && !pin.launch))) continue;
       const isCurrentKind = (pin.kind === currentKind);
       ctx.globalAlpha = isCurrentKind ? 1.0 : 0.45;
 
@@ -4307,105 +4969,103 @@ void main() {
   }
 
   function step(dt, frameDelta) {
+    const frozen = isFrozenBath();
+    const mobility = fluidMobility();
     const pointerWorking = input.down || input.tap;
-    const pinMotion = advancePins(dt, frameDelta);
+    const pinMotion = frozen ? false : advancePins(dt, frameDelta);
     const isActivelyWorking = pointerWorking || pinMotion;
+    let stampedStatic = false;
 
     if (isActivelyWorking) {
-      if (!isSpreading) {
+      if (!frozen && !isSpreading) {
         isSpreading = true;
       }
       if (input.down && isLatteMode()) {
         const inkPins = pins.filter(p => p.kind === "ink");
         if (inkPins.length > 0) {
-          stepsSincePourBake++;
-          if (stepsSincePourBake >= 40 && hasAdvectedSinceBake) {
-            gpuBake();
-            stepsSincePourBake = 0;
+          if (!frozen) {
+            stepsSincePourBake++;
+            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
+              gpuBake();
+              stepsSincePourBake = 0;
+            }
           }
 
           const dx = input.x - input.xPrev;
           const dy = input.y - input.yPrev;
           const invDt = 1 / Math.max(frameDelta, 0.004);
           const radius = INK_RADIUS * dropSizeMult;
-          const addedMass = (4.4 * dt) * flowRateMult;
+          const addedMass = (4.4 * dt) * flowRateMult * mobility;
 
-          gl.uniform1f(uMassLoc, addedMass);
-          gl.uniform1f(uRadius, radius);
-
-          for (const pin of inkPins) {
+          for (let idx = 0; idx < inkPins.length; idx++) {
+            const pin = inkPins[idx];
             const ox = pin.x, oy = pin.y;
             pin.x = clampUv(pin.x + dx);
             pin.y = clampUv(pin.y + dy);
 
-            // Forward viscous push and dipole wake in the bath
-            if (dx * dx + dy * dy > 1e-12) {
-              pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * invDt, (pin.y - oy) * invDt);
+            if (!frozen) {
+              if (dx * dx + dy * dy > 1e-12) {
+                pushPinSeg(ox, oy, pin.x, pin.y, (pin.x - ox) * invDt, (pin.y - oy) * invDt);
+              }
+              splatCapsule(ox, oy, pin.x, pin.y, radius, addedMass);
             }
 
-            // Continuous surfactant mass splat
-            gl.uniform2f(uCenter, pin.x, pin.y);
-            drawTo(surfTex[1 - surfI], PASS_SPLAT);
-            surfI = 1 - surfI;
-
-            // Continuous stamp: if moved beyond threshold or hovered for ~0.075s
-            if (pin.lastStampX === undefined) {
-              pin.lastStampX = pin.x;
-              pin.lastStampY = pin.y;
-              pin.hoverTime = 0;
-            }
-            const movedDist = Math.hypot((pin.x - pin.lastStampX) * domainX, (pin.y - pin.lastStampY) * domainY);
+            // Stamp a continuous capsule along every moved segment so strokes never bead into separate circles
+            const segDist = Math.hypot((pin.x - ox) * domainX, (pin.y - oy) * domainY);
             pin.hoverTime = (pin.hoverTime || 0) + dt;
-
-            if (movedDist > radius * 0.28 || pin.hoverTime > 0.075) {
-              gl.uniform1i(uIsNewDropLoc, 0);
-              gl.uniform1f(uRadius, radius);
+            if (segDist > 1e-5 || (!frozen && pin.hoverTime > 0.06)) {
               const col = pin.color !== undefined ? pin.color : ink;
-              gl.uniform3f(
-                uInkColor,
-                (col & 255) / 255,
-                ((col >> 8) & 255) / 255,
-                ((col >> 16) & 255) / 255
-              );
-              gl.uniform2f(uCenter, pin.x, pin.y);
-              drawTo(inkTex[1 - inkI], PASS_STAMP);
-              inkI = 1 - inkI;
-
+              stampCapsule(idx, ox, oy, pin.x, pin.y, radius, col, false);
               pin.lastStampX = pin.x;
               pin.lastStampY = pin.y;
               pin.hoverTime = 0;
+              stampedStatic = true;
             }
           }
         }
-      } else if (pointerWorking && activeTool === 0 && !pinsModeActive()) {
+      } else if (pointerWorking && brushOn && !stickOn) {
         if (!input.tap) {
-          stepsSincePourBake++;
-          if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
-            gpuBake();
-            stepsSincePourBake = 0;
+          if (!frozen) {
+            stepsSincePourBake++;
+            if (stepsSincePourBake >= 45 && hasAdvectedSinceBake) {
+              gpuBake();
+              stepsSincePourBake = 0;
+            }
           }
         } else {
           stepsSincePourBake = 0;
+          hoverPourTime = 0;
         }
 
         const radius = INK_RADIUS * dropSizeMult;
-        const addedMass = (4.4 * dt + (input.tap ? 1.35 : 0)) * flowRateMult;
-        gl.uniform1f(uMassLoc, addedMass);
-        gl.uniform2f(uCenter, input.x, input.y);
-        gl.uniform1f(uRadius, radius);
-        drawTo(surfTex[1 - surfI], PASS_SPLAT);
-        surfI = 1 - surfI;
+        const addedMass = (4.4 * dt + (input.tap ? 0.95 : 0)) * flowRateMult * mobility;
+        if (!frozen) {
+          splatCapsule(input.xPrev, input.yPrev, input.x, input.y, radius, addedMass);
+        }
 
         if (input.tap) {
-          gpuStamp(true);
+          gpuStamp(true, input.xPrev, input.yPrev, input.x, input.y);
+          stampedStatic = true;
         } else {
-          const movedDist = Math.hypot((input.x - input.stampX) * domainX, (input.y - input.stampY) * domainY);
-          if (movedDist > radius * 0.30) {
-            gpuStamp(false);
+          const segDist = Math.hypot((input.x - input.xPrev) * domainX, (input.y - input.yPrev) * domainY);
+          hoverPourTime += dt;
+          if (segDist > 1e-5 || (!frozen && hoverPourTime > 0.06)) {
+            gpuStamp(false, input.xPrev, input.yPrev, input.x, input.y);
+            hoverPourTime = 0;
+            stampedStatic = true;
           }
         }
       }
       input.tap = false;
+    }
+
+    // At 100% Viscosity, keep the bath 100% stationary like a traditional drawing canvas
+    if (frozen) {
+      isSpreading = false;
+      if (input.down && isLatteMode()) {
+        ringDirty = true;
+      }
+      return stampedStatic;
     }
 
     if (!isSpreading) return false;
@@ -4413,7 +5073,7 @@ void main() {
     const T = tension();
     const V = viscosity();
     gl.uniform1f(uSeqLoc, 0.042 / T);
-    gl.uniform1f(uRateLoc, 10.5 * T / V);
+    gl.uniform1f(uRateLoc, (10.5 * T / V) * mobility);
 
     drawTo(mgRhs[0], PASS_SURF_RHS);
     gl.uniform1f(uScaleLoc, 0.85);
@@ -4431,10 +5091,10 @@ void main() {
     gl.uniform1f(uFrameDtLoc, frameDelta);
     gl.uniform1f(uDampingLoc, ekmanDamping());
     gl.uniform1f(uViscDiffLoc, 0.15 + 0.35 * (1.0 - diffValue));
-    gl.uniform1f(uVortConfLoc, vortValue * 8.5);
+    gl.uniform1f(uVortConfLoc, vortValue * 8.5 * mobility);
 
-    gl.uniform1i(uTool, (pointerWorking && !pinsModeActive()) ? activeTool : 0);
-    gl.uniform1f(uToolDragLoc, stylusDragMult);
+    gl.uniform1i(uTool, (pointerWorking && !brushOn && stickOn && !pinsModeActive()) ? 1 : 0);
+    gl.uniform1f(uToolDragLoc, stylusDragMult * mobility);
     gl.uniform2f(uCenter, input.x, input.y);
     gl.uniform2f(uPrevCenter, input.xPrev, input.yPrev);
     gl.uniform2f(uRakeDir, input.dirX, input.dirY);
@@ -4463,14 +5123,10 @@ void main() {
 
     drawTo(velTex, PASS_COMBINE_VEL);
 
-    const sub = 3;
-    const sdt = dt / sub;
-    gl.uniform1f(uDt, sdt);
-    for (let s = 0; s < sub; s++) {
-      drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF);
-      surfI = 1 - surfI;
-    }
-    drawFlowStep(sdt, sub);
+    gl.uniform1f(uDt, dt);
+    drawTo(surfTex[1 - surfI], PASS_ADVECT_SURF);
+    surfI = 1 - surfI;
+    drawFlowStep(dt, brushOn && pointerWorking);
 
     if (pinMotion || (input.down && isLatteMode())) {
       ringDirty = true;
@@ -4491,7 +5147,7 @@ void main() {
   function hasVisiblePins() {
     if (pinGesture) return true;
     for (let i = 0; i < pins.length; i++) {
-      if (pins[i].kind !== "ink" || pushInkActive) return true;
+      if (pins[i].kind !== "ink" || (isLatteMode() && (input.down || pins[i].launch))) return true;
     }
     return false;
   }
@@ -4525,16 +5181,30 @@ void main() {
       return;
     }
 
-    ringCtx.strokeStyle = "rgba(235, 225, 210, 0.65)";
     ringCtx.lineWidth = Math.max(1.2, minDim / 480);
 
-    const radius = (activeTool === 0)
-      ? 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult
-      : STICK_BASE_RADIUS * minDim * stylusRadiusMult;
+    if (stickOn) {
+      const pushRadius = STICK_BASE_RADIUS * minDim * stylusRadiusMult;
+      ringCtx.save();
+      if (brushOn) {
+        ringCtx.setLineDash([Math.max(3, minDim / 180), Math.max(3, minDim / 180)]);
+        ringCtx.strokeStyle = "rgba(245, 232, 206, 0.52)";
+      } else {
+        ringCtx.strokeStyle = "rgba(235, 225, 210, 0.72)";
+      }
+      ringCtx.beginPath();
+      ringCtx.arc(input.x * w, input.y * h, pushRadius, 0, Math.PI * 2);
+      ringCtx.stroke();
+      ringCtx.restore();
+    }
 
-    ringCtx.beginPath();
-    ringCtx.arc(input.x * w, input.y * h, radius, 0, Math.PI * 2);
-    ringCtx.stroke();
+    if (brushOn) {
+      const dropRadius = 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult;
+      ringCtx.strokeStyle = "rgba(235, 225, 210, 0.68)";
+      ringCtx.beginPath();
+      ringCtx.arc(input.x * w, input.y * h, dropRadius, 0, Math.PI * 2);
+      ringCtx.stroke();
+    }
 
     // GPU-composited transform avoids layout invalidation on high-rate touch/Pencil move
     syncToolCursorImage();
@@ -4815,11 +5485,144 @@ void main() {
   const fullscreenBtn = document.getElementById("fullscreen-btn");
   const fsCornerExitBtn = document.getElementById("fs-corner-exit");
   const topDockCard = document.getElementById("top-dock-card");
+  const sumiRail = document.getElementById("sumi-rail");
   const bathDockCard = document.getElementById("bath-dock-card");
   const topDockTab = document.getElementById("top-dock-tab");
+  const toolsDockTab = document.getElementById("tools-dock-tab");
   const bathDockTab = document.getElementById("bath-dock-tab");
-  const topDockTabText = document.getElementById("top-dock-tab-text");
   let hadNativeFullscreen = false;
+  let openScrubEl = null;
+  let compressScrubTimer = null;
+
+  const sizePreviewEl = document.getElementById("size-diameter-preview");
+  const sizePreviewWakeEl = document.getElementById("size-preview-wake");
+  const sizePreviewCoreEl = document.getElementById("size-preview-core");
+  let sizePreviewHideTimer = null;
+  let activeSizePreviewKey = null;
+  let activeSizePreviewAnchor = null;
+
+  function bathPixelsPerDomainUnit() {
+    const [cx, cy] = stageFromWorld(0.5, 0.5);
+    const [rx, ry] = stageFromWorld(0.5 + 0.1 / domainX, 0.5);
+    const [bx, by] = stageFromWorld(0.5, 0.5 + 0.1 / domainY);
+    const pxX = Math.hypot(rx - cx, ry - cy) * 10;
+    const pxY = Math.hypot(bx - cx, by - cy) * 10;
+    return Math.max(64, 0.5 * (pxX + pxY));
+  }
+
+  function hideSizeDiameterPreview() {
+    if (sizePreviewHideTimer) {
+      clearTimeout(sizePreviewHideTimer);
+      sizePreviewHideTimer = null;
+    }
+    activeSizePreviewKey = null;
+    activeSizePreviewAnchor = null;
+    if (sizePreviewEl) sizePreviewEl.classList.remove("visible");
+  }
+
+  function scheduleHideSizePreview(delayMs = 200) {
+    if (sizePreviewHideTimer) clearTimeout(sizePreviewHideTimer);
+    sizePreviewHideTimer = setTimeout(() => {
+      hideSizeDiameterPreview();
+    }, delayMs);
+  }
+
+  function showSizeDiameterPreview(key, anchorEl) {
+    if (!sizePreviewEl || !anchorEl || (key !== "stick-size" && key !== "size")) return;
+    if (sizePreviewHideTimer) {
+      clearTimeout(sizePreviewHideTimer);
+      sizePreviewHideTimer = null;
+    }
+    activeSizePreviewKey = key;
+    activeSizePreviewAnchor = anchorEl;
+
+    const unitPx = bathPixelsPerDomainUnit();
+    let coreDiam = 24;
+    let wakeDiam = 24;
+
+    if (key === "stick-size") {
+      coreDiam = Math.max(6, 2 * STICK_BASE_RADIUS * stylusRadiusMult * unitPx);
+      wakeDiam = Math.max(12, 2 * STICK_BASE_RADIUS * 1.65 * stylusRadiusMult * unitPx);
+      if (sizePreviewWakeEl) {
+        sizePreviewWakeEl.style.display = "block";
+        sizePreviewWakeEl.style.width = `${wakeDiam.toFixed(1)}px`;
+        sizePreviewWakeEl.style.height = `${wakeDiam.toFixed(1)}px`;
+      }
+      if (sizePreviewCoreEl) {
+        sizePreviewCoreEl.style.background = "rgba(245, 226, 192, 0.14)";
+        sizePreviewCoreEl.style.width = `${coreDiam.toFixed(1)}px`;
+        sizePreviewCoreEl.style.height = `${coreDiam.toFixed(1)}px`;
+      }
+    } else {
+      coreDiam = Math.max(6, 2 * (0.034 * Math.sqrt(0.72)) * dropSizeMult * unitPx);
+      wakeDiam = coreDiam;
+      if (sizePreviewWakeEl) {
+        sizePreviewWakeEl.style.display = "none";
+      }
+      if (sizePreviewCoreEl) {
+        const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+        sizePreviewCoreEl.style.background = `${activeHex}33`;
+        sizePreviewCoreEl.style.width = `${coreDiam.toFixed(1)}px`;
+        sizePreviewCoreEl.style.height = `${coreDiam.toFixed(1)}px`;
+      }
+    }
+
+    const stageRect = stage.getBoundingClientRect();
+    let anchorRight = 160;
+    let centerY = stageRect.height * 0.5;
+
+    if (anchorEl.classList && anchorEl.classList.contains("rail-scrub") && anchorEl.parentElement) {
+      const slotRect = anchorEl.parentElement.getBoundingClientRect();
+      // Anchor smoothly to the expanded 248px slider right edge so the circle never jumps during expansion
+      anchorRight = (slotRect.left - stageRect.left) + 248;
+      centerY = (slotRect.top + slotRect.height * 0.5) - stageRect.top;
+    } else {
+      const cardRect = topDockCard ? topDockCard.getBoundingClientRect() : anchorEl.getBoundingClientRect();
+      const inputRect = anchorEl.getBoundingClientRect();
+      anchorRight = cardRect.right - stageRect.left;
+      centerY = (inputRect.top + inputRect.height * 0.5) - stageRect.top;
+    }
+
+    const outerRadius = 0.5 * wakeDiam;
+    const pad = 12;
+    const centerX = Math.min(stageRect.width - outerRadius - pad, anchorRight + 18 + outerRadius);
+    const clampedY = Math.max(outerRadius + pad, Math.min(stageRect.height - outerRadius - pad, centerY));
+
+    sizePreviewEl.style.left = `${centerX.toFixed(1)}px`;
+    sizePreviewEl.style.top = `${clampedY.toFixed(1)}px`;
+    sizePreviewEl.classList.add("visible");
+  }
+
+  function collapseAllScrubbers() {
+    if (compressScrubTimer) {
+      clearTimeout(compressScrubTimer);
+      compressScrubTimer = null;
+    }
+    document.querySelectorAll(".rail-scrub.expanded").forEach(el => el.classList.remove("expanded"));
+    if (sumiRail) sumiRail.classList.remove("has-expanded-scrub");
+    openScrubEl = null;
+    hideSizeDiameterPreview();
+  }
+
+  function expandScrubber(el) {
+    if (compressScrubTimer) {
+      clearTimeout(compressScrubTimer);
+      compressScrubTimer = null;
+    }
+    document.querySelectorAll(".rail-scrub.expanded").forEach(other => {
+      if (other !== el) other.classList.remove("expanded");
+    });
+    el.classList.add("expanded");
+    if (sumiRail) sumiRail.classList.add("has-expanded-scrub");
+    openScrubEl = el;
+  }
+
+  function scheduleCompressScrubber(delayMs = 160) {
+    if (compressScrubTimer) clearTimeout(compressScrubTimer);
+    compressScrubTimer = setTimeout(() => {
+      collapseAllScrubbers();
+    }, delayMs);
+  }
 
   if (fullscreenBtn) {
     fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
@@ -4831,17 +5634,22 @@ void main() {
   }
 
   function closeDockedDrawers() {
+    collapseAllScrubbers();
     if (topDockCard) topDockCard.classList.remove("dock-open");
+    if (sumiRail) sumiRail.classList.remove("dock-open");
     if (bathDockCard) bathDockCard.classList.remove("dock-open");
   }
 
   function setFullScreenMode(enable) {
+    if (isIOSDevice && !enable) return;
     const next = !!enable;
     if (next === isFullScreenMode) return;
     isFullScreenMode = next;
 
     stage.classList.toggle("fullscreen-mode", isFullScreenMode);
-    closeDockedDrawers();
+    if (!isFullScreenMode) {
+      closeDockedDrawers();
+    }
 
     if (fullscreenBtn) {
       fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
@@ -4909,26 +5717,36 @@ void main() {
   if (topDockTab && topDockCard) {
     topDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
-      const opening = !topDockCard.classList.contains("dock-open");
-      topDockCard.classList.toggle("dock-open", opening);
-      if (opening && bathDockCard) bathDockCard.classList.remove("dock-open");
+      collapseAllScrubbers();
+      topDockCard.classList.toggle("dock-open");
+    });
+  }
+
+  if (toolsDockTab && sumiRail) {
+    toolsDockTab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      collapseAllScrubbers();
+      sumiRail.classList.toggle("dock-open");
     });
   }
 
   if (bathDockTab && bathDockCard) {
     bathDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
-      const opening = !bathDockCard.classList.contains("dock-open");
-      bathDockCard.classList.toggle("dock-open", opening);
-      if (opening && topDockCard) topDockCard.classList.remove("dock-open");
+      collapseAllScrubbers();
+      bathDockCard.classList.toggle("dock-open");
     });
   }
 
+  document.addEventListener("pointerdown", (e) => {
+    if (openScrubEl && !openScrubEl.contains(e.target)) {
+      collapseAllScrubbers();
+    }
+  });
+
   view.addEventListener("pointerdown", (e) => {
     flushPendingColorIfAny();
-    if (isFullScreenMode) {
-      closeDockedDrawers();
-    }
+    collapseAllScrubbers();
     if (pinsModeActive() && pinGesture) { e.preventDefault(); return; } // single-pointer gestures only
     view.setPointerCapture(e.pointerId);
     const p = worldFromEvent(e);
@@ -4955,6 +5773,7 @@ void main() {
       };
     }
     drawRing();
+    wakeLoop();
     e.preventDefault();
   });
 
@@ -4963,6 +5782,7 @@ void main() {
     input.x = p[0]; input.y = p[1];
     input.inside = true;
     ringDirty = true;
+    wakeLoop();
     const g = pinGesture;
     if (g && e.pointerId === g.pointerId) {
       g.px = p[0]; g.py = p[1];
@@ -4997,7 +5817,7 @@ void main() {
       input.inside = false;
     }
     if (pouredDrop) {
-      if (sumiMode && (activeTool === 0 || isLatteMode())) cycleColor();
+      if (sumiMode && brushOn) cycleColor();
       pouredDrop = false;
     }
     if (isLatteMode()) {
@@ -5013,6 +5833,7 @@ void main() {
       view.releasePointerCapture(e.pointerId);
     }
     drawRing();
+    wakeLoop();
   }
 
   view.addEventListener("pointerup", endPointer);
@@ -5046,7 +5867,9 @@ void main() {
       }
       e.preventDefault();
     } else if ((e.key === "Delete" || e.key === "Backspace") && pinsModeActive()) {
-      clearPinsByKind(activePinKind());
+      const kind = activePinKind();
+      clearPinsByKind(kind);
+      if (kind === "ink") ensureLattePins();
       e.preventDefault();
     } else if ((e.key === "r" || e.key === "R") && document.querySelector(".corner-pin.visible")) {
       bathQuad = DEFAULT_BATH_QUAD.map(pt => [pt[0], pt[1]]);
@@ -5082,82 +5905,123 @@ void main() {
     });
   });
 
-  // Tool Hotspot Selection (Brushes vs Bamboo Stick)
-  document.querySelectorAll(".tool-hotspot").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const clickedTool = parseInt(btn.getAttribute("data-tool"), 10);
-      const wasAlreadyActive = (activeTool === clickedTool);
+  // =========================================================
+  // Drop + Push Dual-Switch & Middle Section Controls
+  // =========================================================
+  const railBrushBlock = document.getElementById("rail-brush-block");
+  const railBrushToggle = document.getElementById("rail-brush-toggle");
+  const railStickBlock = document.getElementById("rail-stick-block");
+  const railStickToggle = document.getElementById("rail-stick-toggle");
 
-      document.querySelectorAll(".tool-hotspot").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".top-view").forEach(p => p.classList.remove("active"));
-
-      btn.classList.add("active");
-      activeTool = clickedTool;
-      if (topDockTabText) {
-        topDockTabText.textContent = activeTool === 0 ? "Inks" : "Stick";
-      }
-      if (isFullScreenMode && topDockCard && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-        if (wasAlreadyActive) {
-          topDockCard.classList.toggle("dock-open");
-        } else {
-          topDockCard.classList.add("dock-open");
-        }
-        if (bathDockCard) bathDockCard.classList.remove("dock-open");
-      }
-
-      if (!pinsModeActive() && pinGesture) finishPinGesture(true);
-      if (activeTool === 0 && pushInkActive) ensureLattePins();
-      const panel = document.getElementById(`panel-${activeTool}`);
-      if (panel) panel.classList.add("active");
-
-      syncToolCursorImage();
-      updatePinUI();
-      if (input.inside) drawRing();
-    });
-  });
-
-  // Sumi Inks dual-clickable sub-mode: Drop (always base active) + Push (optional pin-push pour)
+  const pourCol = document.getElementById("pour-col");
+  const pushCol = document.getElementById("push-col");
+  const stickSubmodeWrap = document.getElementById("stick-submode-wrap");
   const inkPinControls = document.getElementById("ink-pin-controls");
-  const dropModeBtn = document.querySelector('[data-ink-mode="drop"]');
-  const pushModeBtn = document.querySelector('[data-ink-mode="push"]');
+  const pinControls = document.getElementById("pin-controls");
+  const unifiedFooterNote = document.getElementById("unified-footer-note");
 
-  function syncInkModeUI() {
-    if (dropModeBtn) {
-      dropModeBtn.classList.add("active");
-      dropModeBtn.setAttribute("aria-pressed", "true");
+  function syncToolStateUI() {
+    // 1. Drop visual state (collapses sliders underneath when OFF)
+    if (railBrushToggle) {
+      railBrushToggle.classList.toggle("active", brushOn);
+      railBrushToggle.setAttribute("aria-pressed", brushOn ? "true" : "false");
     }
-    if (pushModeBtn) {
-      pushModeBtn.classList.toggle("active", pushInkActive);
-      pushModeBtn.setAttribute("aria-pressed", pushInkActive ? "true" : "false");
+    if (railBrushBlock) railBrushBlock.classList.toggle("is-off", !brushOn);
+    if (pourCol) pourCol.classList.toggle("is-off", !brushOn);
+
+    // 2. Push visual state (collapses sliders underneath when OFF)
+    if (railStickToggle) {
+      railStickToggle.classList.toggle("active", stickOn);
+      railStickToggle.setAttribute("aria-pressed", stickOn ? "true" : "false");
     }
-    if (inkPinControls) {
-      inkPinControls.classList.toggle("active", pushInkActive);
+    if (railStickBlock) railStickBlock.classList.toggle("is-off", !stickOn);
+    if (pushCol) pushCol.classList.toggle("is-off", !stickOn);
+
+    // 3. Studio Table tool rack plaques
+    document.querySelectorAll(".tool-hotspot").forEach(btn => {
+      const idx = parseInt(btn.getAttribute("data-tool"), 10);
+      const isOn = idx === 0 ? brushOn : stickOn;
+      btn.classList.toggle("active", isOn);
+      btn.setAttribute("aria-pressed", isOn ? "true" : "false");
+    });
+
+    // 4. Studio Table contextual sub-controls (hidden in Full-Screen / iPad mode)
+    if (stickSubmodeWrap) stickSubmodeWrap.style.display = (!brushOn && stickOn) ? "" : "none";
+
+    const showInkPins = brushOn && stickOn;
+    const showStickPins = !brushOn && stickOn && stickMode === "pins";
+    if (inkPinControls) inkPinControls.classList.toggle("active", showInkPins);
+    if (pinControls) pinControls.classList.toggle("active", showStickPins);
+    if (showInkPins) ensureLattePins();
+
+    if (unifiedFooterNote) {
+      const showHint = !showInkPins && !showStickPins;
+      unifiedFooterNote.style.display = showHint ? "" : "none";
+      if (brushOn && !stickOn) {
+        unifiedFooterNote.textContent = "Touch or hold water to float concentric ink rings";
+      } else if (!brushOn && stickOn) {
+        unifiedFooterNote.textContent = "Drag water to comb and swirl ink freely";
+      }
     }
-    if (pushInkActive) {
-      ensureLattePins();
+
+    if (brushOn && stickOn) {
+      view.setAttribute("aria-label", "Suminagashi water bath. Drop + Push mode: drag to pour ink while pushing fluid.");
+    } else if (brushOn) {
+      view.setAttribute("aria-label", "Suminagashi water bath. Drop mode: touch or drag to pour ink.");
+    } else if (stickMode === "pins") {
+      view.setAttribute("aria-label", "Suminagashi water bath. Push Pins mode: tap to place pins, drag a pin back to aim it, drag water to sweep.");
+    } else {
+      view.setAttribute("aria-label", "Suminagashi water bath. Push mode: drag water to comb and swirl ink.");
     }
-    view.setAttribute("aria-label", pushInkActive
-      ? "Suminagashi water bath. Drop + Push mode: drag to pour fluid while pushing pin; touch anywhere to relocate."
-      : "Suminagashi water bath. Hold to drop and pour ink.");
+
+    syncToolCursorImage();
     updatePinUI();
     drawRing();
   }
 
-  document.querySelectorAll("[data-ink-mode]").forEach(btn => {
+  function toggleToolSwitch(which) {
+    collapseAllScrubbers();
+    if (which === "brush") {
+      brushOn = !brushOn;
+      if (!brushOn && !stickOn) stickOn = true;
+    } else {
+      stickOn = !stickOn;
+      if (!brushOn && !stickOn) brushOn = true;
+    }
+    if (pinGesture) finishPinGesture(true);
+    syncToolStateUI();
+  }
+
+  if (railBrushToggle) {
+    railBrushToggle.addEventListener("click", () => toggleToolSwitch("brush"));
+  }
+  if (railStickToggle) {
+    railStickToggle.addEventListener("click", () => toggleToolSwitch("stick"));
+  }
+  document.querySelectorAll(".tool-hotspot").forEach(btn => {
     btn.addEventListener("click", () => {
-      const mode = btn.getAttribute("data-ink-mode");
-      if (mode === "push") {
-        pushInkActive = !pushInkActive;
-      } else {
-        pushInkActive = false;
-      }
-      if (pinGesture) finishPinGesture(true);
-      syncInkModeUI();
+      const clickedTool = parseInt(btn.getAttribute("data-tool"), 10);
+      toggleToolSwitch(clickedTool === 0 ? "brush" : "stick");
     });
   });
+  if (pourCol) {
+    const head = pourCol.querySelector(".tool-col-head");
+    if (head) {
+      head.style.cursor = "pointer";
+      head.title = "Toggle Drop ON or OFF";
+      head.addEventListener("click", () => toggleToolSwitch("brush"));
+    }
+  }
+  if (pushCol) {
+    const head = pushCol.querySelector(".tool-col-head");
+    if (head) {
+      head.style.cursor = "pointer";
+      head.title = "Toggle Push ON or OFF";
+      head.addEventListener("click", () => toggleToolSwitch("stick"));
+    }
+  }
 
-  // Bamboo Stick sub-mode (Stir vs Pins) + pin controls
-  const pinControls = document.getElementById("pin-controls");
+  // Bamboo Stick sub-mode (Stir vs Pins when Stick ONLY is active)
   document.querySelectorAll("[data-stick-mode]").forEach(btn => {
     btn.addEventListener("click", () => {
       stickMode = btn.getAttribute("data-stick-mode");
@@ -5167,12 +6031,7 @@ void main() {
         b.setAttribute("aria-pressed", on ? "true" : "false");
       });
       if (pinGesture) finishPinGesture(true);
-      pinControls.classList.toggle("active", stickMode === "pins");
-      view.setAttribute("aria-label", stickMode === "pins"
-        ? "Suminagashi water bath. Tap to place pins, drag a pin back to aim it, drag the water to sweep."
-        : "Suminagashi water bath. Hold to pour ink.");
-      updatePinUI();
-      drawRing();
+      syncToolStateUI();
     });
   });
 
@@ -5216,8 +6075,14 @@ void main() {
     });
   });
 
-  // Ink Push Pin actions
-  document.getElementById("ink-pin-clear").addEventListener("click", () => { clearPinsByKind("ink"); });
+  // Ink Push Pin actions (optional if present)
+  const inkPinClearBtn = document.getElementById("ink-pin-clear");
+  if (inkPinClearBtn) {
+    inkPinClearBtn.addEventListener("click", () => {
+      clearPinsByKind("ink");
+      if (isLatteMode()) ensureLattePins();
+    });
+  }
 
   // Stick Pin actions
   document.getElementById("pin-fire").addEventListener("click", () => { fireSlingshots(); });
@@ -5299,7 +6164,9 @@ void main() {
     drawRing();
   }
 
-  document.getElementById("sumi-mode").addEventListener("change", (e) => { sumiMode = e.target.checked; });
+  document.getElementById("sumi-mode").addEventListener("change", (e) => {
+    sumiMode = e.target.checked;
+  });
 
   const waterSwatchLabel = document.getElementById("water-swatch-label");
   document.getElementById("bath-color").addEventListener("input", (e) => {
@@ -5319,6 +6186,21 @@ void main() {
   document.getElementById("glide").addEventListener("input", (e) => {
     glideValue = parseFloat(e.target.value);
     document.getElementById("glide-read").textContent = Math.round(glideValue * 100) + "%";
+    if (isFrozenBath()) {
+      isSpreading = false;
+      idleSimSteps = 0;
+      if (pendingSync) {
+        gl.deleteSync(pendingSync);
+        pendingSync = null;
+      }
+      gl.useProgram(program);
+      drawTo(velTex, PASS_ZERO);
+      drawTo(inertVelTex[0], PASS_ZERO);
+      drawTo(inertVelTex[1], PASS_ZERO);
+      drawTo(surfTex[0], PASS_ZERO);
+      drawTo(surfTex[1], PASS_ZERO);
+      drawTo(null, PASS_DISPLAY);
+    }
   });
 
   document.getElementById("vorticity").addEventListener("input", (e) => {
@@ -5326,24 +6208,198 @@ void main() {
     document.getElementById("vorticity-read").textContent = Math.round(vortValue * 100) + "%";
   });
 
-  document.getElementById("size").addEventListener("input", (e) => {
-    dropSizeMult = parseFloat(e.target.value);
-    document.getElementById("size-read").textContent = dropSizeMult.toFixed(1) + "x";
-    if (input.inside) drawRing();
-  });
-  document.getElementById("flow").addEventListener("input", (e) => {
-    flowRateMult = parseFloat(e.target.value);
-    document.getElementById("flow-read").textContent = flowRateMult.toFixed(1) + "x";
+  // =========================================================
+  // Two-Way Parameter Sync: Quick-Rail Touch Scrubbers <-> Flyout Sliders
+  // =========================================================
+  const SCRUB_CONFIG = {
+    "size": {
+      min: 0.2, max: 2.0, def: 0.3,
+      inputId: "size", readId: "size-read",
+      get: () => dropSizeMult,
+      set: (v) => { dropSizeMult = v; if (input.inside || isLatteMode()) drawRing(); }
+    },
+    "flow": {
+      min: 0.1, max: 3.0, def: 1.4,
+      inputId: "flow", readId: "flow-read",
+      get: () => flowRateMult,
+      set: (v) => { flowRateMult = v; }
+    },
+    "stick-size": {
+      min: 0.2, max: 4.0, def: 1.0,
+      inputId: "stick-size", readId: "stick-size-read",
+      get: () => stylusRadiusMult,
+      set: (v) => { stylusRadiusMult = v; if (input.inside || pinsModeActive()) drawRing(); }
+    },
+    "stick-drag": {
+      min: 0.1, max: 5.0, def: 1.0,
+      inputId: "stick-drag", readId: "stick-drag-read",
+      get: () => stylusDragMult,
+      set: (v) => { stylusDragMult = v; }
+    }
+  };
+
+  function syncScrubberUI(key) {
+    const cfg = SCRUB_CONFIG[key];
+    if (!cfg) return;
+    const val = cfg.get();
+    const pct = Math.max(0, Math.min(100, ((val - cfg.min) / (cfg.max - cfg.min)) * 100));
+    const disp = val.toFixed(2) + "x";
+    const fillEl = document.getElementById(`scrub-fill-${key}`);
+    const thumbEl = document.getElementById(`scrub-thumb-${key}`);
+    const valEl = document.getElementById(`scrub-val-${key}`);
+    const scrubEl = document.querySelector(`.rail-scrub[data-scrub="${key}"]`);
+    const inputEl = document.getElementById(cfg.inputId);
+    const readEl = document.getElementById(cfg.readId);
+    if (fillEl) fillEl.style.width = pct.toFixed(2) + "%";
+    if (thumbEl) thumbEl.style.left = `calc(${(pct / 100).toFixed(4)} * (100% - 16px) + 8px)`;
+    if (valEl) valEl.textContent = disp;
+    if (scrubEl) scrubEl.setAttribute("aria-valuenow", val.toFixed(2));
+    if (inputEl && Math.abs(parseFloat(inputEl.value) - val) > 1e-5) inputEl.value = String(val);
+    if (readEl) readEl.textContent = disp;
+  }
+
+  function syncAllScrubbersUI() {
+    Object.keys(SCRUB_CONFIG).forEach(syncScrubberUI);
+  }
+
+  function applyParamValue(key, rawVal) {
+    const cfg = SCRUB_CONFIG[key];
+    if (!cfg || Number.isNaN(rawVal)) return;
+    const clamped = Math.max(cfg.min, Math.min(cfg.max, rawVal));
+    cfg.set(clamped);
+    syncScrubberUI(key);
+  }
+
+  Object.keys(SCRUB_CONFIG).forEach(key => {
+    const cfg = SCRUB_CONFIG[key];
+    const inputEl = document.getElementById(cfg.inputId);
+    if (inputEl) {
+      inputEl.addEventListener("input", (e) => {
+        applyParamValue(key, parseFloat(e.target.value));
+        if (key === "stick-size" || key === "size") {
+          showSizeDiameterPreview(key, inputEl);
+        }
+      });
+      if (key === "stick-size" || key === "size") {
+        inputEl.addEventListener("pointerdown", () => showSizeDiameterPreview(key, inputEl));
+        inputEl.addEventListener("pointerup", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("pointercancel", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("change", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("blur", () => hideSizeDiameterPreview());
+      }
+    }
   });
 
-  document.getElementById("stick-size").addEventListener("input", (e) => {
-    stylusRadiusMult = parseFloat(e.target.value);
-    document.getElementById("stick-size-read").textContent = stylusRadiusMult.toFixed(1) + "x";
-    if (input.inside) drawRing();
-  });
-  document.getElementById("stick-drag").addEventListener("input", (e) => {
-    stylusDragMult = parseFloat(e.target.value);
-    document.getElementById("stick-drag-read").textContent = stylusDragMult.toFixed(1) + "x";
+  document.querySelectorAll(".rail-scrub").forEach(scrubEl => {
+    const key = scrubEl.getAttribute("data-scrub");
+    const cfg = SCRUB_CONFIG[key];
+    if (!cfg) return;
+    scrubEl.setAttribute("tabindex", "0");
+
+    let activePointer = null;
+    let startX = 0;
+    let startVal = cfg.def;
+    let moved = false;
+    let wasAlreadyExpanded = false;
+    let lastTapTime = 0;
+
+    function valueFromExpandedTrack(clientX) {
+      const rect = scrubEl.getBoundingClientRect();
+      const pad = 12;
+      const usable = Math.max(1, rect.width - pad * 2);
+      const t = Math.max(0, Math.min(1, (clientX - rect.left - pad) / usable));
+      return cfg.min + t * (cfg.max - cfg.min);
+    }
+
+    scrubEl.addEventListener("pointerdown", (e) => {
+      if (activePointer !== null) return;
+      activePointer = e.pointerId;
+      startX = e.clientX;
+      startVal = cfg.get();
+      moved = false;
+      wasAlreadyExpanded = scrubEl.classList.contains("expanded");
+
+      expandScrubber(scrubEl);
+      if (wasAlreadyExpanded) {
+        applyParamValue(key, valueFromExpandedTrack(e.clientX));
+      }
+      if (key === "stick-size" || key === "size") {
+        showSizeDiameterPreview(key, scrubEl);
+      } else {
+        hideSizeDiameterPreview();
+      }
+
+      scrubEl.setPointerCapture(e.pointerId);
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    scrubEl.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== activePointer) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 2) moved = true;
+
+      if (wasAlreadyExpanded) {
+        applyParamValue(key, valueFromExpandedTrack(e.clientX));
+      } else {
+        // Smooth continuous adjustment across expanded width without jumping on initial touch
+        const nextVal = startVal + (dx / 185) * (cfg.max - cfg.min);
+        applyParamValue(key, nextVal);
+      }
+      if (key === "stick-size" || key === "size") {
+        showSizeDiameterPreview(key, scrubEl);
+      }
+    });
+
+    function endScrub(e) {
+      if (e.pointerId !== activePointer) return;
+      if (scrubEl.hasPointerCapture(e.pointerId)) {
+        scrubEl.releasePointerCapture(e.pointerId);
+      }
+      activePointer = null;
+
+      if (!moved && e.type === "pointerup") {
+        const now = performance.now();
+        if (now - lastTapTime < 320) {
+          applyParamValue(key, cfg.def);
+          lastTapTime = 0;
+          scheduleCompressScrubber(160);
+          return;
+        }
+        lastTapTime = now;
+
+        // If already expanded, tapping a spot on the expanded track completes the selection and compresses back
+        if (wasAlreadyExpanded) {
+          scheduleCompressScrubber(160);
+        }
+        // If tapped from compact without dragging, remain expanded until user taps/drags a value (or taps outside)
+        return;
+      }
+
+      // Selection finished via drag -> compress back into compact pill
+      scheduleCompressScrubber(160);
+    }
+
+    scrubEl.addEventListener("pointerup", endScrub);
+    scrubEl.addEventListener("pointercancel", endScrub);
+
+    scrubEl.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+        expandScrubber(scrubEl);
+        applyParamValue(key, cfg.get() + 0.05);
+        if (key === "stick-size" || key === "size") showSizeDiameterPreview(key, scrubEl);
+        scheduleCompressScrubber(600);
+        e.preventDefault();
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+        expandScrubber(scrubEl);
+        applyParamValue(key, cfg.get() - 0.05);
+        if (key === "stick-size" || key === "size") showSizeDiameterPreview(key, scrubEl);
+        scheduleCompressScrubber(600);
+        e.preventDefault();
+      } else if (e.key === "Escape" || e.key === "Enter") {
+        collapseAllScrubbers();
+      }
+    });
   });
 
   document.getElementById("clear").addEventListener("click", reset);
@@ -5392,8 +6448,7 @@ void main() {
 
       gl.deleteTexture(exportTex);
       gl.deleteFramebuffer(exportFbo);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, view.width, view.height);
+      drawTo(null, PASS_DISPLAY);
 
       // 2. Dynamic Color Quantization (Preserves floated photo colors alongside inks)
       const waterHex = (document.getElementById("bath-color").value || "#b8b0a2").toLowerCase();
@@ -5667,11 +6722,21 @@ void main() {
     const stageObserver = new ResizeObserver(() => layout());
     stageObserver.observe(stage);
   }
-
-  let last = performance.now();
-  let acc = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && loopReady) {
+      drawTo(null, PASS_DISPLAY);
+      wakeLoop();
+    }
+  });
+  window.addEventListener("pageshow", () => {
+    if (loopReady) {
+      drawTo(null, PASS_DISPLAY);
+      wakeLoop();
+    }
+  });
 
   function frame(now) {
+    rafId = 0;
     let delta = (now - last) / 1000;
     last = now;
     if (delta > 0.05) delta = 0.05;
@@ -5731,13 +6796,19 @@ void main() {
 
     if (painted) drawTo(null, PASS_DISPLAY);
     if (ringDirty) drawRing();
-    requestAnimationFrame(frame);
+
+    const hasActivePins = !!pinGesture || !!masterStroke || pins.some(p => p.state === "flying" || p.state === "following");
+    if (isSpreading || input.down || input.tap || ringDirty || hasActivePins) {
+      rafId = requestAnimationFrame(frame);
+    }
   }
 
   layout();
   seedInitialBath();
-  syncInkModeUI();
-  requestAnimationFrame(frame);
+  syncAllScrubbersUI();
+  syncToolStateUI();
+  loopReady = true;
+  wakeLoop();
 })();
 </script>
 </body>
