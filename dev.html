@@ -1166,16 +1166,16 @@
   }
 
   /* =========================================================
-     Suminagashi Craftsman Quick-Rail (Full-Screen / iPad Left Dock)
+     Middle Drop + Push Control Card & Original Top/Bottom Flyouts (Full-Screen / iPad)
      ========================================================= */
   .studio-stage.fullscreen-mode .sumi-rail {
     position: absolute;
     left: max(10px, env(safe-area-inset-left, 10px));
     top: 50%;
     transform: translateY(-50%);
-    width: 146px;
-    padding: 10px;
-    border-radius: 10px;
+    width: 142px;
+    padding: 9px;
+    border-radius: 9px;
     background-color: #d6cbb8;
     background-image:
       radial-gradient(circle at 25% 20%, rgba(248, 242, 230, 0.78), transparent 60%),
@@ -1188,134 +1188,14 @@
       0 8px 26px rgba(0, 0, 0, 0.68);
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    z-index: 37;
-  }
-
-  .rail-mode-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 6px;
-    border-radius: 5px;
-    background: rgba(62, 46, 32, 0.12);
-    border: 1px solid rgba(75, 58, 40, 0.26);
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #423020;
-    text-align: center;
-  }
-
-  .rail-ink-header,
-  .rail-drawer-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .rail-ink-dish {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 2.5px solid var(--ceramic);
-    background: #161514;
-    padding: 0;
-    cursor: pointer;
-    flex-shrink: 0;
-    box-shadow:
-      0 2px 5px rgba(25, 18, 12, 0.5),
-      inset 0 2px 4px rgba(0, 0, 0, 0.55),
-      0 0 0 1.5px var(--accent);
-    transition: transform 0.14s ease;
-  }
-
-  .rail-ink-dish:active {
-    transform: scale(0.92);
-  }
-
-  .rail-ink-auto {
-    position: absolute;
-    right: -3px;
-    bottom: -3px;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #f5ede0;
-    border: 1px solid rgba(60, 45, 30, 0.6);
-    color: #7d2616;
-    font-family: system-ui, sans-serif;
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .rail-ink-dish:not(.auto-on) .rail-ink-auto {
-    display: none;
-  }
-
-  .rail-flyout-btn {
-    flex: 1;
-    height: 34px;
-    padding: 0 9px;
-    border-radius: 6px;
-    border: 1px solid rgba(75, 58, 40, 0.5);
-    background: rgba(242, 235, 222, 0.85);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-    color: var(--ink-text);
-    font-family: inherit;
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-  }
-
-  .rail-flyout-btn:hover {
-    background: rgba(250, 245, 235, 0.98);
-  }
-
-  .rail-flyout-btn.open {
-    background: linear-gradient(180deg, #7d2919, #571b0f);
-    color: #f7efe2;
-    border-color: #3f1108;
-  }
-
-  .rail-flyout-kanji {
-    color: #9e2a1b;
-    font-weight: 700;
-    font-size: 13.5px;
-  }
-
-  .rail-flyout-btn.open .rail-flyout-kanji {
-    color: #ffd6c2;
-  }
-
-  .rail-water-dot {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    border: 1.5px solid #e5dac8;
-    box-shadow: 0 0 0 1px rgba(45, 32, 20, 0.55), inset 0 1px 2px rgba(0, 0, 0, 0.35);
-    background: #b8b0a2;
-    flex-shrink: 0;
+    gap: 7px;
+    z-index: 34;
   }
 
   .rail-divider {
     height: 1px;
-    background: rgba(75, 58, 40, 0.24);
-    margin: 1px 0;
+    background: rgba(75, 58, 40, 0.26);
+    margin: 2px 0;
   }
 
   .rail-tool-block {
@@ -1324,7 +1204,7 @@
     gap: 6px;
   }
 
-  /* Tactile Urushi Lacquer ON/OFF Tool Switch */
+  /* Tactile Urushi Lacquer ON/OFF Switch (Drop / Push) */
   .rail-switch-btn {
     width: 100%;
     height: 34px;
@@ -1337,9 +1217,9 @@
       0 1px 0 rgba(255, 250, 240, 0.45);
     color: #4a3c2f;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -1396,15 +1276,7 @@
     color: #ffdca8;
   }
 
-  /* On-the-Fly Washi & Burnished Brass Scrub Bars */
-  .rail-scrub-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    transition: opacity 0.18s ease;
-  }
-
-  .rail-tool-block.is-off .rail-scrub-group,
+  /* Continuous Touch Sliders Underneath Drop & Push */
   .rail-tool-block.is-off .rail-scrub {
     opacity: 0.38;
     transition: opacity 0.18s ease;
@@ -1412,7 +1284,7 @@
 
   .rail-scrub {
     position: relative;
-    height: 30px;
+    height: 29px;
     border-radius: 6px;
     background: rgba(58, 44, 30, 0.16);
     border: 1px solid rgba(60, 45, 30, 0.48);
@@ -1478,60 +1350,111 @@
     color: #281e15;
   }
 
-  /* Slide-Out Parchment Flyouts Docked Cleanly Beside the Quick-Rail */
+  /* Original Left-Edge Docked Palette (Above) & Bath (Below) Flyouts */
   .studio-stage.fullscreen-mode .parchment-card {
     overflow: visible;
-    width: clamp(356px, 36cqmax, 436px);
+    width: clamp(300px, 28cqmax, 380px);
     max-height: calc(100dvh - 28px);
-    padding: 16px 18px;
+    padding: 15px 17px;
     border-radius: 9px;
     z-index: 38;
-    opacity: 0;
-    pointer-events: none;
     box-shadow:
       inset 0 0 16px rgba(68, 50, 32, 0.4),
       inset 0 1px 0 rgba(255, 250, 240, 0.55),
       0 12px 34px rgba(0, 0, 0, 0.75);
-    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .studio-stage.fullscreen-mode .top-slot {
     left: 0;
-    top: max(14px, env(safe-area-inset-top, 14px));
+    top: max(12px, env(safe-area-inset-top, 12px));
     height: auto;
     min-height: 0;
-    gap: 12px;
-    transform: translateX(calc(-100% - 24px));
+    gap: 10px;
+    transform: translateX(calc(-100% + 6px));
   }
 
   .studio-stage.fullscreen-mode .top-view.active {
-    gap: 12px;
+    height: auto;
+    gap: 10px;
+  }
+
+  /* In Full-Screen / iPad mode, Top Flyout has ONLY Palette Selection + Auto Toggle */
+  .studio-stage.fullscreen-mode .dual-tool-grid,
+  .studio-stage.fullscreen-mode .pin-controls,
+  .studio-stage.fullscreen-mode .unified-footer-note,
+  .studio-stage.fullscreen-mode #stick-submode-wrap {
+    display: none !important;
   }
 
   .studio-stage.fullscreen-mode .bath-slot {
     left: 0;
     top: auto;
-    bottom: max(14px, env(safe-area-inset-bottom, 14px));
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
     height: auto;
     min-height: 0;
     gap: 12px;
-    transform: translateX(calc(-100% - 24px));
-  }
-
-  .studio-stage.fullscreen-mode .top-slot.dock-open,
-  .studio-stage.fullscreen-mode .bath-slot.dock-open {
-    transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 158px));
-    opacity: 1;
-    pointer-events: auto;
+    transform: translateX(calc(-100% + 6px));
   }
 
   @media (hover: hover) and (pointer: fine) {
     .studio-stage.fullscreen-mode .top-slot:hover,
     .studio-stage.fullscreen-mode .bath-slot:hover {
-      transform: translateX(calc(max(10px, env(safe-area-inset-left, 10px)) + 158px));
-      opacity: 1;
-      pointer-events: auto;
+      transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
     }
+  }
+
+  .studio-stage.fullscreen-mode .top-slot.dock-open,
+  .studio-stage.fullscreen-mode .bath-slot.dock-open {
+    transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
+  }
+
+  /* Protruding Parchment Handle Tabs on Palette (Above) & Bath (Below) Flyouts */
+  .studio-stage.fullscreen-mode .dock-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: absolute;
+    left: 100%;
+    width: 34px;
+    padding: 13px 5px;
+    background-color: #d6cbb8;
+    background-image: linear-gradient(90deg, #c6b9a3, #dfd4c2);
+    border: 1px solid rgba(55, 42, 28, 0.78);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 3px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 250, 240, 0.55);
+    color: var(--ink-text);
+    font-family: inherit;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .studio-stage.fullscreen-mode .top-slot .dock-tab {
+    top: 16px;
+  }
+
+  .studio-stage.fullscreen-mode .bath-slot .dock-tab {
+    bottom: 16px;
+  }
+
+  .studio-stage.fullscreen-mode .dock-tab-kanji {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #9e2a1b;
+    line-height: 1;
+  }
+
+  .studio-stage.fullscreen-mode .dock-tab-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-text);
   }
 
   /* Right-Side Docked Print & Clear Plaques + Quick Exit Fullscreen Button */
@@ -1853,45 +1776,29 @@
 
 <div class="studio-stage" id="studio-stage">
 
-  <!-- 0. CRAFTSMAN SUMINAGASHI QUICK-RAIL (Full-Screen / iPad) -->
-  <aside class="sumi-rail" id="sumi-rail" aria-label="Suminagashi Quick Controls">
-    <div class="rail-mode-banner" id="rail-mode-banner">Pour + Push</div>
-
-    <div class="rail-ink-header">
-      <button class="rail-ink-dish auto-on" id="rail-ink-dish" type="button" title="Active ink dish — tap to cycle next dish">
-        <span class="rail-ink-auto" title="Auto-cycle ink dishes active">&#8635;</span>
-      </button>
-      <button class="rail-flyout-btn" id="rail-palette-btn" type="button" aria-expanded="false" title="Open Ink Palette &amp; Fine Settings">
-        <span class="rail-flyout-kanji">墨</span>
-        <span class="rail-flyout-label">Palette</span>
-        <span class="rail-flyout-arrow">&#9656;</span>
-      </button>
-    </div>
-
-    <div class="rail-divider"></div>
-
-    <!-- BRUSHES (POUR INK) SWITCH + LIVE SCRUBBERS -->
+  <!-- MIDDLE LEFT SECTION (Full-Screen / iPad): Drop + Push & Sliders ONLY -->
+  <aside class="sumi-rail" id="sumi-rail" aria-label="Drop and Push Controls">
     <div class="rail-tool-block" id="rail-brush-block">
-      <button class="rail-switch-btn active" id="rail-brush-toggle" type="button" aria-pressed="true" title="Toggle Brushes (Pour Ink) ON or OFF">
+      <button class="rail-switch-btn active" id="rail-brush-toggle" type="button" aria-pressed="true" title="Toggle Drop ON or OFF">
         <span class="rail-switch-left">
           <span class="rail-switch-dot"></span>
-          <span class="rail-switch-name">Brushes</span>
+          <span class="rail-switch-name">Drop</span>
         </span>
         <span class="rail-switch-pill" id="rail-brush-pill">ON</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Slide left/right to adjust Drop Size (double-tap to reset)">
+      <div class="rail-scrub" data-scrub="size" role="slider" aria-label="Drop Size" aria-valuemin="0.2" aria-valuemax="2.0" aria-valuenow="0.30" title="Slide left/right to adjust Size (double-tap to reset)">
         <div class="rail-scrub-fill" id="scrub-fill-size" style="width: 5.56%"></div>
         <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Drop</span>
+          <span class="rail-scrub-label">Size</span>
           <strong class="rail-scrub-val" id="scrub-val-size">0.30x</strong>
         </div>
       </div>
 
-      <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Pour Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Slide left/right to adjust Pour Rate (double-tap to reset)">
+      <div class="rail-scrub" data-scrub="flow" role="slider" aria-label="Drop Rate" aria-valuemin="0.1" aria-valuemax="3.0" aria-valuenow="1.40" title="Slide left/right to adjust Rate (double-tap to reset)">
         <div class="rail-scrub-fill" id="scrub-fill-flow" style="width: 44.83%"></div>
         <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Flow</span>
+          <span class="rail-scrub-label">Rate</span>
           <strong class="rail-scrub-val" id="scrub-val-flow">1.40x</strong>
         </div>
       </div>
@@ -1899,51 +1806,44 @@
 
     <div class="rail-divider"></div>
 
-    <!-- STICK (PUSH / STIR FLUID) SWITCH + LIVE SCRUBBERS -->
     <div class="rail-tool-block" id="rail-stick-block">
-      <button class="rail-switch-btn active" id="rail-stick-toggle" type="button" aria-pressed="true" title="Toggle Bamboo Stick (Push Fluid) ON or OFF">
+      <button class="rail-switch-btn active" id="rail-stick-toggle" type="button" aria-pressed="true" title="Toggle Push ON or OFF">
         <span class="rail-switch-left">
           <span class="rail-switch-dot"></span>
-          <span class="rail-switch-name">Stick</span>
+          <span class="rail-switch-name">Push</span>
         </span>
         <span class="rail-switch-pill" id="rail-stick-pill">ON</span>
       </button>
 
-      <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Stick Tip Width" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Slide left/right to adjust Tip Width (double-tap to reset)">
+      <div class="rail-scrub" data-scrub="stick-size" role="slider" aria-label="Push Size" aria-valuemin="0.2" aria-valuemax="4.0" aria-valuenow="1.00" title="Slide left/right to adjust Size (double-tap to reset)">
         <div class="rail-scrub-fill" id="scrub-fill-stick-size" style="width: 21.05%"></div>
         <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Tip</span>
+          <span class="rail-scrub-label">Size</span>
           <strong class="rail-scrub-val" id="scrub-val-stick-size">1.00x</strong>
         </div>
       </div>
 
-      <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push / Stir Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Slide left/right to adjust Push Force (double-tap to reset)">
+      <div class="rail-scrub" data-scrub="stick-drag" role="slider" aria-label="Push Force" aria-valuemin="0.1" aria-valuemax="5.0" aria-valuenow="1.00" title="Slide left/right to adjust Force (double-tap to reset)">
         <div class="rail-scrub-fill" id="scrub-fill-stick-drag" style="width: 18.37%"></div>
         <div class="rail-scrub-content">
-          <span class="rail-scrub-label">Push</span>
+          <span class="rail-scrub-label">Force</span>
           <strong class="rail-scrub-val" id="scrub-val-stick-drag">1.00x</strong>
         </div>
       </div>
     </div>
-
-    <div class="rail-divider"></div>
-
-    <!-- WATER BATH DRAWER TRIGGER -->
-    <button class="rail-flyout-btn bath-trigger" id="rail-bath-btn" type="button" aria-expanded="false" title="Open Water Bath &amp; Paper Controls">
-      <span class="rail-water-dot" id="rail-water-dot"></span>
-      <span class="rail-flyout-kanji">水</span>
-      <span class="rail-flyout-label">Bath</span>
-      <span class="rail-flyout-arrow">&#9656;</span>
-    </button>
   </aside>
 
-  <!-- 1. TOP CARD OVERLAY: Unified Sumi Palette + Brushes & Stick Parameters -->
+  <!-- 1. TOP CARD OVERLAY: Sumi Ink Palette Flyout -->
   <div class="parchment-card top-slot" id="top-dock-card">
+    <button class="dock-tab" id="top-dock-tab" type="button" title="Hover or tap for Ink Palette">
+      <span class="dock-tab-kanji">墨</span>
+      <span class="dock-tab-text" id="top-dock-tab-text">Inks</span>
+    </button>
     <div class="top-view active" id="panel-unified">
       <div>
         <div class="section-header">
           <div class="header-title-group">
-            <h2 id="unified-card-title">Pour + Push</h2>
+            <h2 id="unified-card-title">Sumi Inks</h2>
           </div>
           <div class="header-right-group">
             <div class="mode-toggle" id="stick-submode-wrap" role="group" aria-label="Stick mode" style="display: none;">
@@ -1969,19 +1869,19 @@
       <div class="dual-tool-grid">
         <div class="tool-col" id="pour-col">
           <div class="tool-col-head">
-            <span class="tool-col-title">Brushes</span>
+            <span class="tool-col-title">Drop</span>
             <span class="tool-col-badge" id="pour-col-badge">ON</span>
           </div>
           <label class="craft-slider">
             <div class="craft-slider-header">
-              <span>Drop Size</span>
+              <span>Size</span>
               <strong id="size-read">0.30x</strong>
             </div>
             <input id="size" type="range" min="0.2" max="2.0" step="any" value="0.3">
           </label>
           <label class="craft-slider" id="pour-slider-wrap">
             <div class="craft-slider-header">
-              <span>Pour Rate</span>
+              <span>Rate</span>
               <strong id="flow-read">1.40x</strong>
             </div>
             <input id="flow" type="range" min="0.1" max="3.0" step="any" value="1.4">
@@ -1990,19 +1890,19 @@
 
         <div class="tool-col" id="push-col">
           <div class="tool-col-head">
-            <span class="tool-col-title">Stick</span>
+            <span class="tool-col-title">Push</span>
             <span class="tool-col-badge" id="push-col-badge">ON</span>
           </div>
           <label class="craft-slider">
             <div class="craft-slider-header">
-              <span>Tip Width</span>
+              <span>Size</span>
               <strong id="stick-size-read">1.00x</strong>
             </div>
             <input id="stick-size" type="range" min="0.2" max="4.0" step="any" value="1.0">
           </label>
           <label class="craft-slider">
             <div class="craft-slider-header">
-              <span>Push Force</span>
+              <span>Force</span>
               <strong id="stick-drag-read">1.00x</strong>
             </div>
             <input id="stick-drag" type="range" min="0.1" max="5.0" step="any" value="1.0">
@@ -2064,24 +1964,28 @@
   </div>
 
   <!-- 2. MIDDLE TOOL RACK HOTSPOTS (Studio Table Mode ON/OFF Switches) -->
-  <button class="tool-hotspot active" data-tool="0" type="button" aria-pressed="true" title="Toggle Brushes (Pour Ink) ON or OFF">
+  <button class="tool-hotspot active" data-tool="0" type="button" aria-pressed="true" title="Toggle Drop ON or OFF">
     <span class="plaque-label">
       <span class="plaque-dot"></span>
-      <span>Brushes</span>
+      <span>Drop</span>
       <span class="plaque-state" data-plaque-state="0">ON</span>
     </span>
   </button>
 
-  <button class="tool-hotspot active" data-tool="1" type="button" aria-pressed="true" title="Toggle Stick (Push Fluid) ON or OFF">
+  <button class="tool-hotspot active" data-tool="1" type="button" aria-pressed="true" title="Toggle Push ON or OFF">
     <span class="plaque-label">
       <span class="plaque-dot"></span>
-      <span>Stick</span>
+      <span>Push</span>
       <span class="plaque-state" data-plaque-state="1">ON</span>
     </span>
   </button>
 
   <!-- 3. BOTTOM CARD OVERLAY: Water Bath Controls -->
   <div class="parchment-card bath-slot" id="bath-dock-card">
+    <button class="dock-tab" id="bath-dock-tab" type="button" title="Hover or tap for Water Bath Parameters">
+      <span class="dock-tab-kanji">水</span>
+      <span class="dock-tab-text">Bath</span>
+    </button>
     <div class="section-header">
       <div class="header-title-group">
         <h2>Water Bath</h2>
@@ -5396,8 +5300,8 @@ void main() {
   const fsCornerExitBtn = document.getElementById("fs-corner-exit");
   const topDockCard = document.getElementById("top-dock-card");
   const bathDockCard = document.getElementById("bath-dock-card");
-  const railPaletteBtn = document.getElementById("rail-palette-btn");
-  const railBathBtn = document.getElementById("rail-bath-btn");
+  const topDockTab = document.getElementById("top-dock-tab");
+  const bathDockTab = document.getElementById("bath-dock-tab");
   let hadNativeFullscreen = false;
 
   if (fullscreenBtn) {
@@ -5409,23 +5313,9 @@ void main() {
     return document.fullscreenElement || document.webkitFullscreenElement || null;
   }
 
-  function syncDockButtonStates() {
-    const topOpen = !!(topDockCard && topDockCard.classList.contains("dock-open"));
-    const bathOpen = !!(bathDockCard && bathDockCard.classList.contains("dock-open"));
-    if (railPaletteBtn) {
-      railPaletteBtn.classList.toggle("open", topOpen);
-      railPaletteBtn.setAttribute("aria-expanded", topOpen ? "true" : "false");
-    }
-    if (railBathBtn) {
-      railBathBtn.classList.toggle("open", bathOpen);
-      railBathBtn.setAttribute("aria-expanded", bathOpen ? "true" : "false");
-    }
-  }
-
   function closeDockedDrawers() {
     if (topDockCard) topDockCard.classList.remove("dock-open");
     if (bathDockCard) bathDockCard.classList.remove("dock-open");
-    syncDockButtonStates();
   }
 
   function setFullScreenMode(enable) {
@@ -5499,55 +5389,23 @@ void main() {
   document.addEventListener("fullscreenchange", handleNativeFullscreenChange);
   document.addEventListener("webkitfullscreenchange", handleNativeFullscreenChange);
 
-  if (railPaletteBtn && topDockCard) {
-    railPaletteBtn.addEventListener("click", (e) => {
+  if (topDockTab && topDockCard) {
+    topDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
       const opening = !topDockCard.classList.contains("dock-open");
       topDockCard.classList.toggle("dock-open", opening);
       if (opening && bathDockCard) bathDockCard.classList.remove("dock-open");
-      syncDockButtonStates();
     });
   }
 
-  if (railBathBtn && bathDockCard) {
-    railBathBtn.addEventListener("click", (e) => {
+  if (bathDockTab && bathDockCard) {
+    bathDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
       const opening = !bathDockCard.classList.contains("dock-open");
       bathDockCard.classList.toggle("dock-open", opening);
       if (opening && topDockCard) topDockCard.classList.remove("dock-open");
-      syncDockButtonStates();
     });
   }
-
-  // Smooth hover-open support on fine-pointer desktop in Full-Screen mode
-  let dockHoverTimer = null;
-  function bindDesktopHoverDrawer(triggerBtn, card, otherCard) {
-    if (!triggerBtn || !card) return;
-    const isFineHover = () => isFullScreenMode && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const keepOpen = () => {
-      if (!isFineHover()) return;
-      if (dockHoverTimer) { clearTimeout(dockHoverTimer); dockHoverTimer = null; }
-      card.classList.add("dock-open");
-      if (otherCard) otherCard.classList.remove("dock-open");
-      syncDockButtonStates();
-    };
-    const scheduleClose = () => {
-      if (!isFineHover()) return;
-      if (dockHoverTimer) clearTimeout(dockHoverTimer);
-      dockHoverTimer = setTimeout(() => {
-        if (!triggerBtn.matches(":hover") && !card.matches(":hover")) {
-          card.classList.remove("dock-open");
-          syncDockButtonStates();
-        }
-      }, 220);
-    };
-    triggerBtn.addEventListener("pointerenter", keepOpen);
-    triggerBtn.addEventListener("pointerleave", scheduleClose);
-    card.addEventListener("pointerenter", keepOpen);
-    card.addEventListener("pointerleave", scheduleClose);
-  }
-  bindDesktopHoverDrawer(railPaletteBtn, topDockCard, bathDockCard);
-  bindDesktopHoverDrawer(railBathBtn, bathDockCard, topDockCard);
 
   view.addEventListener("pointerdown", (e) => {
     flushPendingColorIfAny();
@@ -5710,12 +5568,8 @@ void main() {
   });
 
   // =========================================================
-  // Unified Brushes (Pour) + Stick (Push) Dual-Switch & Quick-Rail
+  // Drop + Push Dual-Switch & Middle Section Controls
   // =========================================================
-  const railModeBanner = document.getElementById("rail-mode-banner");
-  const unifiedCardTitle = document.getElementById("unified-card-title");
-  const railInkDish = document.getElementById("rail-ink-dish");
-  const railWaterDot = document.getElementById("rail-water-dot");
   const railBrushBlock = document.getElementById("rail-brush-block");
   const railBrushToggle = document.getElementById("rail-brush-toggle");
   const railBrushPill = document.getElementById("rail-brush-pill");
@@ -5727,22 +5581,13 @@ void main() {
   const pourColBadge = document.getElementById("pour-col-badge");
   const pushCol = document.getElementById("push-col");
   const pushColBadge = document.getElementById("push-col-badge");
-  const colorsRow = document.getElementById("colors-row");
-  const autoCycleWrap = document.getElementById("auto-cycle-wrap");
   const stickSubmodeWrap = document.getElementById("stick-submode-wrap");
   const inkPinControls = document.getElementById("ink-pin-controls");
   const pinControls = document.getElementById("pin-controls");
   const unifiedFooterNote = document.getElementById("unified-footer-note");
 
   function syncToolStateUI() {
-    let modeTitle = "Pour + Push";
-    if (brushOn && !stickOn) modeTitle = "Sumi Pour";
-    else if (!brushOn && stickOn) modeTitle = "Bamboo Stick";
-
-    if (railModeBanner) railModeBanner.textContent = modeTitle;
-    if (unifiedCardTitle) unifiedCardTitle.textContent = modeTitle;
-
-    // 1. Brushes (Pour Ink) visual state
+    // 1. Drop visual state
     if (railBrushToggle) {
       railBrushToggle.classList.toggle("active", brushOn);
       railBrushToggle.setAttribute("aria-pressed", brushOn ? "true" : "false");
@@ -5752,7 +5597,7 @@ void main() {
     if (pourCol) pourCol.classList.toggle("is-off", !brushOn);
     if (pourColBadge) pourColBadge.textContent = brushOn ? "ON" : "OFF";
 
-    // 2. Stick (Push / Stir Fluid) visual state
+    // 2. Push visual state
     if (railStickToggle) {
       railStickToggle.classList.toggle("active", stickOn);
       railStickToggle.setAttribute("aria-pressed", stickOn ? "true" : "false");
@@ -5772,24 +5617,9 @@ void main() {
       if (badge) badge.textContent = isOn ? "ON" : "OFF";
     });
 
-    // 4. Palette & header sub-controls
-    if (colorsRow) colorsRow.classList.toggle("is-off", !brushOn);
-    if (autoCycleWrap) autoCycleWrap.style.display = brushOn ? "" : "none";
+    // 4. Studio Table contextual sub-controls (hidden in Full-Screen / iPad mode)
     if (stickSubmodeWrap) stickSubmodeWrap.style.display = (!brushOn && stickOn) ? "" : "none";
 
-    // 5. Ceramic ink dish & water dot on Quick-Rail
-    if (railInkDish) {
-      const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
-      railInkDish.style.background = activeHex;
-      railInkDish.classList.toggle("auto-on", !!sumiMode);
-      railInkDish.style.opacity = brushOn ? "1" : "0.45";
-    }
-    if (railWaterDot) {
-      const bathInput = document.getElementById("bath-color");
-      if (bathInput) railWaterDot.style.background = bathInput.value;
-    }
-
-    // 6. Contextual footer (Push-Pour Grid vs Dry Stick Pins vs Clear Hint)
     const showInkPins = brushOn && stickOn;
     const showStickPins = !brushOn && stickOn && stickMode === "pins";
     if (inkPinControls) inkPinControls.classList.toggle("active", showInkPins);
@@ -5807,13 +5637,13 @@ void main() {
     }
 
     if (brushOn && stickOn) {
-      view.setAttribute("aria-label", "Suminagashi water bath. Pour + Push mode: drag to pour ink while pushing a fluid wake.");
+      view.setAttribute("aria-label", "Suminagashi water bath. Drop + Push mode: drag to pour ink while pushing fluid.");
     } else if (brushOn) {
-      view.setAttribute("aria-label", "Suminagashi water bath. Sumi Pour mode: touch or hold to float concentric ink rings.");
+      view.setAttribute("aria-label", "Suminagashi water bath. Drop mode: touch or drag to pour ink.");
     } else if (stickMode === "pins") {
-      view.setAttribute("aria-label", "Suminagashi water bath. Stick Pins mode: tap to place pins, drag a pin back to aim it, drag water to sweep.");
+      view.setAttribute("aria-label", "Suminagashi water bath. Push Pins mode: tap to place pins, drag a pin back to aim it, drag water to sweep.");
     } else {
-      view.setAttribute("aria-label", "Suminagashi water bath. Bamboo Stick mode: drag water to comb and swirl ink.");
+      view.setAttribute("aria-label", "Suminagashi water bath. Push mode: drag water to comb and swirl ink.");
     }
 
     syncToolCursorImage();
@@ -5849,7 +5679,7 @@ void main() {
     const head = pourCol.querySelector(".tool-col-head");
     if (head) {
       head.style.cursor = "pointer";
-      head.title = "Toggle Brushes ON or OFF";
+      head.title = "Toggle Drop ON or OFF";
       head.addEventListener("click", () => toggleToolSwitch("brush"));
     }
   }
@@ -5857,20 +5687,9 @@ void main() {
     const head = pushCol.querySelector(".tool-col-head");
     if (head) {
       head.style.cursor = "pointer";
-      head.title = "Toggle Stick ON or OFF";
+      head.title = "Toggle Push ON or OFF";
       head.addEventListener("click", () => toggleToolSwitch("stick"));
     }
-  }
-
-  if (railInkDish) {
-    railInkDish.addEventListener("click", () => {
-      if (!brushOn) {
-        brushOn = true;
-        syncToolStateUI();
-      } else {
-        cycleColor();
-      }
-    });
   }
 
   // Bamboo Stick sub-mode (Stir vs Pins when Stick ONLY is active)
@@ -6004,7 +5823,6 @@ void main() {
       node.setAttribute("aria-pressed", node === el ? "true" : "false");
     });
     const hex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
-    if (railInkDish) railInkDish.style.background = hex;
     for (const pin of pins) {
       if (pin.kind === "ink" && pin.state === "idle") {
         pin.color = packed;
@@ -6016,14 +5834,12 @@ void main() {
 
   document.getElementById("sumi-mode").addEventListener("change", (e) => {
     sumiMode = e.target.checked;
-    if (railInkDish) railInkDish.classList.toggle("auto-on", sumiMode);
   });
 
   const waterSwatchLabel = document.getElementById("water-swatch-label");
   document.getElementById("bath-color").addEventListener("input", (e) => {
     const hex = e.target.value;
     if (waterSwatchLabel) waterSwatchLabel.style.background = hex;
-    if (railWaterDot) railWaterDot.style.background = hex;
     const n = parseInt(hex.slice(1), 16);
     gl.useProgram(program);
     gl.uniform3f(uWater, ((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
