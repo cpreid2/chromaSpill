@@ -1166,16 +1166,71 @@
     transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  .studio-stage.ios-device #fullscreen-btn,
+  .studio-stage.ios-device #fs-corner-exit {
+    display: none !important;
+  }
+
+  /* Live 1:1 Circular Diameter Preview Floating Beside Size Sliders */
+  .size-diameter-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 85;
+    opacity: 0;
+    transform: scale(0.78);
+    transition: opacity 0.16s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .size-diameter-preview.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .size-preview-wake,
+  .size-preview-core {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .size-preview-wake {
+    border: 1.5px dashed rgba(246, 236, 218, 0.78);
+    background: radial-gradient(circle, rgba(246, 236, 218, 0.08) 0%, rgba(246, 236, 218, 0.02) 70%, transparent 100%);
+    box-shadow: 0 0 0 1px rgba(24, 16, 10, 0.38);
+  }
+
+  .size-preview-core {
+    border: 2px solid rgba(252, 244, 228, 0.96);
+    background: rgba(245, 226, 192, 0.14);
+    box-shadow:
+      0 0 0 1px rgba(24, 16, 10, 0.65),
+      inset 0 0 0 1px rgba(24, 16, 10, 0.32),
+      0 6px 18px rgba(0, 0, 0, 0.36);
+  }
+
+  .size-preview-core::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(252, 244, 228, 0.95);
+    box-shadow: 0 0 0 1px rgba(24, 16, 10, 0.65);
+  }
+
   .studio-stage.fullscreen-mode .sumi-rail.dock-open {
     transform: translateX(max(12px, env(safe-area-inset-left, 12px))) translateY(-50%);
     z-index: 39;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .studio-stage.fullscreen-mode .sumi-rail:hover {
-      transform: translateX(max(12px, env(safe-area-inset-left, 12px))) translateY(-50%);
-      z-index: 39;
-    }
   }
 
   .studio-stage.fullscreen-mode .sumi-rail .dock-tab {
@@ -1494,13 +1549,6 @@
     min-height: 0;
     gap: 12px;
     transform: translateX(calc(-100% + 6px));
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .studio-stage.fullscreen-mode .top-slot:hover,
-    .studio-stage.fullscreen-mode .bath-slot:hover {
-      transform: translateX(max(12px, env(safe-area-inset-left, 12px)));
-    }
   }
 
   .studio-stage.fullscreen-mode .top-slot.dock-open,
@@ -2030,27 +2078,6 @@
         </div>
       </div>
 
-      <div class="pin-controls active" id="ink-pin-controls">
-        <div class="pin-row">
-          <span class="pin-count" id="ink-pin-count">1 push pin</span>
-          <div class="pin-row-actions">
-            <div class="grid-dropdown-wrap">
-              <button class="btn-float-image btn-grid" id="ink-grid-btn" type="button" title="Place symmetric grid of push-pour pins">Grid &blacktriangledown;</button>
-              <div class="grid-menu" id="ink-grid-menu">
-                <button type="button" data-grid-tool="ink" data-grid="1pin">1 Pin (Center)</button>
-                <button type="button" data-grid-tool="ink" data-grid="2x2">2 &times; 2 (4)</button>
-                <button type="button" data-grid-tool="ink" data-grid="3x3">3 &times; 3 (9)</button>
-                <button type="button" data-grid-tool="ink" data-grid="4x4">4 &times; 4 (16)</button>
-                <button type="button" data-grid-tool="ink" data-grid="ring6">Ring (6)</button>
-                <button type="button" data-grid-tool="ink" data-grid="ring8">Ring (8)</button>
-                <button type="button" data-grid-tool="ink" data-grid="cross">Cross (5)</button>
-              </div>
-            </div>
-            <button class="btn-float-image" id="ink-pin-clear" type="button" title="Reset push pins to center (Delete)">Reset</button>
-          </div>
-        </div>
-      </div>
-
       <div class="pin-controls" id="pin-controls">
         <p class="pin-hint">Tap: pin &bull; Drag pin back: slingshot &bull; Drag water: sweep</p>
         <div class="pin-row">
@@ -2075,10 +2102,6 @@
             <button class="btn-float-image btn-fire" id="pin-fire" type="button" title="Release all slingshot pins (F)" disabled>Release</button>
           </div>
         </div>
-      </div>
-
-      <div class="unified-footer-note" id="unified-footer-note" style="display: none;">
-        Touch or hold water to float concentric ink rings
       </div>
     </div>
   </div>
@@ -2161,6 +2184,12 @@
 
   <!-- Skeuomorphic Tool Cursor Hovering Over the Bath Circle -->
   <img id="tool-cursor" class="tool-cursor" src="brush.png" alt="" aria-hidden="true">
+
+  <!-- Live Circular Tool Diameter Preview Next to Active Size Slider -->
+  <div class="size-diameter-preview" id="size-diameter-preview" aria-hidden="true">
+    <div class="size-preview-wake" id="size-preview-wake"></div>
+    <div class="size-preview-core" id="size-preview-core"></div>
+  </div>
 
   <!-- Optional Corner Calibration Pins (Press 'P' to show/drag) -->
   <div class="corner-pin" data-corner="0" data-label="TL"></div>
@@ -2273,8 +2302,11 @@
   let inkH = BASE_INK;
   let domainX = 1.0;
   let domainY = 1.0;
-  // Default to opening directly in Full Screen mode on iPad
+  // Default to opening directly in Full Screen mode on iPad (and hide fullscreen buttons on iPad)
   let isFullScreenMode = isIOSDevice;
+  if (isIOSDevice) {
+    stage.classList.add("ios-device");
+  }
   if (isFullScreenMode) {
     stage.classList.add("fullscreen-mode");
   }
@@ -4764,7 +4796,7 @@ void main() {
     }
 
     for (const pin of pins) {
-      if (pin.kind === "ink" && !isLatteMode()) continue;
+      if (pin.kind === "ink" && (!isLatteMode() || (!input.down && !pin.launch))) continue;
       const isCurrentKind = (pin.kind === currentKind);
       ctx.globalAlpha = isCurrentKind ? 1.0 : 0.45;
 
@@ -5087,7 +5119,7 @@ void main() {
   function hasVisiblePins() {
     if (pinGesture) return true;
     for (let i = 0; i < pins.length; i++) {
-      if (pins[i].kind !== "ink" || isLatteMode()) return true;
+      if (pins[i].kind !== "ink" || (isLatteMode() && (input.down || pins[i].launch))) return true;
     }
     return false;
   }
@@ -5121,16 +5153,30 @@ void main() {
       return;
     }
 
-    ringCtx.strokeStyle = "rgba(235, 225, 210, 0.65)";
     ringCtx.lineWidth = Math.max(1.2, minDim / 480);
 
-    const radius = brushOn
-      ? 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult
-      : STICK_BASE_RADIUS * minDim * stylusRadiusMult;
+    if (stickOn) {
+      const pushRadius = STICK_BASE_RADIUS * minDim * stylusRadiusMult;
+      ringCtx.save();
+      if (brushOn) {
+        ringCtx.setLineDash([Math.max(3, minDim / 180), Math.max(3, minDim / 180)]);
+        ringCtx.strokeStyle = "rgba(245, 232, 206, 0.52)";
+      } else {
+        ringCtx.strokeStyle = "rgba(235, 225, 210, 0.72)";
+      }
+      ringCtx.beginPath();
+      ringCtx.arc(input.x * w, input.y * h, pushRadius, 0, Math.PI * 2);
+      ringCtx.stroke();
+      ringCtx.restore();
+    }
 
-    ringCtx.beginPath();
-    ringCtx.arc(input.x * w, input.y * h, radius, 0, Math.PI * 2);
-    ringCtx.stroke();
+    if (brushOn) {
+      const dropRadius = 0.034 * Math.sqrt(0.72) * minDim * dropSizeMult;
+      ringCtx.strokeStyle = "rgba(235, 225, 210, 0.68)";
+      ringCtx.beginPath();
+      ringCtx.arc(input.x * w, input.y * h, dropRadius, 0, Math.PI * 2);
+      ringCtx.stroke();
+    }
 
     // GPU-composited transform avoids layout invalidation on high-rate touch/Pencil move
     syncToolCursorImage();
@@ -5420,6 +5466,105 @@ void main() {
   let openScrubEl = null;
   let compressScrubTimer = null;
 
+  const sizePreviewEl = document.getElementById("size-diameter-preview");
+  const sizePreviewWakeEl = document.getElementById("size-preview-wake");
+  const sizePreviewCoreEl = document.getElementById("size-preview-core");
+  let sizePreviewHideTimer = null;
+  let activeSizePreviewKey = null;
+  let activeSizePreviewAnchor = null;
+
+  function bathPixelsPerDomainUnit() {
+    const [cx, cy] = stageFromWorld(0.5, 0.5);
+    const [rx, ry] = stageFromWorld(0.5 + 0.1 / domainX, 0.5);
+    const [bx, by] = stageFromWorld(0.5, 0.5 + 0.1 / domainY);
+    const pxX = Math.hypot(rx - cx, ry - cy) * 10;
+    const pxY = Math.hypot(bx - cx, by - cy) * 10;
+    return Math.max(64, 0.5 * (pxX + pxY));
+  }
+
+  function hideSizeDiameterPreview() {
+    if (sizePreviewHideTimer) {
+      clearTimeout(sizePreviewHideTimer);
+      sizePreviewHideTimer = null;
+    }
+    activeSizePreviewKey = null;
+    activeSizePreviewAnchor = null;
+    if (sizePreviewEl) sizePreviewEl.classList.remove("visible");
+  }
+
+  function scheduleHideSizePreview(delayMs = 200) {
+    if (sizePreviewHideTimer) clearTimeout(sizePreviewHideTimer);
+    sizePreviewHideTimer = setTimeout(() => {
+      hideSizeDiameterPreview();
+    }, delayMs);
+  }
+
+  function showSizeDiameterPreview(key, anchorEl) {
+    if (!sizePreviewEl || !anchorEl || (key !== "stick-size" && key !== "size")) return;
+    if (sizePreviewHideTimer) {
+      clearTimeout(sizePreviewHideTimer);
+      sizePreviewHideTimer = null;
+    }
+    activeSizePreviewKey = key;
+    activeSizePreviewAnchor = anchorEl;
+
+    const unitPx = bathPixelsPerDomainUnit();
+    let coreDiam = 24;
+    let wakeDiam = 24;
+
+    if (key === "stick-size") {
+      coreDiam = Math.max(6, 2 * STICK_BASE_RADIUS * stylusRadiusMult * unitPx);
+      wakeDiam = Math.max(12, 2 * STICK_BASE_RADIUS * 1.65 * stylusRadiusMult * unitPx);
+      if (sizePreviewWakeEl) {
+        sizePreviewWakeEl.style.display = "block";
+        sizePreviewWakeEl.style.width = `${wakeDiam.toFixed(1)}px`;
+        sizePreviewWakeEl.style.height = `${wakeDiam.toFixed(1)}px`;
+      }
+      if (sizePreviewCoreEl) {
+        sizePreviewCoreEl.style.background = "rgba(245, 226, 192, 0.14)";
+        sizePreviewCoreEl.style.width = `${coreDiam.toFixed(1)}px`;
+        sizePreviewCoreEl.style.height = `${coreDiam.toFixed(1)}px`;
+      }
+    } else {
+      coreDiam = Math.max(6, 2 * (0.034 * Math.sqrt(0.72)) * dropSizeMult * unitPx);
+      wakeDiam = coreDiam;
+      if (sizePreviewWakeEl) {
+        sizePreviewWakeEl.style.display = "none";
+      }
+      if (sizePreviewCoreEl) {
+        const activeHex = dynamicPalette[currentSwatchIndex] ? dynamicPalette[currentSwatchIndex][1] : "#161514";
+        sizePreviewCoreEl.style.background = `${activeHex}33`;
+        sizePreviewCoreEl.style.width = `${coreDiam.toFixed(1)}px`;
+        sizePreviewCoreEl.style.height = `${coreDiam.toFixed(1)}px`;
+      }
+    }
+
+    const stageRect = stage.getBoundingClientRect();
+    let anchorRight = 160;
+    let centerY = stageRect.height * 0.5;
+
+    if (anchorEl.classList && anchorEl.classList.contains("rail-scrub") && anchorEl.parentElement) {
+      const slotRect = anchorEl.parentElement.getBoundingClientRect();
+      // Anchor smoothly to the expanded 248px slider right edge so the circle never jumps during expansion
+      anchorRight = (slotRect.left - stageRect.left) + 248;
+      centerY = (slotRect.top + slotRect.height * 0.5) - stageRect.top;
+    } else {
+      const cardRect = topDockCard ? topDockCard.getBoundingClientRect() : anchorEl.getBoundingClientRect();
+      const inputRect = anchorEl.getBoundingClientRect();
+      anchorRight = cardRect.right - stageRect.left;
+      centerY = (inputRect.top + inputRect.height * 0.5) - stageRect.top;
+    }
+
+    const outerRadius = 0.5 * wakeDiam;
+    const pad = 12;
+    const centerX = Math.min(stageRect.width - outerRadius - pad, anchorRight + 18 + outerRadius);
+    const clampedY = Math.max(outerRadius + pad, Math.min(stageRect.height - outerRadius - pad, centerY));
+
+    sizePreviewEl.style.left = `${centerX.toFixed(1)}px`;
+    sizePreviewEl.style.top = `${clampedY.toFixed(1)}px`;
+    sizePreviewEl.classList.add("visible");
+  }
+
   function collapseAllScrubbers() {
     if (compressScrubTimer) {
       clearTimeout(compressScrubTimer);
@@ -5428,6 +5573,7 @@ void main() {
     document.querySelectorAll(".rail-scrub.expanded").forEach(el => el.classList.remove("expanded"));
     if (sumiRail) sumiRail.classList.remove("has-expanded-scrub");
     openScrubEl = null;
+    hideSizeDiameterPreview();
   }
 
   function expandScrubber(el) {
@@ -5467,12 +5613,15 @@ void main() {
   }
 
   function setFullScreenMode(enable) {
+    if (isIOSDevice && !enable) return;
     const next = !!enable;
     if (next === isFullScreenMode) return;
     isFullScreenMode = next;
 
     stage.classList.toggle("fullscreen-mode", isFullScreenMode);
-    closeDockedDrawers();
+    if (!isFullScreenMode) {
+      closeDockedDrawers();
+    }
 
     if (fullscreenBtn) {
       fullscreenBtn.setAttribute("aria-pressed", isFullScreenMode ? "true" : "false");
@@ -5541,12 +5690,7 @@ void main() {
     topDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
       collapseAllScrubbers();
-      const opening = !topDockCard.classList.contains("dock-open");
-      topDockCard.classList.toggle("dock-open", opening);
-      if (opening) {
-        if (sumiRail) sumiRail.classList.remove("dock-open");
-        if (bathDockCard) bathDockCard.classList.remove("dock-open");
-      }
+      topDockCard.classList.toggle("dock-open");
     });
   }
 
@@ -5554,12 +5698,7 @@ void main() {
     toolsDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
       collapseAllScrubbers();
-      const opening = !sumiRail.classList.contains("dock-open");
-      sumiRail.classList.toggle("dock-open", opening);
-      if (opening) {
-        if (topDockCard) topDockCard.classList.remove("dock-open");
-        if (bathDockCard) bathDockCard.classList.remove("dock-open");
-      }
+      sumiRail.classList.toggle("dock-open");
     });
   }
 
@@ -5567,12 +5706,7 @@ void main() {
     bathDockTab.addEventListener("click", (e) => {
       e.stopPropagation();
       collapseAllScrubbers();
-      const opening = !bathDockCard.classList.contains("dock-open");
-      bathDockCard.classList.toggle("dock-open", opening);
-      if (opening) {
-        if (topDockCard) topDockCard.classList.remove("dock-open");
-        if (sumiRail) sumiRail.classList.remove("dock-open");
-      }
+      bathDockCard.classList.toggle("dock-open");
     });
   }
 
@@ -5584,9 +5718,7 @@ void main() {
 
   view.addEventListener("pointerdown", (e) => {
     flushPendingColorIfAny();
-    if (isFullScreenMode) {
-      closeDockedDrawers();
-    }
+    collapseAllScrubbers();
     if (pinsModeActive() && pinGesture) { e.preventDefault(); return; } // single-pointer gestures only
     view.setPointerCapture(e.pointerId);
     const p = worldFromEvent(e);
@@ -5912,11 +6044,14 @@ void main() {
     });
   });
 
-  // Ink Push Pin actions (reset back to 1 centered push-pour pin)
-  document.getElementById("ink-pin-clear").addEventListener("click", () => {
-    clearPinsByKind("ink");
-    if (isLatteMode()) ensureLattePins();
-  });
+  // Ink Push Pin actions (optional if present)
+  const inkPinClearBtn = document.getElementById("ink-pin-clear");
+  if (inkPinClearBtn) {
+    inkPinClearBtn.addEventListener("click", () => {
+      clearPinsByKind("ink");
+      if (isLatteMode()) ensureLattePins();
+    });
+  }
 
   // Stick Pin actions
   document.getElementById("pin-fire").addEventListener("click", () => { fireSlingshots(); });
@@ -6104,7 +6239,17 @@ void main() {
     if (inputEl) {
       inputEl.addEventListener("input", (e) => {
         applyParamValue(key, parseFloat(e.target.value));
+        if (key === "stick-size" || key === "size") {
+          showSizeDiameterPreview(key, inputEl);
+        }
       });
+      if (key === "stick-size" || key === "size") {
+        inputEl.addEventListener("pointerdown", () => showSizeDiameterPreview(key, inputEl));
+        inputEl.addEventListener("pointerup", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("pointercancel", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("change", () => scheduleHideSizePreview(220));
+        inputEl.addEventListener("blur", () => hideSizeDiameterPreview());
+      }
     }
   });
 
@@ -6141,6 +6286,11 @@ void main() {
       if (wasAlreadyExpanded) {
         applyParamValue(key, valueFromExpandedTrack(e.clientX));
       }
+      if (key === "stick-size" || key === "size") {
+        showSizeDiameterPreview(key, scrubEl);
+      } else {
+        hideSizeDiameterPreview();
+      }
 
       scrubEl.setPointerCapture(e.pointerId);
       e.stopPropagation();
@@ -6158,6 +6308,9 @@ void main() {
         // Smooth continuous adjustment across expanded width without jumping on initial touch
         const nextVal = startVal + (dx / 185) * (cfg.max - cfg.min);
         applyParamValue(key, nextVal);
+      }
+      if (key === "stick-size" || key === "size") {
+        showSizeDiameterPreview(key, scrubEl);
       }
     });
 
@@ -6197,11 +6350,13 @@ void main() {
       if (e.key === "ArrowRight" || e.key === "ArrowUp") {
         expandScrubber(scrubEl);
         applyParamValue(key, cfg.get() + 0.05);
+        if (key === "stick-size" || key === "size") showSizeDiameterPreview(key, scrubEl);
         scheduleCompressScrubber(600);
         e.preventDefault();
       } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
         expandScrubber(scrubEl);
         applyParamValue(key, cfg.get() - 0.05);
+        if (key === "stick-size" || key === "size") showSizeDiameterPreview(key, scrubEl);
         scheduleCompressScrubber(600);
         e.preventDefault();
       } else if (e.key === "Escape" || e.key === "Enter") {
